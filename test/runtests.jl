@@ -1,5 +1,6 @@
-using SyntaxHighlightREPL
+using PimpMyREPL
 using Base.Test
 
-# write your own tests here
-@test 1 == 1
+print("hoho")
+
+include(joinpath("..", "src", "Tokenize", "test", "runtests.jl"))

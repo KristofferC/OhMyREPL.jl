@@ -28,7 +28,7 @@ build_script:
 # Need to convert from shallow to complete for Pkg.clone to work
   - IF EXIST .git\shallow (git fetch --unshallow)
   - C:\projects\julia\bin\julia -e "versioninfo();
-      Pkg.clone(pwd(), \"SyntaxHighlightREPL\"); Pkg.build(\"SyntaxHighlightREPL\")"
+      Pkg.clone(pwd(), \"PimpMyREPL\"); Pkg.build(\"PimpMyREPL\")"
 
 test_script:
-  - C:\projects\julia\bin\julia -e "Pkg.test(\"SyntaxHighlightREPL\")"
+  - C:\projects\julia\bin\julia -e "Pkg.test(\"PimpMyREPL\")"
