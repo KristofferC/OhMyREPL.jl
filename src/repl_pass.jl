@@ -1,12 +1,14 @@
 using .ANSICodes
 
-import ANSICodes.ANSIToken
+import .ANSICodes.ANSIToken
 import Tokenize.Tokens.Token
 import Tokenize.Lexers
 
+using Logging
+@Logging.configure(level=DEBUG)
 
 type Pass
-	f
+	f!
 	enabled::Bool
 	update_on_cursormovement::Bool
 end
@@ -18,34 +20,61 @@ end
 
 ReplPassCollector() = ReplPassCollector(ANSIToken[], Tuple{String, Pass}[])
 
-function testpass(f, str::String, cursorpos::Int)
-	rpc = ReplPassCollector()
-	add_pass!(rpc)
-	tokens = collect(Lexers.Lexer(b))
-	apply_passes(rpc, collect())
-end
 
-function testpasses(str::String, cursorpos::Int = 1)
-	b = IOBuffer()
-	apply_passes(collect(Lexers.Lexer(b)))
-	write_results!(buff, )
+function test_pass(io::IO, f, str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false)
+	rpc = ReplPassCollector()
+	add_pass!(rpc, "TestPass", f)
+	tokens = collect(Lexers.Lexer(str))
+	apply_passes!(rpc, tokens, cursorpos, cursormovement)
+	untokenize_with_ANSI(io, rpc.ansitokens, tokens)
 end
+test_pass(f, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
+		test_pass(STDOUT, f, str, cursorpos, cursormovement)
+
+
+function test_passes(io::IO, rpc::ReplPassCollector, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false)
+	b = IOBuffer()
+	tokens = collect(Lexers.Lexer(str))
+	apply_passes!(rpc, tokens, cursorpos, cursormovement)
+	untokenize_with_ANSI(io, rpc.ansitokens, tokens)
+end
+test_passes(io::IO, str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false) =
+		test_passes(io, REPL_PASSES, str, cursorpos, cursormovement)
+test_passes(str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false) =
+		test_passes(STDOUT, REPL_PASSES, str, cursorpos, cursormovement)
+
+
+
+function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token})
+	@assert length(tokens) == length(ansitokens)
+	print("\e[0m]")
+	for (token, ansitoken) in zip(tokens, ansitokens)
+		print(io, ansitoken, token)
+		print(io, "\e[0m") # TODO Provide a user definable postfix?
+	end
+end
+untokenize_with_ANSI(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}) =
+	untokenize_with_ANSI(STDOUT, ansitokens, tokens)
+
 
 const REPL_PASSES = ReplPassCollector(ANSIToken[], Tuple{String, Pass}[])
 
-function apply_passes!(rpc::ReplPassCollector, tokens::Vector{Token}, cursormovement::Bool = false)
+function apply_passes!(rpc::ReplPassCollector, tokens::Vector{Token}, cursorpos::Int = 1, cursormovement::Bool = false)
 	resize!(rpc.ansitokens, length(tokens))
-	for i in 1:length(tokens)
+	for i in 1:length(rpc.ansitokens)
 		rpc.ansitokens[i] = ANSIToken()
 	end
+
 	for i in 1:length(rpc.passes)
 		pass = rpc.passes[i][2]
+		print(pass)
 		if pass.enabled
 			if cursormovement && !pass.update_on_cursormovement
 				continue
 			end
 			# This is an enabled pass that should be run, so run it!
-			pass.f!(rpc.ansitokens, tokens)
+			print(pass)
+			pass.f!(rpc.ansitokens, tokens, cursorpos)
 		end
 	end
 end
@@ -54,8 +83,8 @@ apply_passes!(tokens::Vector{Token}, cursormovement::Bool) =
 	apply_passes!(REPL_PASSES, tokens, cursormovement)
 
 
-function write_results!(buff::IO, ansitokens::Vector{ANSITokens}, tokens::Vector{Token})
-	for ansitoken, token in zip(ansitoken, tokens)
+function write_results!(buff::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token})
+	for (ansitoken, token) in zip(ansitoken, tokens)
 		ANSICodes.print_with_ANSI(buff, anistoken, string(tokens))
 	end
 	return buff
@@ -90,7 +119,7 @@ end
 
 function add_pass!(rpc::ReplPassCollector, name::String, f, update_on_cursormovement::Bool = true)
 	idx = _check_pass_name(name, false)
-	push!(REPL_PASSES.passes, (name, Pass(f, true, update_on_cursormovement)))
+	push!(rpc.passes, (name, Pass(f, true, update_on_cursormovement)))
 end
 add_pass!(name::String, f, update_on_cursormovement::Bool = true) =
 	add_pass!(REPL_PASSES, name, f, update_on_cursormovement)
@@ -98,7 +127,7 @@ add_pass!(name::String, f, update_on_cursormovement::Bool = true) =
 
 function enable_pass!(rpc::ReplPassCollector, name::String, enabled::Bool)
 	idx = _check_pass_name(name, true)
-	REPL_PASSES.passes[idx][2].enabled = enabled
+	rpc.passes[idx][2].enabled = enabled
 end
 enable_pass!(name::String, enabled::Bool) = enable_pass!(REPL_PASSES, name, enabled)
 

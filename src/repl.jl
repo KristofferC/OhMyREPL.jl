@@ -9,7 +9,7 @@ import Base.LineEdit: buffer
 import Base.REPL: respond, LatexCompletions, return_callback, repl_filename
 
 import ..Passes
-import ..Tokenize.Lexers
+import Tokenize.Lexers
 
 using PimpMyREPL
 

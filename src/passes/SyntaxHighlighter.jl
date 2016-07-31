@@ -1,8 +1,15 @@
 module SyntaxHighlighter
 
+using Tokenize
+using Tokenize.Tokens
+import Tokenize.Tokens: Token, kind, startpos, endpos
+
+using ...ANSICodes
+import ...ANSICodes: ANSIToken, ANSIValue, update!
+
 import ..Passes: ANSITokenSettings
 
-type SyntaxHighlighterSettings
+type ColorScheme
 	symbol::ANSIToken
 	comment::ANSIToken
 	string::ANSIToken
@@ -13,12 +20,31 @@ type SyntaxHighlighterSettings
     error::ANSIToken
 end
 
-SyntaxHighlighterSettings() = SyntaxHighlighterSettings(:magenta, :dark_gray, :light_yellow, :light_blue, :red, :default, :green)
+ColorScheme() = ColorScheme([ANSIToken() for i in 1:length(fieldnames(ColorScheme))]...)
 
+type SyntaxHighlighterSettings
+	colorscheme::ColorScheme
+end
+SyntaxHighlighterSettings() = SyntaxHighlighterSettings(ColorScheme())
 
-const JL_HIGHLIGHTER = SyntaxHighlighterSettings()
+SYNTAX_HIGHLIGHTER_SETTINGS = SyntaxHighlighterSettings()
 
-add_pass!("SyntaxHighlighter", JL_HIGHLIGHTER, false)
+function _create_monokai()
+	monokai = ColorScheme()
+	monokai.symbol = ANSIToken(:foreground, :magenta)
+	monokai.comment = ANSIToken(:foreground, :dark_gray)
+	monokai.string = ANSIToken(:foreground, :light_yellow)
+	monokai.call = ANSIToken(:foreground, :light_blue)
+	monokai.op = ANSIToken(:foreground, :red)
+	monokai.text = ANSIToken(:foreground, :default)
+	monokai.function_def = ANSIToken(:foreground, :light_blue)
+	monokai.error, :error, :default)
+end
+
+#MONOKAI = _create_monokai()
+#SYNTAX_HIGHLIGHTER_SETTINGS.colorscheme = MONOKAI
+
+# add_pass!("SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
 
 
 function colorize_code(tokens::Vector{Token}, scheme::SyntaxHighlighterSettings = COLORSCHEME)

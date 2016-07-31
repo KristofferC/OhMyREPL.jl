@@ -6,10 +6,15 @@ module PimpMyREPL
 
 using Tokenize
 
-include("ANSIData.jl")
+
+
+include("ANSICodes.jl")
 include("repl_pass.jl")
 include(joinpath("passes", "Passes.jl"))
 include("repl.jl")
+
+using .ANSICodes
+export ANSICodes
 
 #if isdefined(Base, :active_repl)
 #    Prompt.run_highlightREPL()

@@ -13,6 +13,28 @@ A user can add a repl pass with add_pass(func, :name)
 pass_enabled(:name, bool)
 
 
+#
+
+The way colourized text is written to the Terminal is by first writing something called an ANSI Code followed by the text tto be shown. An ansi code is first initializedPrinting `"\e[33mHello" will
+
+In `PimpMyREPL` this is abstracted away by a type called `ANSIToken` in the `ANSICode` module.
+
+Àn `ANSIToken` is created from the where all the arguments are optional keyword arguments.
+
+`ANSIToken(;background::Symbol, foreground::Symbol, bold::Bool, italics::Bold, strikethrough::Bool)`
+
+Showing an `ANSIToken` will prints it
+
+Printing italic red text with a green background can then be done as:
+
+`print(ANSIToken(foreground = :red, italics = true, background = :green), "red and italic text")`
+
+
+
+To test what colors and are available to your terminal you can run the `ANSICode.test_ANSI()` which will print some text with different colors and modifiers.
+
+
+
 
 
 # Tokenize

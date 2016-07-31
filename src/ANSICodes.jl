@@ -1,4 +1,5 @@
-module ANSIData
+module ANSICodes
+
 
 const FOREGROUNDS = Dict(
 	:default => 39,
@@ -41,70 +42,169 @@ const BACKGROUNDS = Dict(
 )
 
 # [On, Off]
-const bold = 1
-const italics = 3
-const underline = 4
-const strikethrough = 9
 
-type ANSIToken
-	foreground::Int
-	background::Int
-	bold::Bool
-	underline::Bool
-	strikethrough::Bool
-	italics::Bool
+const BOLD = (1, 22)
+const ITALICS = (3, 23)
+const UNDERLINE = (4, 24)
+const STRIKETHROUGH = (9, 29)
+
+abstract AbstractANSI
+
+
+immutable ANSIValue
+	val::Int
+	active::Bool
+end
+ANSIValue(val::Int) = ANSIValue(val, true)
+
+
+val(x::ANSIValue) = x.val
+activate(x::ANSIValue, v::Bool = true) = ANSIValue(x.val, v)
+isactive(x::ANSIValue) = x.active
+set(x::ANSIValue, val::Int) = ANSIValue(val, x.active)
+
+
+ANSIValue(layer, val) = ANSIValue(ANSIValue(), layer, val)
+function ANSIValue(layer::Symbol, val::Symbol)
+	if layer == :foreground
+		return ANSIValue(FOREGROUNDS[val])
+	elseif layer == :background
+		return ANSIValue(BACKGROUNDS[val])
+	else
+		throw(ArgumentError("invalid layer $layer, valid layers are :background and :foregound"))
+	end
 end
 
-function Base.string(t::ANSIToken)
-	b = IOBuffer()
-	write(b, '\\')
-	show(b, t)
-	return takebuf_string(b)
+function ANSIValue(style::Symbol, val::Bool)
+	if style == :bold
+		return ANSIValue(BOLD[!val + 1])
+	elseif style == :italics
+		return ANSIValue(ITALICS[!val + 1])
+	elseif style == :underline
+		return ANSIValue(UNDERLINE[!val + 1])
+	elseif style == :strikethrough
+		return ANSIValue(STRIKETHROUGH[!val + 1])
+	else
+		throw(ArgumentError("invalid style $style, valid styles are :bold, :italics, strikethrough, :underline"))
+	end
+end
+
+# make immutable?
+type ANSIToken
+	foreground::ANSIValue
+	background::ANSIValue
+	bold::ANSIValue
+	italics::ANSIValue
+	underline::ANSIValue
+	strikethrough::ANSIValue
+end
+
+function update!(a::ANSIToken, b::ANSIToken)
+	isactive(b.foreground) && (a.foreground = b.foreground)
+	isactive(b.background) && (a.background = b.background)
+	isactive(b.bold) && (a.bold = b.bold)
+	isactive(b.italics) && (a.italics = b.italics)
+	isactive(b.underline) && (a.underline = b.underline)
+	isactive(b.strikethrough) && (a.strikethrough = b.strikethrough)
+end
+
+# Some defaults, everything deactive
+function _ANSIToken()
+	ANSIToken(ANSIValue(39, false),
+			  ANSIValue(49, false),
+			  ANSIValue(1, false),
+			  ANSIValue(3, false),
+			  ANSIValue(4, false),
+			  ANSIValue(9, false))
+end
+
+
+function ANSIToken(;foreground::Symbol = :nothing, background::Symbol = :nothing,
+	                bold = :nothing, italics = :nothing, underline = :nothing, strikethrough = :nothing)
+	x = _ANSIToken()
+	foreground != :nothing && (x.foreground = ANSIValue(FOREGROUNDS[foreground]))
+	background != :nothing && (x.background = ANSIValue(BACKGROUNDS[background]))
+	bold != :nothing && (x.bold = ANSIValue(BOLD[!bold + 1]))
+	italics != :nothing && (x.italics = ANSIValue(ITALICS[!italics + 1]))
+	underline != :nothing && (x.underline = ANSIValue(UNDERLINE[!underline + 1]))
+	strikethrough != :nothing && (x.strikethrough = ANSIValue(STRIKETHROUGH[!strikethrough + 1]))
+	return x
+end
+
+#=
+function ANSIToken(;foreground::ANSIValue = ANSIValue(39, false), background::ANSIValue = ANSIValue(49, false),
+	                bold::ANSIValue = ANSIValue(1, false), underline::ANSIValue = ANSIValue(3, false),
+	                strikethrough::ANSIValue = ANSIValue(4, false), italics::ANSIValue = ANSIValue(9, false))
+	return ANSIToken(foreground, background,
+		             bold, underline, strikethrough, italics)
+end
+=#
+
+
+function _print(io, t::ANSIToken, escape = false)
+	one_active = false
+	if isactive(t.foreground) || isactive(t.background) ||
+	   	    isactive(t.bold) || isactive(t.italics)  ||
+	   	    isactive(t.underline) || isactive(t.strikethrough)
+		one_active = true
+		escape ? print(io, "\\e[") : print(io, "\e[")
+	end
+	isactive(t.foreground) && print(io, val(t.foreground))
+	isactive(t.background) && print(io, val(t.background))
+	isactive(t.bold) && print(io, val(t.bold))
+	isactive(t.italics) && print(io, val(t.italics))
+	isactive(t.underline) && print(io, val(t.underline))
+	isactive(t.strikethrough) && print(io, val(t.strikethrough))
+	if one_active; print(io, "m"); end
+	return nothing
+end
+
+function Base.print(io::IO, t::ANSIToken)
+	_print(io, t, false)
 end
 
 function Base.show(io::IO, t::ANSIToken)
-	print(io, "\e[")
-	t.bold && print(io, bold, ";")
-	t.underline && print(io, underline, ";")
-	t.strikethrough && print(io, strikethrough, ";")
-	t.italics && print(io, italics, ";")
-	print(io, t.foreground, ";", t.background, "m"
+	_print(io, t, false)
+	_print(io, t, true)
+	print(io, "\e[0m", Base.input_color())
 end
 
-function ANSIToken(;foreground::Symbol = :default, background::Symbol = :default,
-	                bold::Bool = false, underline::Bool = false, strikethrough::Bool = false,
-	                italics::Bool = false)
-	return ANSIToken(FOREGROUNDS[foreground], BACKGROUNDS[background],
-		             bold, underline, strikethrough, italics)
-end
-
-const DEFAULT_TOKEN = ANSIToken()
-
-
-
-function print_with_ANSI(io::IO, t::ANSIToken, str::String)
-	, str, "\e[0m")
-end
-
-print_with_ANSI(t::ANSIToken, str::String) = print_with_ANSI(STDOUT, t, str)
 
 function test_ANSI(io::IO = STDOUT)
 	for col in keys(FOREGROUNDS)
-		print_with_ANSI(io, ANSIToken(foreground = col), "Foreground color: $col")
-		println()
+		tok = ANSIToken(foreground = col)
+		print(io, tok, "Foreground color: $col, ANSI code: ")
+		show(io, tok)
+		println(io, "\e[0m")
 	end
 	for col in keys(BACKGROUNDS)
-		print_with_ANSI(io, ANSIToken(background = col), "Background color: $col")
-		println()
+		tok = ANSIToken(background = col)
+		print(io, tok, "Background color: $col, ANSI code: ")
+		show(io, tok)
+		println(io, "\e[0m")
 	end
-	print_with_ANSI(io, ANSIToken(bold = true), "Bold text")
-	println()
-	print_with_ANSI(io, ANSIToken(underline = true), "Underlined text")
-	println()
-	print_with_ANSI(io, ANSIToken(strikethrough = true), "Strikethrough text")
-	println()
-	print_with_ANSI(io, ANSIToken(italics = true), "Italic text")
-	println()
+	tok = ANSIToken(bold = true)
+	print(io, tok, "Bold text, ANSI code: ")
+	_print(io, tok, true)
+	println(io, "\e[0m")
+
+	tok = ANSIToken(underline = true)
+	print(io, tok, "Underlined text, ANSI code: ")
+	_print(io, tok, true)
+	println(io, "\e[0m")
+
+	tok = ANSIToken(italics = true)
+	print(io, tok, "Italic text, ANSI code: ")
+	_print(io, tok, true)
+	println(io, "\e[0m", Base.input_color())
+
+
+	tok = ANSIToken(strikethrough = true)
+	print(io, tok, "Strikethrough text, ANSI code: ")
+	_print(io, tok, true)
+	println(io, "\e[0m")
 end
+
+test_ANSI()
 
 end # module

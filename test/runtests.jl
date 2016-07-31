@@ -1,6 +1,3 @@
-using PimpMyREPL
-using Base.Test
-
-print("hoho")
-
-include(joinpath("..", "src", "Tokenize", "test", "runtests.jl"))
+include("test_ANSI.jl")
+#include("test_custompass.jl")
+include("test_bracketmatch.jl")
