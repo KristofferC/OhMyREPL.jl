@@ -11,7 +11,9 @@ import Base.REPL: respond, LatexCompletions, return_callback, repl_filename
 import ..Passes
 import Tokenize.Lexers
 
+
 using PimpMyREPL
+import PimpMyREPL: untokenize_with_ANSI, apply_passes!
 
 function create_highlightREPL(; prompt = "fulia> ", name = :wat, repl = Base.active_repl,
     main_mode = repl.interface.modes[1])
@@ -76,15 +78,16 @@ function run_highlightREPL(; prompt = "fulia> ", name = :wat, key = '>')
 
     q = function (s, data, c)
             LineEdit.edit_insert(s, c)
-            b = LineEdit.buffer(s)
-            t = LineEdit.terminal(s)
-            l = collect(Lexers.Lexer(b))
-            new_str = Passes.colorize_code(l)
-            Base.Terminals.clear_line(t)
-            LineEdit.write_prompt(t, main_mode)
-            write(LineEdit.terminal(s), new_str)
+            tokens = collect(Lexers.Lexer(LineEdit.buffer(s)))
+            b = IOBuffer()
+            apply_passes!(tokens)
+            Base.Terminals.clear_line(LineEdit.terminal(s))
+            #LineEdit.write_prompt(t, main_mode)
+            untokenize_with_ANSI(b, tokens)
+            write(LineEdit.terminal(s), takebuf_string(b))
         end
 
+    println("injecting")
     main_mode.keymap_dict['\0'] = q
     nothing
 end

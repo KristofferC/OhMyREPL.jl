@@ -16,8 +16,8 @@ include("repl.jl")
 using .ANSICodes
 export ANSICodes
 
-#if isdefined(Base, :active_repl)
-#    Prompt.run_highlightREPL()
-#end
+if isdefined(Base, :active_repl)
+    Prompt.run_highlightREPL()
+end
 
 end # module
