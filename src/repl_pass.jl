@@ -71,7 +71,6 @@ function apply_passes!(rpc::ReplPassCollector, tokens::Vector{Token}, cursorpos:
 
     for i in 1:length(rpc.passes)
         pass = rpc.passes[i][2]
-        println("Applying pass, ", rpc.passes[i][1])
         if pass.enabled
             if cursormovement && !pass.update_on_cursormovement
                 continue

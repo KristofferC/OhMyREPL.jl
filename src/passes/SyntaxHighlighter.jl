@@ -42,7 +42,7 @@ function _create_monokai()
     monokai.op = ANSIToken(foreground = :red)
     monokai.keyword = ANSIToken(foreground = :red)
     monokai.text = ANSIToken(foreground = :default)
-    monokai.function_def = ANSIToken(foreground = :light_blue)
+    monokai.function_def = ANSIToken(foreground = :green)
     monokai.error = ANSIToken(foreground = :default)
     return monokai
 end
