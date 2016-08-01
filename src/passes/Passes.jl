@@ -6,7 +6,7 @@ module Passes
 using ..ANSICodes
 import ..ANSICodes.ANSIToken
 
-#include("SyntaxHighlighter.jl")
+include("SyntaxHighlighter.jl")
 include("BracketMatcher.jl")
 
 end # module

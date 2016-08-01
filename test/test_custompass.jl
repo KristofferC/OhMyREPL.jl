@@ -8,22 +8,6 @@ import PimpMyREPL.ANSICodes: ANSIToken, ANSIValue
 using Tokenize
 
 
-# untokenize_with_ansi
-#=
-ansitokens = [ANSIToken(foreground = :magenta),
-              ANSIToken(background = :blue),
-              ANSIToken(background = :blue),
-              ANSIToken(background = :red)]
-
-# Two tokens
-tokens = collect(tokenize("function foo"))
-b = IOBuffer()
-PimpMyREPL.untokenize_with_ANSI(b, tokens, ansitokens)
-print(takebuf_string(b))
-=#
-
-
-
 function foobar_bluify(ansitokens, tokens, ::Int)
     for (ansitok, tok) in zip(ansitokens, tokens)
         println(tok)
@@ -36,7 +20,9 @@ end
 
 b = IOBuffer()
 
-PimpMyREPL.test_pass(b, foobar_bluify, "function :foobar, foobar # foobar")
+str = "function :foobar, foobar # foobar"
+PimpMyREPL.test_pass(b, foobar_bluify, str)
 
-show(takebuf_string(b))
+println("Original string: ", str)
+println("Bluified string: ", takebuf_string(b))
 end

@@ -16,7 +16,7 @@ type BracketMatcherSettings
 end
 
 const BRACKETMATCHER_SETTINGS =
- BracketMatcherSettings(ANSIToken(foreground = :red))
+ BracketMatcherSettings(ANSIToken(bold = :true))
 
 @compat function (matcher::BracketMatcherSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)
     left_bracket_match, right_bracket_match, matched = bracket_match(tokens, cursorpos)
@@ -26,18 +26,13 @@ const BRACKETMATCHER_SETTINGS =
     return
 end
 
-
 add_pass!("BracketMatcher", BRACKETMATCHER_SETTINGS, true)
 
-
-const LEFT_DELIMS = [Tokens.lparen, Tokens.lsquare, Tokens.lbrace]
-
-const RIGHT_DELIMS = [Tokens.rparen, Tokens.rsquare, Tokens.rbrace]
-
-
-# Takes a string and a position in bytes of the cursor position
+# Takes a string and a cursor index.
 # Returns index of left matching bracket, right matching bracket
 # and if there was a match at all as a 3 tuple.
+const LEFT_DELIMS = [Tokens.lparen, Tokens.lsquare, Tokens.lbrace]
+const RIGHT_DELIMS = [Tokens.rparen, Tokens.rsquare, Tokens.rbrace]
 function bracket_match(tokens::Vector{Token}, cursoridx::Int)
     enclosing_token_idx = -1
     char_counter = 0
