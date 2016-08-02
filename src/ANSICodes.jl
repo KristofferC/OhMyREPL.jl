@@ -1,6 +1,5 @@
 module ANSICodes
 
-
 const FOREGROUNDS = Dict(
     :default => 39,
     :black => 30,
@@ -64,7 +63,7 @@ isactive(x::ANSIValue) = x.active
 set(x::ANSIValue, val::Int) = ANSIValue(val, x.active)
 
 
-ANSIValue(layer, val) = ANSIValue(ANSIValue(), layer, val)
+# ANSIValue(layer, val) = ANSIValue(ANSIValue(), layer, val)
 function ANSIValue(layer::Symbol, val::Symbol)
     if layer == :foreground
         return ANSIValue(FOREGROUNDS[val])
@@ -130,15 +129,6 @@ function ANSIToken(;foreground::Symbol = :nothing, background::Symbol = :nothing
     strikethrough != :nothing && (x.strikethrough = ANSIValue(STRIKETHROUGH[!strikethrough + 1]))
     return x
 end
-
-#=
-function ANSIToken(;foreground::ANSIValue = ANSIValue(39, false), background::ANSIValue = ANSIValue(49, false),
-                    bold::ANSIValue = ANSIValue(1, false), underline::ANSIValue = ANSIValue(3, false),
-                    strikethrough::ANSIValue = ANSIValue(4, false), italics::ANSIValue = ANSIValue(9, false))
-    return ANSIToken(foreground, background,
-                     bold, underline, strikethrough, italics)
-end
-=#
 
 function maybe_print(io::IO, isfirst::Bool, token::ANSIValue)
     if isactive(token)
@@ -215,6 +205,6 @@ function test_ANSI(io::IO = STDOUT)
     println(io, "\e[0m")
 end
 
-test_ANSI()
+# test_ANSI()
 
 end # module

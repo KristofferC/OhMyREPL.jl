@@ -18,5 +18,6 @@ PimpMyREPL.test_pass(b, PimpMyREPL.Passes.BracketMatcher.BRACKETMATCHER_SETTINGS
 
 println("Original string: ", str)
 println("BracketMatched string: ", takebuf_string(b))
+println()
 
 end

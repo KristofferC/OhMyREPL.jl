@@ -9,14 +9,14 @@ import Tokenize.Tokens: Token, kind, startpos, endpos
 using ...ANSICodes
 import ...ANSICodes: ANSIToken, ANSIValue, update!
 
-import PimpMyREPL.add_pass!
+import PimpMyREPL: add_pass!, PASS_HANDLER
 
 type BracketMatcherSettings
     token::ANSIToken
 end
 
 const BRACKETMATCHER_SETTINGS =
- BracketMatcherSettings(ANSIToken(bold = :true))
+ BracketMatcherSettings(ANSIToken(bold = :true, underline = :true))
 
 @compat function (matcher::BracketMatcherSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)
     left_bracket_match, right_bracket_match, matched = bracket_match(tokens, cursorpos)
@@ -26,7 +26,7 @@ const BRACKETMATCHER_SETTINGS =
     return
 end
 
-add_pass!("BracketMatcher", BRACKETMATCHER_SETTINGS, true)
+add_pass!(PASS_HANDLER, "BracketMatcher", BRACKETMATCHER_SETTINGS, true)
 
 # Takes a string and a cursor index.
 # Returns index of left matching bracket, right matching bracket

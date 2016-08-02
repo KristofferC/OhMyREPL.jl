@@ -6,12 +6,11 @@ module PimpMyREPL
 
 using Tokenize
 
-
-
 include("ANSICodes.jl")
 include("repl_pass.jl")
 include(joinpath("passes", "Passes.jl"))
 include("repl.jl")
+include("bracket_inserter.jl")
 
 using .ANSICodes
 export ANSICodes

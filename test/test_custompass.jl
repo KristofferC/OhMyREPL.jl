@@ -25,4 +25,6 @@ PimpMyREPL.test_pass(b, foobar_bluify, str)
 
 println("Original string: ", str)
 println("Bluified string: ", takebuf_string(b))
+println()
+
 end

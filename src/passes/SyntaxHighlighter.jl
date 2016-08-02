@@ -9,7 +9,7 @@ import Tokenize.Tokens: Token, kind, iskeyword
 using ...ANSICodes
 import ...ANSICodes: ANSIToken, ANSIValue, update!
 
-import PimpMyREPL.add_pass!
+import PimpMyREPL: add_pass!, PASS_HANDLER
 
 type ColorScheme
     symbol::ANSIToken
@@ -35,11 +35,11 @@ SYNTAX_HIGHLIGHTER_SETTINGS = SyntaxHighlighterSettings()
 # Try to represent the Monokai colorscheme.
 function _create_monokai()
     monokai = ColorScheme()
-    monokai.symbol = ANSIToken(foreground = :magenta)
+    monokai.symbol = ANSIToken(foreground = :light_blue)
     monokai.comment = ANSIToken(foreground = :dark_gray)
     monokai.string = ANSIToken(foreground = :light_yellow)
-    monokai.call = ANSIToken(foreground = :light_blue)
-    monokai.op = ANSIToken(foreground = :red)
+    monokai.call = ANSIToken(foreground = :blue)
+    monokai.op = ANSIToken(foreground = :light_red)
     monokai.keyword = ANSIToken(foreground = :red)
     monokai.text = ANSIToken(foreground = :default)
     monokai.function_def = ANSIToken(foreground = :green)
@@ -50,7 +50,7 @@ end
 MONOKAI = _create_monokai()
 SYNTAX_HIGHLIGHTER_SETTINGS.colorscheme = MONOKAI
 
-add_pass!("SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
+add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
 
 
 @compat function (highlighter::SyntaxHighlighterSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)

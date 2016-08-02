@@ -17,16 +17,17 @@ type Pass
     update_on_cursormovement::Bool
 end
 
-immutable ReplPassCollector
+immutable PassHandler
     ansitokens::Vector{ANSIToken}
     passes::Vector{Tuple{String, Pass}}
 end
 
-ReplPassCollector() = ReplPassCollector(ANSIToken[], Tuple{String, Pass}[])
+PassHandler() = PassHandler(ANSIToken[], Tuple{String, Pass}[])
+const PASS_HANDLER = PassHandler(ANSIToken[], Tuple{String, Pass}[])
 
 
 function test_pass(io::IO, f, str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false)
-    rpc = ReplPassCollector()
+    rpc = PassHandler()
     add_pass!(rpc, "TestPass", f)
     tokens = collect(Lexers.Lexer(str))
     apply_passes!(rpc, tokens, cursorpos, cursormovement)
@@ -36,18 +37,14 @@ test_pass(f, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::B
         test_pass(STDOUT, f, str, cursorpos, cursormovement)
 
 
-function test_passes(io::IO, rpc::ReplPassCollector, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false)
+function test_passes(io::IO, rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false)
     b = IOBuffer()
     tokens = collect(Lexers.Lexer(str))
     apply_passes!(rpc, tokens, cursorpos, cursormovement)
     untokenize_with_ANSI(io, rpc.ansitokens, tokens)
 end
-test_passes(io::IO, str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false) =
-        test_passes(io, REPL_PASSES, str, cursorpos, cursormovement)
-test_passes(str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false) =
-        test_passes(STDOUT, REPL_PASSES, str, cursorpos, cursormovement)
-
-
+test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
+    test_passes(STDOUT, rpc, str, cursorpos, cursormovement)
 
 function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token})
     @assert length(tokens) == length(ansitokens)
@@ -57,13 +54,12 @@ function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vec
         print(io, "\e[0m") # TODO Provide a user definable postfix?
     end
 end
+untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}) = untokenize_with_ANSI(io, rpc.ansitokens, tokens)
 untokenize_with_ANSI(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}) =
     untokenize_with_ANSI(STDOUT, ansitokens, tokens)
-untokenize_with_ANSI(io::IO, tokens::Vector{Token})  = untokenize_with_ANSI(io, REPL_PASSES.ansitokens, tokens)
 
-const REPL_PASSES = ReplPassCollector(ANSIToken[], Tuple{String, Pass}[])
 
-function apply_passes!(rpc::ReplPassCollector, tokens::Vector{Token}, cursorpos::Int = 1, cursormovement::Bool = false)
+function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, cursorpos::Int = 1, cursormovement::Bool = false)
     resize!(rpc.ansitokens, length(tokens))
     for i in 1:length(rpc.ansitokens)
         rpc.ansitokens[i] = ANSIToken()
@@ -81,29 +77,21 @@ function apply_passes!(rpc::ReplPassCollector, tokens::Vector{Token}, cursorpos:
     end
 end
 
-apply_passes!(tokens::Vector{Token}, cursorpos::Int = 1, cursormovement::Bool=false) =
-    apply_passes!(REPL_PASSES, tokens, cursorpos, cursormovement)
-
-
-
-write_results!(buff::IO, tokens::Vector{Token}) = write_results(buff, REPL_PASSES, tokens)
-
-write_results!(buff::IO, rpc::ReplPassCollector, tokens::Vector{Token}) =
+write_results!(buff::IO, rpc::PassHandler, tokens::Vector{Token}) =
     write_results(buff, rpc.ansitokens, tokens)
 
-
 # Returns -1 if not found else index of where the pass is
-function _find_pass(name::String)
-    for i in 1:length(REPL_PASSES.passes)
-        if REPL_PASSES.passes[i][1] == name
+function _find_pass(rpc::PassHandler, name::String)
+    for i in 1:length(rpc.passes)
+        if rpc.passes[i][1] == name
             return i
         end
     end
     return -1
 end
 
-function _check_pass_name(name::String, shouldexist::Bool)
-    idx = _find_pass(name)
+function _check_pass_name(rpc::PassHandler, name::String, shouldexist::Bool)
+    idx = _find_pass(rpc, name)
     if idx == -1 && shouldexist
         throw(ArgumentError("pass $name could not be found"))
     elseif idx != -1 && !shouldexist
@@ -113,22 +101,19 @@ function _check_pass_name(name::String, shouldexist::Bool)
 end
 
 
-function add_pass!(rpc::ReplPassCollector, name::String, f, update_on_cursormovement::Bool = true)
-    idx = _check_pass_name(name, false)
+function add_pass!(rpc::PassHandler, name::String, f, update_on_cursormovement::Bool = true)
+    idx = _check_pass_name(rpc, name, false)
     push!(rpc.passes, (name, Pass(f, true, update_on_cursormovement)))
 end
-add_pass!(name::String, f, update_on_cursormovement::Bool = true) =
-    add_pass!(REPL_PASSES, name, f, update_on_cursormovement)
 
 
-function enable_pass!(rpc::ReplPassCollector, name::String, enabled::Bool)
-    idx = _check_pass_name(name, true)
+function enable_pass!(rpc::PassHandler, name::String, enabled::Bool)
+    idx = _check_pass_name(rpc, name, true)
     rpc.passes[idx][2].enabled = enabled
 end
-enable_pass!(name::String, enabled::Bool) = enable_pass!(REPL_PASSES, name, enabled)
 
 
-function set_prescedence!(name::String, presc::Int)
+function set_prescedence!(rpc::PassHandler, name::String, presc::Int)
     error("TODO")
     pass_idx = _check_pass_name(name, true)
     if pass_idx == -1
@@ -137,10 +122,8 @@ function set_prescedence!(name::String, presc::Int)
 end
 
 
-
-
 #=
-function Base.show(io::IO, rpc::ReplPassCollector)
+function Base.show(io::IO, rpc::PassHandler)
 
     print(io, "+-----------------------+----------+")
     print(io, "| Pass name             | Enabled  |")
