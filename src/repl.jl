@@ -123,8 +123,8 @@ function refresh_multi_line(termbuf, terminal, buf, state)
 
     # Count the '\n' at the end of the line if the terminal emulator does (specific to DOS cmd prompt)
     miscountnl = @static is_windows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
-      lindent = 7
-    indent = 7 # TODO this gets the cursor right but not the text
+    lindent = 7
+    indent = 0 # TODO this gets the cursor right but not the text
     # Now go through the buffer line by line
     seek(buf, 0)
     moreinput = true # add a blank line if there is a trailing newline on the last line
