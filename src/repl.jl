@@ -114,7 +114,6 @@ end
 
 # Pasted from LineEdit.jl but the writes to the Terminal have been removed.
 function refresh_multi_line(termbuf, terminal, buf, state)
-
     cols = width(terminal)
     curs_row = -1 # relative to prompt (1-based)
     curs_pos = -1 # 1-based column position of the cursor
@@ -125,11 +124,12 @@ function refresh_multi_line(termbuf, terminal, buf, state)
     # Count the '\n' at the end of the line if the terminal emulator does (specific to DOS cmd prompt)
     miscountnl = @static is_windows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
       lindent = 7
-    indent = 0 # TODO this gets the cursor right but not the text
+    indent = 7 # TODO this gets the cursor right but not the text
     # Now go through the buffer line by line
     seek(buf, 0)
     moreinput = true # add a blank line if there is a trailing newline on the last line
     while moreinput
+        prev_pos = position(buf)
         l = readline(buf)
         moreinput = endswith(l, "\n")
         # We need to deal with on-screen characters, so use strwidth to compute occupied columns
@@ -139,6 +139,12 @@ function refresh_multi_line(termbuf, terminal, buf, state)
         cmove_col(termbuf, lindent + 1)
         # We expect to be line after the last valid output line (due to
         # the '\n' at the end of the previous line)
+        if curs_row != -1
+            seek(buf, prev_pos)
+            write(buf, " "^indent)
+            write(buf, "balle")
+            write(buf, l)
+        end
         if curs_row == -1
             # in this case, we haven't yet written the cursor position
             line_pos -= slength # '\n' gets an extra pos
