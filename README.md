@@ -1,6 +1,6 @@
 # PimpMyREPL
 
-Loading it gives you syntax highlighting, bracket highlighting and some other goodies.
+Loading it gives the Julia REPL syntax highlighting, bracket highlighting and some other goodies.
 
 ![repl](https://media.giphy.com/media/l0HlyCECiFySyUdBS/giphy.gif)
 
