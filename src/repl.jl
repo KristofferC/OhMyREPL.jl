@@ -139,12 +139,6 @@ function refresh_multi_line(termbuf, terminal, buf, state)
         cmove_col(termbuf, lindent + 1)
         # We expect to be line after the last valid output line (due to
         # the '\n' at the end of the previous line)
-        if curs_row != -1
-            seek(buf, prev_pos)
-            write(buf, " "^indent)
-            write(buf, "balle")
-            write(buf, l)
-        end
         if curs_row == -1
             # in this case, we haven't yet written the cursor position
             line_pos -= slength # '\n' gets an extra pos
