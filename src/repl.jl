@@ -13,7 +13,7 @@ import ..Passes
 import Tokenize.Lexers
 
 import Base.Terminals: raw!, width, height, cmove, getX,
-                       getY, clear_line, beep
+                       getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
 
 
 using PimpMyREPL
@@ -98,12 +98,81 @@ function hijack_REPL()
             rewrite_with_ANSI(s, data, c, main_mode)
         end
 
+         D["\e[200~"] = (s, data, c) ->begin
+            input = LineEdit.bracketed_paste(s) # read directly from s until reaching the end-bracketed-paste marker
+            sbuffer = LineEdit.buffer(s)
+            curspos = position(sbuffer)
+            seek(sbuffer, 0)
+            shouldeval = (nb_available(sbuffer) == curspos && search(sbuffer, UInt8('\n')) == 0)
+            seek(sbuffer, curspos)
+            if curspos == 0
+                # if pasting at the beginning, strip leading whitespace
+                input = lstrip(input)
+            end
+            if !shouldeval
+                # when pasting in the middle of input, just paste in place
+                # don't try to execute all the WIP, since that's rather confusing
+                # and is often ill-defined how it should behave
+                edit_insert(s, input)
+                rewrite_with_ANSI(s, data, c, main_mode)
+                return
+            end
+            edit_insert(sbuffer, input)
+            input = takebuf_string(sbuffer)
+            oldpos = start(input)
+            firstline = true
+            while !done(input, oldpos) # loop until all lines have been executed
+                ast, pos = Base.syntax_deprecation_warnings(false) do
+                    Base.parse(input, oldpos, raise=false)
+                end
+                if (isa(ast, Expr) && (ast.head == :erdisable_ror || ast.head == :continue || ast.head == :incomplete)) ||
+                        (done(input, pos) && !endswith(input, '\n'))
+                    # remaining text is incomplete (an error, or parser ran to the end but didn't stop with a newline):
+                    # Insert all the remaining text as one line (might be empty)
+                    tail = input[oldpos:end]
+                    if !firstline
+                        # strip leading whitespace, but only if it was the result of executing something
+                        # (avoids modifying the user's current leading wip line)
+                        tail = lstrip(tail)
+                    end
+                    LineEdit.replace_line(s, tail)
+                    rewrite_with_ANSI(s, data, c, main_mode)
+                    break
+                end
+                # get the line and strip leading and trailing whitespace
+                line = strip(input[oldpos:prevind(input, pos)])
+                if !isempty(line)
+                    # put the line on the screen and history
+                    LineEdit.replace_line(s, line)
+                    _commit_line(s, data, c, main_mode)
+                    # execute the statement
+                    terminal = LineEdit.terminal(s) # This is slightly ugly but ok for now
+                    raw!(terminal, false) && disable_bracketed_paste(terminal)
+                    LineEdit.mode(s).on_done(s, LineEdit.buffer(s), true)
+                    raw!(terminal, true) && enable_bracketed_paste(terminal)
+
+                end
+                oldpos = pos
+                firstline = false
+            end
+        end
+
         main_mode.keymap_dict = LineEdit.keymap([D, main_mode.keymap_dict])
         loaded = true
     end
 
     nothing
 end
+
+
+function _commit_line(s, data, c, main_mode)
+    move_input_end(s)
+    rewrite_with_ANSI(s, data, c, main_mode)
+    println(terminal(s))
+    add_history(s)
+    state(s, mode(s)).ias = InputAreaState(0, 0)
+end
+
 
 match_input(f::Function, str::String, i) = f
 function match_input(k::Dict, str::String, i=1)
