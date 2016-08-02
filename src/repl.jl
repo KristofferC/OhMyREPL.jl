@@ -12,6 +12,7 @@ import Base.REPL: respond, LatexCompletions, return_callback, repl_filename
 import ..Passes
 import Tokenize.Lexers
 
+import Base.Terminals
 import Base.Terminals: raw!, width, height, cmove, getX,
                        getY, clear_line, beep
 
