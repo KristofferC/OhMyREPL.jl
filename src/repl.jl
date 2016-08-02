@@ -31,7 +31,7 @@ function rewrite_with_ANSI(s, data, c, main_mode, cursormove::Bool = false)
         b = IOBuffer()
         tokens = collect(Lexers.Lexer(buffer(s)))
         apply_passes!(PASS_HANDLER, tokens, cursoridx, cursormove)
-        untokenize_with_ANSI(b, PASS_HANDLER , tokens)
+        untokenize_with_ANSI(b, PASS_HANDLER , tokens, buffer(s))
         LineEdit.write_prompt(terminal(s), main_mode)
         LineEdit.write(terminal(s), "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
         write(terminal(s), takebuf_string(b))
@@ -124,12 +124,11 @@ function refresh_multi_line(termbuf, terminal, buf, state)
     # Count the '\n' at the end of the line if the terminal emulator does (specific to DOS cmd prompt)
     miscountnl = @static is_windows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
     lindent = 7
-    indent = 0 # TODO this gets the cursor right but not the text
+    indent = 7 # TODO this gets the cursor right but not the text
     # Now go through the buffer line by line
     seek(buf, 0)
     moreinput = true # add a blank line if there is a trailing newline on the last line
     while moreinput
-        prev_pos = position(buf)
         l = readline(buf)
         moreinput = endswith(l, "\n")
         # We need to deal with on-screen characters, so use strwidth to compute occupied columns
@@ -152,7 +151,6 @@ function refresh_multi_line(termbuf, terminal, buf, state)
                 if curs_pos == cols
                     # only emit the newline if the cursor is at the end of the line we're writing
                     if line_pos == 0
-                        write(termbuf, "\n")
                         cur_row += 1
                     end
                     curs_row += 1

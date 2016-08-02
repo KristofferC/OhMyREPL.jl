@@ -1,7 +1,8 @@
 using .ANSICodes
 
 import .ANSICodes.ANSIToken
-import Tokenize.Tokens.Token
+import Tokenize.Tokens
+import Tokenize.Tokens: Token, kind, untokenize
 import Tokenize.Lexers
 
 #using Logging
@@ -46,17 +47,25 @@ end
 test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
     test_passes(STDOUT, rpc, str, cursorpos, cursormovement)
 
-function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token})
+# We need to pass in the buffer here so we know when to indent for a new line
+function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, buffer::IOBuffer)
     @assert length(tokens) == length(ansitokens)
     print("\e[0m")
+    bufstr = String(buffer)
+    z = 1
     for (token, ansitoken) in zip(tokens, ansitokens)
-        print(io, ansitoken, token)
+        print(io, ansitoken)
+        for c in untokenize(token)
+            print(io, c)
+            bufstr[z] == '\n' && print(io, " "^7)
+            z = nextind(bufstr, z)
+        end
         print(io, "\e[0m") # TODO Provide a user definable postfix?
     end
 end
-untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}) = untokenize_with_ANSI(io, rpc.ansitokens, tokens)
-untokenize_with_ANSI(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}) =
-    untokenize_with_ANSI(STDOUT, ansitokens, tokens)
+untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}, buffer::IOBuffer) = untokenize_with_ANSI(io, rpc.ansitokens, tokens, buffer)
+untokenize_with_ANSI(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, buffer::IOBuffer) =
+    untokenize_with_ANSI(STDOUT, ansitokens, tokens, buffer)
 
 
 function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, cursorpos::Int = 1, cursormovement::Bool = false)
