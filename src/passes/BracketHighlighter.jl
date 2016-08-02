@@ -31,7 +31,7 @@ add_pass!(PASS_HANDLER, "BracketHighlighter", BRACKETMATCHER_SETTINGS, true)
 # Takes a string and a cursor index.
 # Returns index of left matching bracket, right matching bracket
 # and if there was a match at all as a 3 tuple.
-const LEFT_DELIMS = [Tokens.LPAREN, Tokens.RPAREN, Tokens.LBRACE]
+const LEFT_DELIMS = [Tokens.LPAREN, Tokens.LSQURE, Tokens.LBRACE]
 const RIGHT_DELIMS = [Tokens.RPAREN, Tokens.RSQUARE, Tokens.RBRACE]
 function bracket_match(tokens::Vector{Token}, cursoridx::Int)
     enclosing_token_idx = -1
