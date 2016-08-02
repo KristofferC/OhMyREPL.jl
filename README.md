@@ -4,6 +4,8 @@ Loading it gives the Julia REPL syntax highlighting, bracket highlighting and so
 
 ![repl](https://media.giphy.com/media/l0HlyCECiFySyUdBS/giphy.gif)
 
+**Note:** This is heavily a WIP in progress and are many things to fix. Issues with clear [MCVE](http://stackoverflow.com/help/mcve) are very welcome.
+
 # Installation
 
 ```jl
@@ -12,5 +14,3 @@ Pkg.clone("https://github.com/KristofferC/PimpMyREPL.jl")
 ```
 
 and then just load with `using PimpMyREPL`.
-
-This is heavily a WIP.
