@@ -1,6 +1,6 @@
 module Passes
 
 include("SyntaxHighlighter.jl")
-include("BracketMatcher.jl")
+include("BracketHighlighter.jl")
 
 end # module

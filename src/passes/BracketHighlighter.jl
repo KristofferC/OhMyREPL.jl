@@ -1,24 +1,24 @@
-module BracketMatcher
+module BracketHighlighter
 
 using Compat
 
 using Tokenize
 using Tokenize.Tokens
-import Tokenize.Tokens: Token, kind, startpos, endpos
+import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
 
 using ...ANSICodes
 import ...ANSICodes: ANSIToken, ANSIValue, update!
 
 import PimpMyREPL: add_pass!, PASS_HANDLER
 
-type BracketMatcherSettings
+type BracketHighlighterSettings
     token::ANSIToken
 end
 
 const BRACKETMATCHER_SETTINGS =
- BracketMatcherSettings(ANSIToken(bold = :true, underline = :true))
+ BracketHighlighterSettings(ANSIToken(bold = :true, underline = :true))
 
-@compat function (matcher::BracketMatcherSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)
+@compat function (matcher::BracketHighlighterSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)
     left_bracket_match, right_bracket_match, matched = bracket_match(tokens, cursorpos)
     !matched && return
     update!(ansitokens[left_bracket_match], matcher.token)
@@ -26,13 +26,13 @@ const BRACKETMATCHER_SETTINGS =
     return
 end
 
-add_pass!(PASS_HANDLER, "BracketMatcher", BRACKETMATCHER_SETTINGS, true)
+add_pass!(PASS_HANDLER, "BracketHighlighter", BRACKETMATCHER_SETTINGS, true)
 
 # Takes a string and a cursor index.
 # Returns index of left matching bracket, right matching bracket
 # and if there was a match at all as a 3 tuple.
-const LEFT_DELIMS = [Tokens.lparen, Tokens.lsquare, Tokens.lbrace]
-const RIGHT_DELIMS = [Tokens.rparen, Tokens.rsquare, Tokens.rbrace]
+const LEFT_DELIMS = [Tokens.LPAREN, Tokens.RPAREN, Tokens.LBRACE]
+const RIGHT_DELIMS = [Tokens.RPAREN, Tokens.RSQUARE, Tokens.RBRACE]
 function bracket_match(tokens::Vector{Token}, cursoridx::Int)
     enclosing_token_idx = -1
     char_counter = 0

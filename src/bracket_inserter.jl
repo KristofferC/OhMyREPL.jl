@@ -36,7 +36,6 @@ function insert_into_keymap()
     end
 end
 
-
 if isdefined(Base, :active_repl)
     insert_into_keymap()
 end
