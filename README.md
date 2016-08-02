@@ -2,7 +2,7 @@
 
 Loading it gives you syntax highlighting, bracket highlighting and some other goodies.
 
-
+![repl](https://media.giphy.com/media/l0HlyCECiFySyUdBS/giphy.gif)
 
 # Installation
 
@@ -12,3 +12,5 @@ Pkg.clone("https://github.com/KristofferC/PimpMyREPL.jl")
 ```
 
 and then just load with `using PimpMyREPL`.
+
+This is heavily a WIP.
