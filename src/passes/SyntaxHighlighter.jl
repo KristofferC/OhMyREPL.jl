@@ -22,6 +22,7 @@ type ColorScheme
     function_def::ANSIToken
     error::ANSIToken
     argdef::ANSIToken
+    _macro::ANSIToken
 end
 
 ColorScheme() = ColorScheme([ANSIToken() for i in 1:length(fieldnames(ColorScheme))]...)
@@ -38,20 +39,39 @@ function _create_monokai()
     monokai = ColorScheme()
     monokai.symbol = ANSIToken(foreground = :magenta)
     monokai.comment = ANSIToken(foreground = :dark_gray)
-    monokai.string = ANSIToken(foreground = :yellow)
-    monokai.call = ANSIToken(foreground = :blue)
+    monokai.string = ANSIToken(foreground = :light_blue)
+    monokai.call = ANSIToken(foreground = :cyan)
     monokai.op = ANSIToken(foreground = :light_red)
-    monokai.keyword = ANSIToken(foreground = :red)
+    monokai.keyword = ANSIToken(foreground = :light_magenta)
     monokai.text = ANSIToken(foreground = :default)
+    monokai._macro = ANSIToken(foreground = :yellow)
     monokai.function_def = ANSIToken(foreground = :green)
     monokai.error = ANSIToken(foreground = :default)
-    monokai.argdef = ANSIToken(foreground = :light_blue, italics = :true)
+    monokai.argdef = ANSIToken(foreground = :light_blue)
     return monokai
 end
 
-MONOKAI = _create_monokai()
-SYNTAX_HIGHLIGHTER_SETTINGS.colorscheme = MONOKAI
+# Try to represent the Flatland colorscheme.
+function _create_flatland_dark()
+    flatland = ColorScheme()
+    flatland.symbol = ANSIToken(foreground = :green)
+    flatland.comment = ANSIToken(foreground = :dark_gray)
+    flatland.string = ANSIToken(foreground = :light_cyan)
+    flatland.call = ANSIToken(foreground = :yellow)
+    flatland.op = ANSIToken(foreground = :yellow)
+    flatland.keyword = ANSIToken(foreground = :yellow)
+    flatland.text = ANSIToken(foreground = :default)
+    flatland._macro = ANSIToken(foreground = :yellow)
+    flatland.function_def = ANSIToken(foreground = :green)
+    flatland.error = ANSIToken(foreground = :default)
+    flatland.argdef = ANSIToken(foreground = :cyan)
+    return flatland
+end
 
+MONOKAI = _create_monokai()
+FLATLAND = _create_flatland_dark()
+SYNTAX_HIGHLIGHTER_SETTINGS.colorscheme = MONOKAI
+#SYNTAX_HIGHLIGHTER_SETTINGS.colorscheme = FLATLAND
 add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
 
 @compat function (highlighter::SyntaxHighlighterSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)
@@ -76,6 +96,13 @@ add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
             update!(ansitokens[i], cscheme.op)
         elseif kind(t) == Tokens.COMMENT
             update!(ansitokens[i], cscheme.comment)
+        elseif kind(t) == Tokens.LPAREN && kind(prev_t) == Tokens.IDENTIFIER
+            update!(ansitokens[i-1], cscheme.call)
+        elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.AT_SIGN
+            update!(ansitokens[i-1], cscheme._macro)
+            update!(ansitokens[i], cscheme._macro)
+        elseif kind(t) == Tokens.INTEGER || kind(t) == Tokens.FLOAT
+            update!(ansitokens[i], cscheme.call)
         else
             update!(ansitokens[i], cscheme.text)
         end
@@ -85,3 +112,5 @@ add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
 end
 
 end
+
+

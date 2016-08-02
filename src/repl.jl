@@ -31,7 +31,7 @@ function rewrite_with_ANSI(s, data, c, main_mode, cursormove::Bool = false)
         b = IOBuffer()
         tokens = collect(Lexers.Lexer(buffer(s)))
         apply_passes!(PASS_HANDLER, tokens, cursoridx, cursormove)
-        untokenize_with_ANSI(b, PASS_HANDLER , tokens, buffer(s))
+        untokenize_with_ANSI(b, PASS_HANDLER , tokens)
         LineEdit.write_prompt(terminal(s), main_mode)
         LineEdit.write(terminal(s), "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
         write(terminal(s), takebuf_string(b))
@@ -98,6 +98,7 @@ function hijack_REPL()
             rewrite_with_ANSI(s, data, c, main_mode)
         end
 
+        # Fixup bracket paste a bit
          D["\e[200~"] = (s, data, c) ->begin
             input = LineEdit.bracketed_paste(s) # read directly from s until reaching the end-bracketed-paste marker
             sbuffer = LineEdit.buffer(s)
@@ -121,7 +122,32 @@ function hijack_REPL()
             input = takebuf_string(sbuffer)
             oldpos = start(input)
             firstline = true
+            isprompt_paste = false
+            @label restart
             while !done(input, oldpos) # loop until all lines have been executed
+                # 17599
+                # Check if the next statement starts with "julia> ", in that case
+                # skip it. But first skip whitespace
+                c = oldpos
+                while c <= sizeof(input) && (input[c] == '\n' || input[c] == ' ' || input[c] == '\t')
+                    c = nextind(input, c)
+                end
+                n_whitespace_chars = c - oldpos
+                # Skip over prompt prefix if statement starts with it
+                jl_prompt_len = 7
+                if (firstline || isprompt_paste) && (c + jl_prompt_len <= sizeof(input) && input[c:c+jl_prompt_len-1] == "julia> ")
+                        isprompt_paste = true
+                        oldpos += jl_prompt_len + n_whitespace_chars
+                # We are currently prompt pasting but this line did not have a prompt so skip it
+                isdone = false
+                elseif isprompt_paste
+                    while input[oldpos] != '\n'
+                        oldpos = nextind(input, oldpos)
+                        done(input, oldpos) && (isdone = true; break)
+                    end
+                    isdone && break
+                    continue
+                end
                 ast, pos = Base.syntax_deprecation_warnings(false) do
                     Base.parse(input, oldpos, raise=false)
                 end
