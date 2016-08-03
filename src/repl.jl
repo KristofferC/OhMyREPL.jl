@@ -173,6 +173,7 @@ function hijack_REPL()
                 elseif isprompt_paste
                     while input[oldpos] != '\n'
                         oldpos = nextind(input, oldpos)
+                        oldpos >= sizeof(input) && return
                     end
                     continue
                 end
