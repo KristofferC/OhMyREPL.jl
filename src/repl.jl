@@ -24,7 +24,7 @@ import Base.Terminals: raw!, width, height, cmove, getX,
 using PimpMyREPL
 import PimpMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
-function rewrite_with_ANSI(s, data, c, main_mode, cursormove::Bool = false)
+function rewrite_with_ANSI(s, data, c, cursormove::Bool = false)
         # Clear input area
         p = position(buffer(s))
         LineEdit.clear_input_area(terminal(s), s.mode_state[s.current_mode])
@@ -72,11 +72,11 @@ function hijack_REPL()
         # This needs work...
         hijacked_keys = ["\e[C", "\e[D", "*", "\b", "\e[A", "\e[B", "\e[3~", "^T",
                      "\e[H", "\e[F", "\e[1;5D", "\eOd", "\e[1;5C", "\eOc",
-                     "^B", "^F", "\eb", "\ef", "\t", "(", ")", "}", "{", "]", "["]
+                     "^B", "^F", "\eb", "\ef", "\t", "(", ")", "}", "{", "]", "[", "\"", "\'"]
         @assert length(unique(hijacked_keys)) == length(hijacked_keys)
         for key in hijacked_keys
             f = match_input(main_mode.keymap_dict, key, 1)
-            D[key] = (s, data, c) -> (f(s, data, c); rewrite_with_ANSI(s, data, c, main_mode))
+            D[key] = (s, data, c) -> (f(s, data, c); rewrite_with_ANSI(s, data, c))
         end
 
         # Hack around a bit to make enter not remove syntax highlighting above
@@ -89,7 +89,7 @@ function hijack_REPL()
                 return :done
             else
                 edit_insert(s, '\n')
-                rewrite_with_ANSI(s, data, c, main_mode)
+                rewrite_with_ANSI(s, data, c)
             end
         end
 
@@ -99,10 +99,10 @@ function hijack_REPL()
                 ccall(:jl_raise_debugger, Int, ())
             end
             move_input_end(s)
-            rewrite_with_ANSI(s, data, c, main_mode)
+            rewrite_with_ANSI(s, data, c)
             print(terminal(s), "^C\n\n")
             transition(s, :reset)
-            rewrite_with_ANSI(s, data, c, main_mode)
+            rewrite_with_ANSI(s, data, c)
         end
 
          # Hack around a bit to make changing repls work
@@ -114,7 +114,7 @@ function hijack_REPL()
                 end
             else
                 edit_insert(s, ';')
-                rewrite_with_ANSI(s, data, c, main_mode)
+                rewrite_with_ANSI(s, data, c)
             end
         end
 
@@ -126,7 +126,7 @@ function hijack_REPL()
                 end
             else
                 edit_insert(s, '?')
-                rewrite_with_ANSI(s, data, c, main_mode)
+                rewrite_with_ANSI(s, data, c)
             end
         end
 
@@ -147,7 +147,7 @@ function hijack_REPL()
                 # don't try to execute all the WIP, since that's rather confusing
                 # and is often ill-defined how it should behave
                 edit_insert(s, input)
-                rewrite_with_ANSI(s, data, c, main_mode)
+                rewrite_with_ANSI(s, data, c)
                 return
             end
             edit_insert(sbuffer, input)
@@ -190,7 +190,7 @@ function hijack_REPL()
                         tail = lstrip(tail)
                     end
                     LineEdit.replace_line(s, tail)
-                    rewrite_with_ANSI(s, data, c, main_mode)
+                    rewrite_with_ANSI(s, data, c)
                     break
                 end
                 # get the line and strip leading and trailing whitespace
@@ -198,7 +198,7 @@ function hijack_REPL()
                 if !isempty(line)
                     # put the line on the screen and history
                     LineEdit.replace_line(s, line)
-                    _commit_line(s, data, c, main_mode)
+                    _commit_line(s, data, c)
                     # execute the statement
                     terminal = LineEdit.terminal(s) # This is slightly ugly but ok for now
                     raw!(terminal, false) && disable_bracketed_paste(terminal)
@@ -217,9 +217,9 @@ function hijack_REPL()
     nothing
 end
 
-function _commit_line(s, data, c, main_mode)
+function _commit_line(s, data, c)
     move_input_end(s)
-    rewrite_with_ANSI(s, data, c, main_mode)
+    rewrite_with_ANSI(s, data, c)
     println(terminal(s))
     add_history(s)
     state(s, mode(s)).ias = InputAreaState(0, 0)

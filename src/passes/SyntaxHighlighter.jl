@@ -25,7 +25,7 @@ type ColorScheme
     _macro::ANSIToken
 end
 
-ColorScheme() = ColorScheme([ANSIToken() for i in 1:length(fieldnames(ColorScheme))]...)
+ColorScheme() = ColorScheme([ANSIToken() for _ in 1:length(fieldnames(ColorScheme))]...)
 
 type SyntaxHighlighterSettings
     colorscheme::ColorScheme
@@ -74,7 +74,7 @@ SYNTAX_HIGHLIGHTER_SETTINGS.colorscheme = MONOKAI
 #SYNTAX_HIGHLIGHTER_SETTINGS.colorscheme = FLATLAND
 add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
 
-@compat function (highlighter::SyntaxHighlighterSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)
+@compat function (highlighter::SyntaxHighlighterSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, ::Int)
     cscheme = highlighter.colorscheme
     prev_t = Tokens.Token()
     for (i, t) in enumerate(tokens)

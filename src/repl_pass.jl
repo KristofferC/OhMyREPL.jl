@@ -119,7 +119,7 @@ function enable_pass!(rpc::PassHandler, name::String, enabled::Bool)
     rpc.passes[idx][2].enabled = enabled
 end
 
-
+#=
 function set_prescedence!(rpc::PassHandler, name::String, presc::Int)
     error("TODO")
     pass_idx = _check_pass_name(name, true)
@@ -128,8 +128,6 @@ function set_prescedence!(rpc::PassHandler, name::String, presc::Int)
     presc = clamp(presc, 1, length(passes))
 end
 
-
-#=
 function Base.show(io::IO, rpc::PassHandler)
 
     print(io, "+-----------------------+----------+")
