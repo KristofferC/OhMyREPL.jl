@@ -23,8 +23,7 @@ Put this in `.juliarc.jl`
 function setup()
     @async while true
         if isdefined(Base,:active_repl)
-                @eval using PimpMyREPL
-            end
+            @eval using PimpMyREPL
             break
         else
             sleep(0.1)
