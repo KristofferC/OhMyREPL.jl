@@ -19,7 +19,7 @@ function insert_into_keymap()
         main_mode.keymap_dict[l] = (s, data, c) -> begin
             edit_insert(s, l)
             if BRACKET_INSERTER.complete_brackets
-                if eof(buffer(s)) || String(buffer(s))[position(buffer(s)) + 1] != l
+                if eof(buffer(s)) || @compat String(buffer(s))[position(buffer(s)) + 1] != l
                     edit_insert(s, r)
                     edit_move_left(s)
                 end
@@ -27,7 +27,7 @@ function insert_into_keymap()
         end
         main_mode.keymap_dict[r] = (s, data, c) -> begin
             if eof(buffer(s)) || !BRACKET_INSERTER.complete_brackets ||
-                    String(buffer(s))[position(buffer(s)) + 1] != r
+                    @compat String(buffer(s))[position(buffer(s)) + 1] != r
                 edit_insert(s, r)
             else
                 edit_move_right(s)

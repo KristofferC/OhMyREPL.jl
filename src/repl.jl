@@ -3,11 +3,15 @@
 
 module Prompt
 
+using Compat
+
+import Compat: UTF8String, String
+
 import Base: LineEdit, REPL
 
 import Base.LineEdit: buffer, cmove_col, cmove_up, InputAreaState, transition,
                       terminal, buffer, on_enter, move_input_end, add_history, state, mode, edit_insert
-import Base.REPL: respond, LatexCompletions, return_callback, repl_filename
+import Base.REPL: respond, LatexCompletions, return_callback
 
 import ..Passes
 import Tokenize.Lexers
@@ -26,7 +30,7 @@ function rewrite_with_ANSI(s, data, c, main_mode, cursormove::Bool = false)
         LineEdit.clear_input_area(terminal(s), s.mode_state[s.current_mode])
 
         # Extract the cursor index in character count
-        cursoridx = length(String(buffer(s).data[1:p]))
+        cursoridx = length(UTF8String(buffer(s).data[1:p]))
 
         # Insert colorized text from running the passes
         b = IOBuffer()
@@ -218,7 +222,7 @@ function refresh_multi_line(termbuf, terminal, buf, state)
     line_pos = buf_pos
 
     # Count the '\n' at the end of the line if the terminal emulator does (specific to DOS cmd prompt)
-    miscountnl = @static is_windows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
+    miscountnl = is_windows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
     lindent = 7
     indent = 7 # TODO this gets the cursor right but not the text
     # Now go through the buffer line by line
