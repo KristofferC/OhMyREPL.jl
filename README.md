@@ -18,7 +18,7 @@ and then just load with `using PimpMyREPL`.
 ### Features
 
 * Syntax highlighting - Highlighting of keyword, operators, symbols, strings etc. in different colors.
-* Bracket highlighting - Will make matching brackets highligted when the cursor is between an opening and closing bracket.
+* Bracket highlighting - Will make matching brackets highlighted when the cursor is between an opening and closing bracket.
 * Automatic bracket inserting - Will insert a matching closing bracket to an opening bracket automatically unless the next character is the same opening bracket. Will also ignore an input closing bracket if the character under the cursor is that closing bracket.
 * Prompt pasting - If a pasted statement starts with `julia> ` any statement beginning with `julia> ` will have that part removed before getting parsed and any other statement will be removed. This makes easy to paste what others have copied from their REPL without the need to remove any prompts or output.
 
@@ -56,7 +56,7 @@ TODO: `ANSIToken`, `ANSIValue` docs.
 The pipeline of how things are transformed from normal text to pimped text is as follows:
 
 * When a key is pressed, tokenize the full input string using `Tokenize.jl`.
-* To each token there is an assoicated `ANSIToken` which represents how the Token should be
+* To each token there is an associated `ANSIToken` which represents how the Token should be
 printed in the Terminal.
 * The list of `Tokens`, the list of `ANSITokens`s and the current position of the cursor are then sent to each registered and enabled pass.
 * The purpose of a pass is to look at the list of `Tokens` and update each `ANSIToken` to its liking. The `BracketHighlighter` pass for example looks through the tokens and find matching brackets with help of the cursor position and then updates the corresponding `ANSIToken`s for the found matching bracket `Token`s.
