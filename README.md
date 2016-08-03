@@ -14,3 +14,23 @@ Pkg.clone("https://github.com/KristofferC/PimpMyREPL.jl")
 ```
 
 and then just load with `using PimpMyREPL`.
+
+# Automatically start with Julia.
+
+Put this in `.juliarc.jl`
+
+```jl
+function setup()
+    @async while true
+        if isdefined(Base,:active_repl)
+                @eval using PimpMyREPL
+            end
+            break
+        else
+            sleep(0.1)
+        end
+    end
+end
+
+setup()
+```
