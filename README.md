@@ -46,8 +46,8 @@ The pipeline of how things are transformed from normal text to pimped text is as
 * When a key is pressed, tokenize the full input string using `Tokenize.jl`.
 * To each token there is an assoicated `ANSIToken` which represents how the Token should be
 printed in the Terminal.
-* The list of `Tokens` and the list of `ANSITokens`s is then sent to each registered pass.
-* The purpose of a pass is to look at the list of `Tokens` and update each `ANSIToken` to their liking. The `BracketHighlighter` pass for example looks through the tokens and find matching brackets and update the corresponding `ANSIToken`s for the found matching bracket `Token`s.
+* The list of `Tokens`, the list of `ANSITokens`s and the current position of the cursor is then sent to each registered pass.
+* The purpose of a pass is to look at the list of `Tokens` and update each `ANSIToken` to their liking. The `BracketHighlighter` pass for example looks through the tokens and find matching brackets with help of the cursor position and then update sthe corresponding `ANSIToken`s for the found matching bracket `Token`s.
 * After all passes are done, the `Token`s are then printed out to the terminal according to their now updated `ANSIToken`.
 
 #### Creating your own pass.
@@ -59,8 +59,8 @@ using Tokenize # Load the tokenization library
 # import the global pass handler that keep track of all passes
 import PimpMyREPL: PASS_HANDLER, ANSICodes.ANSIValue
 
-# Write the pass
-function underline_star(ansitokens, tokens, cursormovement::Int)
+# Write the pass function, the cursor position is not used but it needs to be given an argument
+function underline_star(ansitokens, tokens, cursorposition::Int)
     # Loop over all tokens and ansitokens
     for (ansitok, tok) in zip(ansitokens, tokens)
         # If the token is a STAR token
