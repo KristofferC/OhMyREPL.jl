@@ -52,7 +52,7 @@ printed in the Terminal.
 
 #### Creating your own pass.
 
-It is simple to create your own pass. We will here show how to create a pass that will transform all the `*` operators to be underlined and bold. To do so, we simply create a function that looks through the list of tokens for this operator and updates the `ANSIToken` for that `Token`. We then add this function to the global pass handler. This will immidately take effect:
+It is simple to create your own pass. We will here show how to create a pass that will transform all the `*` operators to be underlined and bold. To do so, we simply create a function that looks through the list of tokens for this operator and updates the `ANSIToken` for that `Token`. We then add this function to the global pass handler. This will immidately take effect. 
 
 ```jl
 using Tokenize # Load the tokenization library
@@ -77,3 +77,5 @@ PimpMyREPL.add_pass!(PASS_HANDLER, "Underline star", underline_star);
 ```
 
 ![](https://media.giphy.com/media/l0HlTd7DfONd0N9jG/giphy.gif)
+
+For documentation of the `Token` type please see the [`Tokenize.jl` repo](https://github.com/KristofferC/Tokenize.jl).
