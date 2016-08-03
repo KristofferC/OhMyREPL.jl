@@ -21,13 +21,17 @@ Put this in `.juliarc.jl`
 
 ```jl
 function setup()
-    @async while true
-        if isdefined(Base,:active_repl)
-            @eval using PimpMyREPL
-            break
-        else
-            sleep(0.1)
+    if isdir(Pkg.dir("PimpMyREPL"))
+        @async while true
+            if isdefined(Base, :active_repl)
+                @eval using PimpMyREPL
+                break
+            else
+                sleep(0.1)
+            end
         end
+    else
+        warn("PimpMyREPL not installed")
     end
 end
 
