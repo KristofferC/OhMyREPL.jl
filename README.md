@@ -77,3 +77,5 @@ PimpMyREPL.add_pass!(PASS_HANDLER, "Underline star", underline_star);
 ```
 
 ![](https://media.giphy.com/media/l0HlTd7DfONd0N9jG/giphy.gif)
+
+For a bit of documentation about the `Token` type please the [`Tokenize.jl` repo](https://github.com/KristofferC/Tokenize.jl)

@@ -64,6 +64,8 @@ function hijack_REPL()
     repl = Base.active_repl
     mirepl = isdefined(repl,:mi) ? repl.mi : repl
     main_mode = mirepl.interface.modes[1]
+    shell_mode = mirepl.interface.modes[2]
+    help_mode = mirepl.interface.modes[3]
 
     if !loaded
         D = Dict{Any, Any}()
@@ -101,6 +103,31 @@ function hijack_REPL()
             print(terminal(s), "^C\n\n")
             transition(s, :reset)
             rewrite_with_ANSI(s, data, c, main_mode)
+        end
+
+         # Hack around a bit to make changing repls work
+        D[";"] = (s, data, c) -> begin
+            if isempty(s) || position(LineEdit.buffer(s)) == 0
+                buf = copy(LineEdit.buffer(s))
+                transition(s, shell_mode) do
+                    LineEdit.state(s, shell_mode).input_buffer = buf
+                end
+            else
+                edit_insert(s, ';')
+                rewrite_with_ANSI(s, data, c, main_mode)
+            end
+        end
+
+        D["?"] = (s, data, c) -> begin
+            if isempty(s) || position(LineEdit.buffer(s)) == 0
+                buf = copy(LineEdit.buffer(s))
+                transition(s, help_mode) do
+                    LineEdit.state(s, help_mode).input_buffer = buf
+                end
+            else
+                edit_insert(s, '?')
+                rewrite_with_ANSI(s, data, c, main_mode)
+            end
         end
 
         # Fixup bracket paste a bit
