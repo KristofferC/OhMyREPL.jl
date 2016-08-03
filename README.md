@@ -15,6 +15,13 @@ Pkg.clone("https://github.com/KristofferC/PimpMyREPL.jl")
 
 and then just load with `using PimpMyREPL`.
 
+### Features
+
+* Syntax highlighting - Highlighting of keyword, operators, symbols, strings etc. in different colors.
+* Bracket highlighting - Will make matching brackets highligted when the cursor is between an opening and closing bracket.
+* Automatic bracket inserting - Will insert a matching closing bracket to an opening bracket automatically unless the next character is the same opening bracket. Will also ignore an input closing bracket if the character under the cursor is that closing bracket.
+* Prompt pasting - If a pasted statement starts with `julia> ` any statement beginning with `julia> ` will have that part removed before getting parsed and any other statement will be removed. This makes easy to paste what others have copied from their REPL without the need to remove any prompts or output.
+
 ### Automatically start with Julia.
 
 Put this in `.juliarc.jl`
@@ -34,6 +41,8 @@ end
 
 setup()
 ```
+
+
 
 ### Documentation
 
