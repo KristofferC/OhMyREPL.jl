@@ -49,8 +49,8 @@ The pipeline of how things are transformed from normal text to pimped text is as
 * When a key is pressed, tokenize the full input string using `Tokenize.jl`.
 * To each token there is an assoicated `ANSIToken` which represents how the Token should be
 printed in the Terminal.
-* The list of `Tokens`, the list of `ANSITokens`s and the current position of the cursor is then sent to each registered pass.
-* The purpose of a pass is to look at the list of `Tokens` and update each `ANSIToken` to their liking. The `BracketHighlighter` pass for example looks through the tokens and find matching brackets with help of the cursor position and then update sthe corresponding `ANSIToken`s for the found matching bracket `Token`s.
+* The list of `Tokens`, the list of `ANSITokens`s and the current position of the cursor are then sent to each registered and enabled pass.
+* The purpose of a pass is to look at the list of `Tokens` and update each `ANSIToken` to its liking. The `BracketHighlighter` pass for example looks through the tokens and find matching brackets with help of the cursor position and then updates the corresponding `ANSIToken`s for the found matching bracket `Token`s.
 * After all passes are done, the `Token`s are then printed out to the terminal according to their now updated `ANSIToken`.
 
 #### Creating your own pass.
