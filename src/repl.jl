@@ -155,29 +155,25 @@ function hijack_REPL()
             oldpos = start(input)
             firstline = true
             isprompt_paste = false
-            @label restart
             while !done(input, oldpos) # loop until all lines have been executed
                 # 17599
                 # Check if the next statement starts with "julia> ", in that case
                 # skip it. But first skip whitespace
-                c = oldpos
-                while c <= sizeof(input) && (input[c] == '\n' || input[c] == ' ' || input[c] == '\t')
-                    c = nextind(input, c)
+                while (input[oldpos] == '\n' || input[oldpos] == ' ' || input[oldpos] == '\t')
+                    oldpos = nextind(input, oldpos)
+                    # Hit end of input while removing whitespace => we are done here
+                    oldpos >= sizeof(input) && return
                 end
-                n_whitespace_chars = c - oldpos
                 # Skip over prompt prefix if statement starts with it
                 jl_prompt_len = 7
-                if (firstline || isprompt_paste) && (c + jl_prompt_len <= sizeof(input) && input[c:c+jl_prompt_len-1] == "julia> ")
-                        isprompt_paste = true
-                        oldpos += jl_prompt_len + n_whitespace_chars
-                # We are currently prompt pasting but this line did not have a prompt so skip it
-                isdone = false
+                if (firstline || isprompt_paste) && (oldpos + jl_prompt_len <= sizeof(input) && input[oldpos:oldpos+jl_prompt_len-1] == "julia> ")
+                    isprompt_paste = true
+                    oldpos += jl_prompt_len
+                # If we are prompt pasting and current statement does not begin with julia> , skip to next line
                 elseif isprompt_paste
                     while input[oldpos] != '\n'
                         oldpos = nextind(input, oldpos)
-                        done(input, oldpos) && (isdone = true; break)
                     end
-                    isdone && break
                     continue
                 end
                 ast, pos = Base.syntax_deprecation_warnings(false) do
@@ -208,7 +204,6 @@ function hijack_REPL()
                     raw!(terminal, false) && disable_bracketed_paste(terminal)
                     LineEdit.mode(s).on_done(s, LineEdit.buffer(s), true)
                     raw!(terminal, true) && enable_bracketed_paste(terminal)
-
                 end
                 oldpos = pos
                 firstline = false
@@ -221,7 +216,6 @@ function hijack_REPL()
 
     nothing
 end
-
 
 function _commit_line(s, data, c, main_mode)
     move_input_end(s)
