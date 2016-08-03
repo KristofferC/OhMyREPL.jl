@@ -6,7 +6,7 @@ Loading it gives the Julia REPL syntax highlighting, bracket highlighting, [prom
 
 **Note:** This is heavily a WIP in progress and are many things to fix. Issues with clear [MCVE](http://stackoverflow.com/help/mcve) are very welcome.
 
-# Installation
+### Installation
 
 ```jl
 Pkg.clone("https://github.com/KristofferC/Tokenize.jl")
@@ -15,7 +15,7 @@ Pkg.clone("https://github.com/KristofferC/PimpMyREPL.jl")
 
 and then just load with `using PimpMyREPL`.
 
-# Automatically start with Julia.
+### Automatically start with Julia.
 
 Put this in `.juliarc.jl`
 
@@ -34,3 +34,46 @@ end
 
 setup()
 ```
+
+### Documentation
+
+TODO: `ANSIToken`, `ANSIValue` docs.
+
+#### Pipeline
+
+The pipeline of how things are transformed from normal text to pimped text is as follows:
+
+* When a key is pressed, tokenize the full input string using `Tokenize.jl`.
+* To each token there is an assoicated `ANSIToken` which represents how the Token should be
+printed in the Terminal.
+* The list of `Tokens` and the list of `ANSITokens`s is then sent to each registered pass.
+* The purpose of a pass is to look at the list of `Tokens` and update each `ANSIToken` to their liking. The `BracketHighlighter` pass for example looks through the tokens and find matching brackets and update the corresponding `ANSIToken`s for the found matching bracket `Token`s.
+* After all passes are done, the `Token`s are then printed out to the terminal according to their now updated `ANSIToken`.
+
+#### Creating your own pass.
+
+It is simple to create your own pass. We will here show how to create a pass that will transform all the `*` operators to be underlined and bold. To do so, we simply create a function that looks through the list of tokens for this operator and updates the `ANSIToken` for that `Token`. We then add this function to the global pass handler. This will immidately take effect:
+
+```
+using Tokenize # Load the tokenization library
+# import the global pass handler that keep track of all passes
+import PimpMyREPL: PASS_HANDLER, ANSICodes.ANSIValue
+
+# Write the pass
+function underline_star(ansitokens, tokens, cursormovement::Int)
+    # Loop over all tokens and ansitokens
+    for (ansitok, tok) in zip(ansitokens, tokens)
+        # If the token is a STAR token
+        if Tokenize.Tokens.exactkind(tok) == Tokenize.Tokens.STAR
+            # Update the ansi token
+            ansitok.underline = ANSIValue(:underline, :true)
+            ansitok.bold = ANSIValue(:bold, :true)
+        end
+    end
+end
+
+# Add the pass to the pass_handler
+PimpMyREPL.add_pass!(PASS_HANDLER, "Underline star", underline_star);
+```
+
+![](https://media.giphy.com/media/l0HlTd7DfONd0N9jG/giphy.gif)
