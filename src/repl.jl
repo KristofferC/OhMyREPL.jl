@@ -37,7 +37,7 @@ function rewrite_with_ANSI(s, data, c, main_mode, cursormove::Bool = false)
         tokens = collect(Lexers.Lexer(buffer(s)))
         apply_passes!(PASS_HANDLER, tokens, cursoridx, cursormove)
         untokenize_with_ANSI(b, PASS_HANDLER , tokens)
-        LineEdit.write_prompt(terminal(s), main_mode)
+        LineEdit.write_prompt(terminal(s), s.mode_state[s.current_mode])
         LineEdit.write(terminal(s), "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
         write(terminal(s), takebuf_string(b))
 
