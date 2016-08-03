@@ -77,7 +77,7 @@ function insert_into_keymap()
             return
         end
         str = String(b)
-        i = findfirst(left_brackets2, str[position(b)])
+        i = findfirst(left_brackets2, str[prevind(str, position(b) + 1)])
         if !eof(buffer(s)) && i != 0
             if str[nextind(str, position(b))] == right_brackets2[i]
                 edit_move_right(s)
