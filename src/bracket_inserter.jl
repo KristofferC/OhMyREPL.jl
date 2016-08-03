@@ -78,13 +78,11 @@ function insert_into_keymap()
         end
         str = String(b)
         i = findfirst(left_brackets2, str[prevind(str, position(b) + 1)])
-        if !eof(buffer(s)) && i != 0
-            if str[nextind(str, position(b))] == right_brackets2[i]
-                edit_move_right(s)
-                edit_backspace(s)
-                edit_backspace(s)
-                return
-            end
+        if !eof(buffer(s)) && i != 0 && str[nextind(str, position(b))] == right_brackets2[i]
+            edit_move_right(s)
+            edit_backspace(s)
+            edit_backspace(s)
+            return
         else
             edit_backspace(s)
         end
