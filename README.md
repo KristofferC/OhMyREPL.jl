@@ -54,7 +54,7 @@ printed in the Terminal.
 
 It is simple to create your own pass. We will here show how to create a pass that will transform all the `*` operators to be underlined and bold. To do so, we simply create a function that looks through the list of tokens for this operator and updates the `ANSIToken` for that `Token`. We then add this function to the global pass handler. This will immidately take effect:
 
-```
+```jl
 using Tokenize # Load the tokenization library
 # import the global pass handler that keep track of all passes
 import PimpMyREPL: PASS_HANDLER, ANSICodes.ANSIValue
