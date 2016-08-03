@@ -244,7 +244,11 @@ function refresh_multi_line(termbuf, terminal, buf, state)
     line_pos = buf_pos
 
     # Count the '\n' at the end of the line if the terminal emulator does (specific to DOS cmd prompt)
-    miscountnl = is_windows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
+    if VERSION > v"0.5.0-"
+        miscountnl = is_windows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
+    else
+        miscountnl = false
+    end
     lindent = 7
     indent = 7 # TODO this gets the cursor right but not the text
     # Now go through the buffer line by line
