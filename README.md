@@ -2,9 +2,9 @@
 
 A package that hooks into the Julia REPL and gives it syntax highlighting, bracket highlighting, [prompt paste mode](https://github.com/JuliaLang/julia/pull/17599) and other goodies.
 
-![repl](https://media.giphy.com/media/l0HlyCECiFySyUdBS/giphy.gif)
+![repl](https://i.imgur.com/wtR0ASD.png)
 
-**Note:** This is heavily a WIP in progress and are many things to fix. Issues with clear [MCVE](http://stackoverflow.com/help/mcve) are very welcome.
+**Note:** This is WIP in progress and are many things to fix. Issues with clear [MCVE](http://stackoverflow.com/help/mcve) are very welcome.
 
 ### Installation
 
@@ -17,7 +17,7 @@ and then just load with `using PimpMyREPL`.
 
 ### Features
 
-* Syntax highlighting - Highlighting of keyword, operators, symbols, strings etc. in different colors.
+* Syntax highlighting - Highlighting of keyword, operators, symbols, strings etc. in different colors. There are currently two color schemes named "Monokai16" and "Monokai256" for 16 and 256 colors respectively. To activate a colorsceheme use `colorscheme!(name::String)`. By default the 16 color version will be used on Windows and the 256 color version otherwise.
 * Bracket highlighting - Will make matching brackets highlighted when the cursor is between an opening and closing bracket.
 * Automatic bracket insertion - Will insert a matching closing bracket to an opening bracket automatically unless the next character is the same opening bracket. Will also ignore an input closing bracket if the character under the cursor is that closing bracket.
 * Prompt pasting - If a pasted statement starts with `julia> ` any statement beginning with `julia> ` will have that part removed before getting parsed and any other statement will be removed. This makes easy to paste what others have copied from their REPL without the need to remove any prompts or output.
@@ -88,6 +88,6 @@ end
 PimpMyREPL.add_pass!(PASS_HANDLER, "Underline star", underline_star);
 ```
 
-![](https://media.giphy.com/media/l0HlTd7DfONd0N9jG/giphy.gif)
+![](https://i.imgur.com/MxVeA6j.png)
 
 For documentation of the `Token` type please see the [`Tokenize.jl` repo](https://github.com/KristofferC/Tokenize.jl).

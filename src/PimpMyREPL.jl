@@ -21,8 +21,16 @@ include("bracket_inserter.jl")
 using .ANSICodes
 export ANSICodes
 
-#if isdefined(Base, :active_repl)
-#    Prompt.hijack_REPL()
-#end
+
+function colorscheme!(name::String)
+    Passes.SyntaxHighlighter.activate!(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS,
+                                       name)
+end
+
+export colorscheme!
+
+if isdefined(Base, :active_repl)
+    Prompt.hijack_REPL()
+end
 
 end # module

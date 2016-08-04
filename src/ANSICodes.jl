@@ -94,7 +94,8 @@ end
 
 # make immutable?
 type ANSIToken
-    is256colors::Bool
+    foreground256colors::Bool
+    background256colors::Bool
     foreground::ANSIValue
     background::ANSIValue
     bold::ANSIValue
@@ -104,8 +105,8 @@ type ANSIToken
 end
 
 function update!(a::ANSIToken, b::ANSIToken)
-    isactive(b.foreground) && (a.foreground = b.foreground)
-    isactive(b.background) && (a.background = b.background)
+    isactive(b.foreground) && (a.foreground = b.foreground; a.foreground256colors = b.foreground256colors)
+    isactive(b.background) && (a.background = b.background; a.foreground256colors = b.foreground256colors)
     isactive(b.bold) && (a.bold = b.bold)
     isactive(b.italics) && (a.italics = b.italics)
     isactive(b.underline) && (a.underline = b.underline)
@@ -114,7 +115,7 @@ end
 
 # Some defaults, everything deactive
 function _ANSIToken()
-    ANSIToken(false,
+    ANSIToken(false, false,
               ANSIValue(39, false),
               ANSIValue(49, false),
               ANSIValue(1, false),
@@ -125,14 +126,14 @@ end
 
 
 function ANSIToken(;foreground::Union{Int, Symbol} = :nothing, background::Union{Int, Symbol} = :nothing,
-                    bold = :nothing, italics = :nothing, underline = :nothing, strikethrough = :nothing,
-                    is256colors::Bool = false)
+                    bold = :nothing, italics = :nothing, underline = :nothing, strikethrough = :nothing)
     x = _ANSIToken()
     if foreground != :nothing
         if isa(foreground, Symbol)
             x.foreground = ANSIValue(FOREGROUNDS[foreground])
         else
             x.foreground = ANSIValue(foreground)
+            x.foreground256colors = true
         end
     end
 
@@ -141,13 +142,13 @@ function ANSIToken(;foreground::Union{Int, Symbol} = :nothing, background::Union
             x.background = ANSIValue(BACKGROUNDS[background])
         else
             x.background = ANSIValue(background)
+            x.background256colors = true
         end
     end
     bold != :nothing && (x.bold = ANSIValue(BOLD[!bold + 1]))
     italics != :nothing && (x.italics = ANSIValue(ITALICS[!italics + 1]))
     underline != :nothing && (x.underline = ANSIValue(UNDERLINE[!underline + 1]))
     strikethrough != :nothing && (x.strikethrough = ANSIValue(STRIKETHROUGH[!strikethrough + 1]))
-    x.is256colors = is256colors
     return x
 end
 
@@ -174,8 +175,8 @@ function _print(io::IO, t::ANSIToken, escape = false)
     end
     !one_active && return
 
-    isfirst = maybe_print(io, isfirst, t.foreground, t.is256colors, true)
-    isfirst = maybe_print(io, isfirst, t.background, t.is256colors, false)
+    isfirst = maybe_print(io, isfirst, t.foreground, t.foreground256colors, true)
+    isfirst = maybe_print(io, isfirst, t.background, t.background256colors, false)
     isfirst = maybe_print(io, isfirst, t.bold, false, false)
     isfirst = maybe_print(io, isfirst, t.italics, false, false)
     isfirst = maybe_print(io, isfirst, t.underline, false, false)
@@ -245,7 +246,7 @@ function test_ANSI_256(io::IO = STDOUT)
         if c > 0 && c % 10 == 0
             println(io)
         end
-        print(io, ANSIToken(foreground = c, is256colors = true), c)
+        print(io, ANSIToken(foreground = c), c)
         print(io, "\e[0m")
         pad(io, c)
     end
@@ -255,7 +256,7 @@ function test_ANSI_256(io::IO = STDOUT)
         if c > 0 && c % 10 == 0
             println(io)
         end
-        print(io, ANSIToken(background = c, is256colors = true), c)
+        print(io, ANSIToken(background = c), c)
         print(io, "\e[0m")
         pad(io, c)
     end
