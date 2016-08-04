@@ -54,7 +54,6 @@ immutable ANSIValue
     val::Int
     active::Bool
 end
-ANSIValue(val::Int) = ANSIValue(val, true)
 
 val(x::ANSIValue) = x.val
 activate(x::ANSIValue, v::Bool = true) = ANSIValue(x.val, v)
