@@ -23,6 +23,7 @@ type ColorScheme
     error::ANSIToken
     argdef::ANSIToken
     _macro::ANSIToken
+    number::ANSIToken
 end
 
 ColorScheme() = ColorScheme([ANSIToken() for i in 1:length(fieldnames(ColorScheme))]...)
@@ -48,6 +49,7 @@ function _create_monokai()
     monokai.function_def = ANSIToken(foreground = :green)
     monokai.error = ANSIToken(foreground = :default)
     monokai.argdef = ANSIToken(foreground = :light_blue)
+    monokai.number = ANSIToken(foreground = :light_blue)
     return monokai
 end
 
@@ -57,7 +59,7 @@ function _create_flatland_dark()
     flatland.symbol = ANSIToken(foreground = :green)
     flatland.comment = ANSIToken(foreground = :dark_gray)
     flatland.string = ANSIToken(foreground = :light_cyan)
-    flatland.call = ANSIToken(foreground = :yellow)
+    flatland.call = ANSIToken(foreground = :light_cyan)
     flatland.op = ANSIToken(foreground = :yellow)
     flatland.keyword = ANSIToken(foreground = :yellow)
     flatland.text = ANSIToken(foreground = :default)
@@ -65,6 +67,7 @@ function _create_flatland_dark()
     flatland.function_def = ANSIToken(foreground = :green)
     flatland.error = ANSIToken(foreground = :default)
     flatland.argdef = ANSIToken(foreground = :cyan)
+    flatland.number = ANSIToken(foreground = :green)
     return flatland
 end
 
@@ -102,7 +105,7 @@ add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
             update!(ansitokens[i-1], cscheme._macro)
             update!(ansitokens[i], cscheme._macro)
         elseif kind(t) == Tokens.INTEGER || kind(t) == Tokens.FLOAT
-            update!(ansitokens[i], cscheme.call)
+            update!(ansitokens[i], cscheme.number)
         else
             update!(ansitokens[i], cscheme.text)
         end

@@ -40,6 +40,8 @@ const BACKGROUNDS = Dict(
     :white => 107
 )
 
+const BG_256 = 48
+const FG_256 = 38
 # [On, Off]
 
 const BOLD = (1, 22)
@@ -47,15 +49,12 @@ const ITALICS = (3, 23)
 const UNDERLINE = (4, 24)
 const STRIKETHROUGH = (9, 29)
 
-abstract AbstractANSI
-
 
 immutable ANSIValue
     val::Int
     active::Bool
 end
 ANSIValue(val::Int) = ANSIValue(val, true)
-
 
 val(x::ANSIValue) = x.val
 activate(x::ANSIValue, v::Bool = true) = ANSIValue(x.val, v)
@@ -74,6 +73,11 @@ function ANSIValue(layer::Symbol, val::Symbol)
     end
 end
 
+function ANSIValue(val::Int)
+    !(0 <= val <= 256) && throw(ArgumentError("Only colors between 0 and 256 supported"))
+    return ANSIValue(val, true)
+end
+
 function ANSIValue(style::Symbol, val::Bool)
     if style == :bold
         return ANSIValue(BOLD[!val + 1])
@@ -90,6 +94,7 @@ end
 
 # make immutable?
 type ANSIToken
+    is256colors::Bool
     foreground::ANSIValue
     background::ANSIValue
     bold::ANSIValue
@@ -109,7 +114,8 @@ end
 
 # Some defaults, everything deactive
 function _ANSIToken()
-    ANSIToken(ANSIValue(39, false),
+    ANSIToken(false,
+              ANSIValue(39, false),
               ANSIValue(49, false),
               ANSIValue(1, false),
               ANSIValue(3, false),
@@ -118,21 +124,39 @@ function _ANSIToken()
 end
 
 
-function ANSIToken(;foreground::Symbol = :nothing, background::Symbol = :nothing,
-                    bold = :nothing, italics = :nothing, underline = :nothing, strikethrough = :nothing)
+function ANSIToken(;foreground::Union{Int, Symbol} = :nothing, background::Union{Int, Symbol} = :nothing,
+                    bold = :nothing, italics = :nothing, underline = :nothing, strikethrough = :nothing,
+                    is256colors::Bool = false)
     x = _ANSIToken()
-    foreground != :nothing && (x.foreground = ANSIValue(FOREGROUNDS[foreground]))
-    background != :nothing && (x.background = ANSIValue(BACKGROUNDS[background]))
+    if foreground != :nothing
+        if isa(foreground, Symbol)
+            x.foreground = ANSIValue(FOREGROUNDS[foreground])
+        else
+            x.foreground = ANSIValue(foreground)
+        end
+    end
+
+    if background != :nothing
+        if isa(background, Symbol)
+            x.background = ANSIValue(BACKGROUNDS[background])
+        else
+            x.background = ANSIValue(background)
+        end
+    end
     bold != :nothing && (x.bold = ANSIValue(BOLD[!bold + 1]))
     italics != :nothing && (x.italics = ANSIValue(ITALICS[!italics + 1]))
     underline != :nothing && (x.underline = ANSIValue(UNDERLINE[!underline + 1]))
     strikethrough != :nothing && (x.strikethrough = ANSIValue(STRIKETHROUGH[!strikethrough + 1]))
+    x.is256colors = is256colors
     return x
 end
 
-function maybe_print(io::IO, isfirst::Bool, token::ANSIValue)
+# for 256 colors: <Esc>[38;5;ColorNumberm”
+function maybe_print(io::IO, isfirst::Bool, token::ANSIValue, is256colors::Bool, isforeground::Bool)
     if isactive(token)
         !isfirst && print(io, ";")
+        is256colors && isforeground && print(io, "38;5;")
+        is256colors && !isforeground && print(io, "48;5;")
         isfirst = false
         print(io, val(token))
     end
@@ -149,12 +173,13 @@ function _print(io::IO, t::ANSIToken, escape = false)
         escape ? print(io, "\\e[") : print(io, "\e[")
     end
     !one_active && return
-    isfirst = maybe_print(io, isfirst, t.foreground)
-    isfirst = maybe_print(io, isfirst, t.background)
-    isfirst = maybe_print(io, isfirst, t.bold)
-    isfirst = maybe_print(io, isfirst, t.italics)
-    isfirst = maybe_print(io, isfirst, t.underline)
-    isfirst = maybe_print(io, isfirst, t.strikethrough)
+
+    isfirst = maybe_print(io, isfirst, t.foreground, t.is256colors, true)
+    isfirst = maybe_print(io, isfirst, t.background, t.is256colors, false)
+    isfirst = maybe_print(io, isfirst, t.bold, false, false)
+    isfirst = maybe_print(io, isfirst, t.italics, false, false)
+    isfirst = maybe_print(io, isfirst, t.underline, false, false)
+    isfirst = maybe_print(io, isfirst, t.strikethrough, false, false)
     print(io, "m")
     return nothing
 end
@@ -203,6 +228,37 @@ function test_ANSI(io::IO = STDOUT)
     print(io, tok, "Strikethrough text, ANSI code: ")
     _print(io, tok, true)
     println(io, "\e[0m")
+end
+
+function test_ANSI_256(io::IO = STDOUT)
+    function pad(io, c)
+         if c < 10
+            print(io, "    ")
+        elseif c < 100
+            print(io, "   ")
+        else
+            print(io, "  ")
+        end
+    end
+
+    for c in 0:256
+        if c > 0 && c % 10 == 0
+            println(io)
+        end
+        print(io, ANSIToken(foreground = c, is256colors = true), c)
+        print(io, "\e[0m")
+        pad(io, c)
+    end
+
+    println(io)
+    for c in 0:256
+        if c > 0 && c % 10 == 0
+            println(io)
+        end
+        print(io, ANSIToken(background = c, is256colors = true), c)
+        print(io, "\e[0m")
+        pad(io, c)
+    end
 end
 
 # test_ANSI()

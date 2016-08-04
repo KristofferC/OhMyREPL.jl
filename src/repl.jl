@@ -3,11 +3,14 @@
 
 module Prompt
 
+using Compat
+import Compat.String
+
 import Base: LineEdit, REPL
 
 import Base.LineEdit: buffer, cmove_col, cmove_up, InputAreaState, transition,
                       terminal, buffer, on_enter, move_input_end, add_history, state, mode, edit_insert
-import Base.REPL: respond, LatexCompletions, return_callback, repl_filename
+import Base.REPL: respond, LatexCompletions, return_callback
 
 import ..Passes
 import Tokenize.Lexers

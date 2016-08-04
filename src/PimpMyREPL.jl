@@ -5,6 +5,9 @@ bracket matching and other nifty features.
 module PimpMyREPL
 
 using Tokenize
+using Compat
+import Compat.String
+
 
 include("ANSICodes.jl")
 include("repl_pass.jl")
@@ -15,8 +18,8 @@ include("bracket_inserter.jl")
 using .ANSICodes
 export ANSICodes
 
-if isdefined(Base, :active_repl)
-    Prompt.hijack_REPL()
-end
+#if isdefined(Base, :active_repl)
+#    Prompt.hijack_REPL()
+#end
 
 end # module
