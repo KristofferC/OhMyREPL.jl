@@ -20,7 +20,7 @@ end
 
 immutable PassHandler
     ansitokens::Vector{ANSIToken}
-    passes::Vector{Tuple{String, Pass}}
+    passes::Vector{Tuple{Compat.UTF8String, Pass}}
 end
 
 PassHandler() = PassHandler(ANSIToken[], Tuple{String, Pass}[])
