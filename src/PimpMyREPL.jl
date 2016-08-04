@@ -9,6 +9,9 @@ using Compat
 import Compat.String
 
 
+using Compat
+import Compat: UTF8String, String
+
 include("ANSICodes.jl")
 include("repl_pass.jl")
 include(joinpath("passes", "Passes.jl"))

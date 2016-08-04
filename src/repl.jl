@@ -4,7 +4,8 @@
 module Prompt
 
 using Compat
-import Compat.String
+
+import Compat: UTF8String, String
 
 import Base: LineEdit, REPL
 
@@ -23,20 +24,20 @@ import Base.Terminals: raw!, width, height, cmove, getX,
 using PimpMyREPL
 import PimpMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
-function rewrite_with_ANSI(s, data, c, main_mode, cursormove::Bool = false)
+function rewrite_with_ANSI(s, data, c, cursormove::Bool = false)
         # Clear input area
         p = position(buffer(s))
         LineEdit.clear_input_area(terminal(s), s.mode_state[s.current_mode])
 
         # Extract the cursor index in character count
-        cursoridx = length(String(buffer(s).data[1:p]))
+        cursoridx = length(UTF8String(buffer(s).data[1:p]))
 
         # Insert colorized text from running the passes
         b = IOBuffer()
         tokens = collect(Lexers.Lexer(buffer(s)))
         apply_passes!(PASS_HANDLER, tokens, cursoridx, cursormove)
         untokenize_with_ANSI(b, PASS_HANDLER , tokens)
-        LineEdit.write_prompt(terminal(s), main_mode)
+        LineEdit.write_prompt(terminal(s), s.mode_state[s.current_mode])
         LineEdit.write(terminal(s), "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
         write(terminal(s), takebuf_string(b))
 
@@ -63,17 +64,19 @@ function hijack_REPL()
     repl = Base.active_repl
     mirepl = isdefined(repl,:mi) ? repl.mi : repl
     main_mode = mirepl.interface.modes[1]
+    shell_mode = mirepl.interface.modes[2]
+    help_mode = mirepl.interface.modes[3]
 
     if !loaded
         D = Dict{Any, Any}()
         # This needs work...
         hijacked_keys = ["\e[C", "\e[D", "*", "\b", "\e[A", "\e[B", "\e[3~", "^T",
                      "\e[H", "\e[F", "\e[1;5D", "\eOd", "\e[1;5C", "\eOc",
-                     "^B", "^F", "\eb", "\ef", "\t", "(", ")", "}", "{", "]", "["]
+                     "^B", "^F", "\eb", "\ef", "\t", "(", ")", "}", "{", "]", "[", "\"", "\'"]
         @assert length(unique(hijacked_keys)) == length(hijacked_keys)
         for key in hijacked_keys
             f = match_input(main_mode.keymap_dict, key, 1)
-            D[key] = (s, data, c) -> (f(s, data, c); rewrite_with_ANSI(s, data, c, main_mode))
+            D[key] = (s, data, c) -> (f(s, data, c); rewrite_with_ANSI(s, data, c))
         end
 
         # Hack around a bit to make enter not remove syntax highlighting above
@@ -86,7 +89,7 @@ function hijack_REPL()
                 return :done
             else
                 edit_insert(s, '\n')
-                rewrite_with_ANSI(s, data, c, main_mode)
+                rewrite_with_ANSI(s, data, c)
             end
         end
 
@@ -96,10 +99,35 @@ function hijack_REPL()
                 ccall(:jl_raise_debugger, Int, ())
             end
             move_input_end(s)
-            rewrite_with_ANSI(s, data, c, main_mode)
+            rewrite_with_ANSI(s, data, c)
             print(terminal(s), "^C\n\n")
             transition(s, :reset)
-            rewrite_with_ANSI(s, data, c, main_mode)
+            rewrite_with_ANSI(s, data, c)
+        end
+
+         # Hack around a bit to make changing repls work
+        D[";"] = (s, data, c) -> begin
+            if isempty(s) || position(LineEdit.buffer(s)) == 0
+                buf = copy(LineEdit.buffer(s))
+                transition(s, shell_mode) do
+                    LineEdit.state(s, shell_mode).input_buffer = buf
+                end
+            else
+                edit_insert(s, ';')
+                rewrite_with_ANSI(s, data, c)
+            end
+        end
+
+        D["?"] = (s, data, c) -> begin
+            if isempty(s) || position(LineEdit.buffer(s)) == 0
+                buf = copy(LineEdit.buffer(s))
+                transition(s, help_mode) do
+                    LineEdit.state(s, help_mode).input_buffer = buf
+                end
+            else
+                edit_insert(s, '?')
+                rewrite_with_ANSI(s, data, c)
+            end
         end
 
         # Fixup bracket paste a bit
@@ -119,7 +147,7 @@ function hijack_REPL()
                 # don't try to execute all the WIP, since that's rather confusing
                 # and is often ill-defined how it should behave
                 edit_insert(s, input)
-                rewrite_with_ANSI(s, data, c, main_mode)
+                rewrite_with_ANSI(s, data, c)
                 return
             end
             edit_insert(sbuffer, input)
@@ -127,29 +155,26 @@ function hijack_REPL()
             oldpos = start(input)
             firstline = true
             isprompt_paste = false
-            @label restart
             while !done(input, oldpos) # loop until all lines have been executed
                 # 17599
                 # Check if the next statement starts with "julia> ", in that case
                 # skip it. But first skip whitespace
-                c = oldpos
-                while c <= sizeof(input) && (input[c] == '\n' || input[c] == ' ' || input[c] == '\t')
-                    c = nextind(input, c)
+                while (input[oldpos] == '\n' || input[oldpos] == ' ' || input[oldpos] == '\t')
+                    oldpos = nextind(input, oldpos)
+                    # Hit end of input while removing whitespace => we are done here
+                    oldpos >= sizeof(input) && return
                 end
-                n_whitespace_chars = c - oldpos
                 # Skip over prompt prefix if statement starts with it
                 jl_prompt_len = 7
-                if (firstline || isprompt_paste) && (c + jl_prompt_len <= sizeof(input) && input[c:c+jl_prompt_len-1] == "julia> ")
-                        isprompt_paste = true
-                        oldpos += jl_prompt_len + n_whitespace_chars
-                # We are currently prompt pasting but this line did not have a prompt so skip it
-                isdone = false
+                if (firstline || isprompt_paste) && (oldpos + jl_prompt_len <= sizeof(input) && input[oldpos:oldpos+jl_prompt_len-1] == "julia> ")
+                    isprompt_paste = true
+                    oldpos += jl_prompt_len
+                # If we are prompt pasting and current statement does not begin with julia> , skip to next line
                 elseif isprompt_paste
                     while input[oldpos] != '\n'
                         oldpos = nextind(input, oldpos)
-                        done(input, oldpos) && (isdone = true; break)
+                        oldpos >= sizeof(input) && return
                     end
-                    isdone && break
                     continue
                 end
                 ast, pos = Base.syntax_deprecation_warnings(false) do
@@ -166,7 +191,7 @@ function hijack_REPL()
                         tail = lstrip(tail)
                     end
                     LineEdit.replace_line(s, tail)
-                    rewrite_with_ANSI(s, data, c, main_mode)
+                    rewrite_with_ANSI(s, data, c)
                     break
                 end
                 # get the line and strip leading and trailing whitespace
@@ -174,13 +199,12 @@ function hijack_REPL()
                 if !isempty(line)
                     # put the line on the screen and history
                     LineEdit.replace_line(s, line)
-                    _commit_line(s, data, c, main_mode)
+                    _commit_line(s, data, c)
                     # execute the statement
                     terminal = LineEdit.terminal(s) # This is slightly ugly but ok for now
                     raw!(terminal, false) && disable_bracketed_paste(terminal)
                     LineEdit.mode(s).on_done(s, LineEdit.buffer(s), true)
                     raw!(terminal, true) && enable_bracketed_paste(terminal)
-
                 end
                 oldpos = pos
                 firstline = false
@@ -194,10 +218,9 @@ function hijack_REPL()
     nothing
 end
 
-
-function _commit_line(s, data, c, main_mode)
+function _commit_line(s, data, c)
     move_input_end(s)
-    rewrite_with_ANSI(s, data, c, main_mode)
+    rewrite_with_ANSI(s, data, c)
     println(terminal(s))
     add_history(s)
     state(s, mode(s)).ias = InputAreaState(0, 0)
@@ -221,7 +244,11 @@ function refresh_multi_line(termbuf, terminal, buf, state)
     line_pos = buf_pos
 
     # Count the '\n' at the end of the line if the terminal emulator does (specific to DOS cmd prompt)
-    miscountnl = @static is_windows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
+    if VERSION > v"0.5.0-"
+        miscountnl = is_windows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
+    else
+        miscountnl = false
+    end
     lindent = 7
     indent = 7 # TODO this gets the cursor right but not the text
     # Now go through the buffer line by line
