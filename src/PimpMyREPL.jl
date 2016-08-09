@@ -29,6 +29,8 @@ end
 
 export colorscheme!
 
+export enable_autocomplete_brackets
+
 if isdefined(Base, :active_repl)
     Prompt.hijack_REPL()
 end
