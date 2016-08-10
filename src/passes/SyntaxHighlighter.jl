@@ -29,20 +29,23 @@ end
 
 ColorScheme() = ColorScheme([ANSIToken() for _ in 1:length(fieldnames(ColorScheme))]...)
 
-type SyntaxHighlighterSettings
-    active::ColorScheme
-    schemes::Dict{String, ColorScheme}
-end
-function SyntaxHighlighterSettings()
-    c = ColorScheme()
-    d = Dict("Default" => c)
-    SyntaxHighlighterSettings(c, d)
+function _create_juliadefault()
+    monokai = ColorScheme()
+    monokai.symbol = ANSIToken(bold = true) # purpleish
+    monokai.comment = ANSIToken(bold = true) # greyish
+    monokai.string = ANSIToken(bold = true) # beigish
+    monokai.call = ANSIToken(bold = true) # cyanish
+    monokai.op = ANSIToken(bold = true) # redish
+    monokai.keyword = ANSIToken(bold = true) # redish
+    monokai.text = ANSIToken(bold = true)
+    monokai._macro = ANSIToken(bold = true) # cyanish
+    monokai.function_def = ANSIToken(bold = true)
+    monokai.error = ANSIToken(bold = true)
+    monokai.argdef = ANSIToken(bold = true)  # cyanish
+    monokai.number = ANSIToken(bold = true) # purpleish
+    return monokai
 end
 
-add!(sh::SyntaxHighlighterSettings, name::String, scheme::ColorScheme) = sh.schemes[name] = scheme
-activate!(sh::SyntaxHighlighterSettings, name::String) = sh.active = sh.schemes[name]
-
-SYNTAX_HIGHLIGHTER_SETTINGS = SyntaxHighlighterSettings()
 
 # Try to represent the Monokai colorscheme.
 function _create_monokai()
@@ -79,8 +82,27 @@ function _create_monokai_256()
     return monokai
 end
 
-add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai16", _create_monokai())
+
+type SyntaxHighlighterSettings
+    active::ColorScheme
+    schemes::Dict{String, ColorScheme}
+end
+function SyntaxHighlighterSettings()
+    def = _create_juliadefault()
+    d = Dict("JuliaDefault" => def)
+    SyntaxHighlighterSettings(def, d)
+end
+
+SYNTAX_HIGHLIGHTER_SETTINGS = SyntaxHighlighterSettings()
+
+add!(sh::SyntaxHighlighterSettings, name::String, scheme::ColorScheme) = sh.schemes[name] = scheme
+activate!(sh::SyntaxHighlighterSettings, name::String) = sh.active = sh.schemes[name]
+
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai256", _create_monokai_256())
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai16", _create_monokai())
+# Added by default
+# add!(SYNTAX_HIGHLIGHTER_SETTINGS, "JuliaDefault", _create_juliadefault())
+
 if !is_windows()
     activate!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai256")
 else
