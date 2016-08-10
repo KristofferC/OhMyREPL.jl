@@ -11,8 +11,8 @@ using Tokenize
 function foobar_bluify(ansitokens, tokens, ::Int)
     for (ansitok, tok) in zip(ansitokens, tokens)
         println(tok)
-        if (Tokenize.Tokens.kind(tok) == Tokenize.Tokens.Identifier
-               && untokenize(tok) == "foobar")
+        if (Tokenize.Tokens.kind(tok) == Tokenize.Tokens.IDENTIFIER
+               && Tokenize.Tokens.untokenize(tok) == "foobar")
             ansitok.foreground = ANSIValue(:foreground, :blue)
         end
     end
