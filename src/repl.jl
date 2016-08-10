@@ -68,155 +68,179 @@ function hijack_REPL()
     help_mode = mirepl.interface.modes[3]
 
     if !loaded
-        D = Dict{Any, Any}()
-        # This needs work...
-        hijacked_keys = ["\e[C", "\e[D", "*", "\b", "\e[A", "\e[B", "\e[3~", "^T",
-                     "\e[H", "\e[F", "\e[1;5D", "\eOd", "\e[1;5C", "\eOc",
-                     "^B", "^F", "\eb", "\ef", "\t", "(", ")", "}", "{", "]", "[", "\"", "\'"]
-        @assert length(unique(hijacked_keys)) == length(hijacked_keys)
-        for key in hijacked_keys
-            f = match_input(main_mode.keymap_dict, key, 1)
-            D[key] = (s, data, c) -> (f(s, data, c); rewrite_with_ANSI(s, data, c))
-        end
-
-        # Hack around a bit to make enter not remove syntax highlighting above
-        D["\r"] = (s, data, c) -> begin
-            if on_enter(s) || (eof(buffer(s)) && s.key_repeats > 1)
-                move_input_end(s)
-                println(terminal(s))
-                add_history(s)
-                state(s, mode(s)).ias = InputAreaState(0, 0)
-                return :done
-            else
-                edit_insert(s, '\n')
-                rewrite_with_ANSI(s, data, c)
-            end
-        end
-
-        # Hack around a bit to make Ctrl + C work
-        D["^C"] = (s, data, c) -> begin
-            try # raise the debugger if present
-                ccall(:jl_raise_debugger, Int, ())
-            end
-            move_input_end(s)
-            rewrite_with_ANSI(s, data, c)
-            print(terminal(s), "^C\n\n")
-            transition(s, :reset)
-            rewrite_with_ANSI(s, data, c)
-        end
-
-         # Hack around a bit to make changing repls work
-        D[";"] = (s, data, c) -> begin
-            if isempty(s) || position(LineEdit.buffer(s)) == 0
-                buf = copy(LineEdit.buffer(s))
-                transition(s, shell_mode) do
-                    LineEdit.state(s, shell_mode).input_buffer = buf
-                end
-            else
-                edit_insert(s, ';')
-                rewrite_with_ANSI(s, data, c)
-            end
-        end
-
-        D["?"] = (s, data, c) -> begin
-            if isempty(s) || position(LineEdit.buffer(s)) == 0
-                buf = copy(LineEdit.buffer(s))
-                transition(s, help_mode) do
-                    LineEdit.state(s, help_mode).input_buffer = buf
-                end
-            else
-                edit_insert(s, '?')
-                rewrite_with_ANSI(s, data, c)
-            end
-        end
-
-        # Fixup bracket paste a bit
-         D["\e[200~"] = (s, data, c) ->begin
-            input = LineEdit.bracketed_paste(s) # read directly from s until reaching the end-bracketed-paste marker
-            sbuffer = LineEdit.buffer(s)
-            curspos = position(sbuffer)
-            seek(sbuffer, 0)
-            shouldeval = (nb_available(sbuffer) == curspos && search(sbuffer, UInt8('\n')) == 0)
-            seek(sbuffer, curspos)
-            if curspos == 0
-                # if pasting at the beginning, strip leading whitespace
-                input = lstrip(input)
-            end
-            if !shouldeval
-                # when pasting in the middle of input, just paste in place
-                # don't try to execute all the WIP, since that's rather confusing
-                # and is often ill-defined how it should behave
-                edit_insert(s, input)
-                rewrite_with_ANSI(s, data, c)
-                return
-            end
-            edit_insert(sbuffer, input)
-            input = takebuf_string(sbuffer)
-            oldpos = start(input)
-            firstline = true
-            isprompt_paste = false
-            while !done(input, oldpos) # loop until all lines have been executed
-                # 17599
-                # Check if the next statement starts with "julia> ", in that case
-                # skip it. But first skip whitespace
-                while (input[oldpos] == '\n' || input[oldpos] == ' ' || input[oldpos] == '\t')
-                    oldpos = nextind(input, oldpos)
-                    # Hit end of input while removing whitespace => we are done here
-                    oldpos >= sizeof(input) && return
-                end
-                # Skip over prompt prefix if statement starts with it
-                jl_prompt_len = 7
-                if (firstline || isprompt_paste) && (oldpos + jl_prompt_len <= sizeof(input) && input[oldpos:oldpos+jl_prompt_len-1] == "julia> ")
-                    isprompt_paste = true
-                    oldpos += jl_prompt_len
-                # If we are prompt pasting and current statement does not begin with julia> , skip to next line
-                elseif isprompt_paste
-                    while input[oldpos] != '\n'
-                        oldpos = nextind(input, oldpos)
-                        oldpos >= sizeof(input) && return
-                    end
-                    continue
-                end
-                ast, pos = Base.syntax_deprecation_warnings(false) do
-                    Base.parse(input, oldpos, raise=false)
-                end
-                if (isa(ast, Expr) && (ast.head == :erdisable_ror || ast.head == :continue || ast.head == :incomplete)) ||
-                        (done(input, pos) && !endswith(input, '\n'))
-                    # remaining text is incomplete (an error, or parser ran to the end but didn't stop with a newline):
-                    # Insert all the remaining text as one line (might be empty)
-                    tail = input[oldpos:end]
-                    if !firstline
-                        # strip leading whitespace, but only if it was the result of executing something
-                        # (avoids modifying the user's current leading wip line)
-                        tail = lstrip(tail)
-                    end
-                    LineEdit.replace_line(s, tail)
-                    rewrite_with_ANSI(s, data, c)
-                    break
-                end
-                # get the line and strip leading and trailing whitespace
-                line = strip(input[oldpos:prevind(input, pos)])
-                if !isempty(line)
-                    # put the line on the screen and history
-                    LineEdit.replace_line(s, line)
-                    _commit_line(s, data, c)
-                    # execute the statement
-                    terminal = LineEdit.terminal(s) # This is slightly ugly but ok for now
-                    raw!(terminal, false) && disable_bracketed_paste(terminal)
-                    LineEdit.mode(s).on_done(s, LineEdit.buffer(s), true)
-                    raw!(terminal, true) && enable_bracketed_paste(terminal)
-                end
-                oldpos = pos
-                firstline = false
-            end
-        end
-
-        main_mode.keymap_dict = LineEdit.keymap([D, main_mode.keymap_dict])
+        main_mode.keymap_dict = KEYMAP
         loaded = true
     end
-
     nothing
 end
+
+
+match_input(f::Function, str::String, i) = f
+function match_input(k::Dict, str::String, i=1)
+    key = haskey(k, str[i]) ? str[i] : '\0'
+    # if we don't match on the key, look for a default action then fallback on 'nothing' to ignore
+    return match_input(get(k, key, nothing), str, nextind(str, i))
+end
+
+# This is for precompilation to work
+function create_keymap()
+    term_str = get(ENV, "TERM", @static is_windows() ? "" : "dumb")
+    term = Base.Terminals.TTYTerminal(term_str, Base.TTY(Base.RawFD(0)), Base.TTY(Base.RawFD(0)), Base.TTY(Base.RawFD(0)) )
+    repl = Base.REPL.LineEditREPL(term, true)
+    mi = Base.REPL.setup_interface(repl; hascolor = Base.Terminals.hascolor(term))
+    main_mode = mi.modes[1]
+    keymap = _create_keymap(main_mode)
+end
+
+function _create_keymap(main_mode)
+
+    D = Dict{Any, Any}()
+    # This needs work...
+    hijacked_keys = ["\e[C", "\e[D", "*", "\b", "\e[A", "\e[B", "\e[3~", "^T",
+                 "\e[H", "\e[F", "\e[1;5D", "\eOd", "\e[1;5C", "\eOc",
+                 "^B", "^F", "\eb", "\ef", "\t", "(", ")", "}", "{", "]", "[", "\"", "\'"]
+    @assert length(unique(hijacked_keys)) == length(hijacked_keys)
+    for key in hijacked_keys
+        f = match_input(main_mode.keymap_dict, key, 1)
+        D[key] = (s, data, c) -> (f(s, data, c); rewrite_with_ANSI(s, data, c))
+    end
+
+    # Hack around a bit to make enter not remove syntax highlighting above
+    D["\r"] = (s, data, c) -> begin
+        if on_enter(s) || (eof(buffer(s)) && s.key_repeats > 1)
+            move_input_end(s)
+            println(terminal(s))
+            add_history(s)
+            state(s, mode(s)).ias = InputAreaState(0, 0)
+            return :done
+        else
+            edit_insert(s, '\n')
+            rewrite_with_ANSI(s, data, c)
+        end
+    end
+
+    # Hack around a bit to make Ctrl + C work
+    D["^C"] = (s, data, c) -> begin
+        try # raise the debugger if present
+            ccall(:jl_raise_debugger, Int, ())
+        end
+        move_input_end(s)
+        rewrite_with_ANSI(s, data, c)
+        print(terminal(s), "^C\n\n")
+        transition(s, :reset)
+        rewrite_with_ANSI(s, data, c)
+    end
+
+     # Hack around a bit to make changing repls work
+    D[";"] = (s, data, c) -> begin
+        if isempty(s) || position(LineEdit.buffer(s)) == 0
+            buf = copy(LineEdit.buffer(s))
+            transition(s, shell_mode) do
+                LineEdit.state(s, shell_mode).input_buffer = buf
+            end
+        else
+            edit_insert(s, ';')
+            rewrite_with_ANSI(s, data, c)
+        end
+    end
+
+    D["?"] = (s, data, c) -> begin
+        if isempty(s) || position(LineEdit.buffer(s)) == 0
+            buf = copy(LineEdit.buffer(s))
+            transition(s, help_mode) do
+                LineEdit.state(s, help_mode).input_buffer = buf
+            end
+        else
+            edit_insert(s, '?')
+            rewrite_with_ANSI(s, data, c)
+        end
+    end
+
+    # Fixup bracket paste a bit
+     D["\e[200~"] = (s, data, c) ->begin
+        input = LineEdit.bracketed_paste(s) # read directly from s until reaching the end-bracketed-paste marker
+        sbuffer = LineEdit.buffer(s)
+        curspos = position(sbuffer)
+        seek(sbuffer, 0)
+        shouldeval = (nb_available(sbuffer) == curspos && search(sbuffer, UInt8('\n')) == 0)
+        seek(sbuffer, curspos)
+        if curspos == 0
+            # if pasting at the beginning, strip leading whitespace
+            input = lstrip(input)
+        end
+        if !shouldeval
+            # when pasting in the middle of input, just paste in place
+            # don't try to execute all the WIP, since that's rather confusing
+            # and is often ill-defined how it should behave
+            edit_insert(s, input)
+            rewrite_with_ANSI(s, data, c)
+            return
+        end
+        edit_insert(sbuffer, input)
+        input = takebuf_string(sbuffer)
+        oldpos = start(input)
+        firstline = true
+        isprompt_paste = false
+        while !done(input, oldpos) # loop until all lines have been executed
+            # 17599
+            # Check if the next statement starts with "julia> ", in that case
+            # skip it. But first skip whitespace
+            while (input[oldpos] == '\n' || input[oldpos] == ' ' || input[oldpos] == '\t')
+                oldpos = nextind(input, oldpos)
+                # Hit end of input while removing whitespace => we are done here
+                oldpos >= sizeof(input) && return
+            end
+            # Skip over prompt prefix if statement starts with it
+            jl_prompt_len = 7
+            if (firstline || isprompt_paste) && (oldpos + jl_prompt_len <= sizeof(input) && input[oldpos:oldpos+jl_prompt_len-1] == "julia> ")
+                isprompt_paste = true
+                oldpos += jl_prompt_len
+            # If we are prompt pasting and current statement does not begin with julia> , skip to next line
+            elseif isprompt_paste
+                while input[oldpos] != '\n'
+                    oldpos = nextind(input, oldpos)
+                    oldpos >= sizeof(input) && return
+                end
+                continue
+            end
+            ast, pos = Base.syntax_deprecation_warnings(false) do
+                Base.parse(input, oldpos, raise=false)
+            end
+            if (isa(ast, Expr) && (ast.head == :erdisable_ror || ast.head == :continue || ast.head == :incomplete)) ||
+                    (done(input, pos) && !endswith(input, '\n'))
+                # remaining text is incomplete (an error, or parser ran to the end but didn't stop with a newline):
+                # Insert all the remaining text as one line (might be empty)
+                tail = input[oldpos:end]
+                if !firstline
+                    # strip leading whitespace, but only if it was the result of executing something
+                    # (avoids modifying the user's current leading wip line)
+                    tail = lstrip(tail)
+                end
+                LineEdit.replace_line(s, tail)
+                rewrite_with_ANSI(s, data, c)
+                break
+            end
+            # get the line and strip leading and trailing whitespace
+            line = strip(input[oldpos:prevind(input, pos)])
+            if !isempty(line)
+                # put the line on the screen and history
+                LineEdit.replace_line(s, line)
+                _commit_line(s, data, c)
+                # execute the statement
+                terminal = LineEdit.terminal(s) # This is slightly ugly but ok for now
+                raw!(terminal, false) && disable_bracketed_paste(terminal)
+                LineEdit.mode(s).on_done(s, LineEdit.buffer(s), true)
+                raw!(terminal, true) && enable_bracketed_paste(terminal)
+            end
+            oldpos = pos
+            firstline = false
+        end
+    end
+    return LineEdit.keymap([D, main_mode.keymap_dict])
+end
+
+const KEYMAP = create_keymap()
+
 
 function _commit_line(s, data, c)
     move_input_end(s)
@@ -227,12 +251,6 @@ function _commit_line(s, data, c)
 end
 
 
-match_input(f::Function, str::String, i) = f
-function match_input(k::Dict, str::String, i=1)
-    key = haskey(k, str[i]) ? str[i] : '\0'
-    # if we don't match on the key, look for a default action then fallback on 'nothing' to ignore
-    return match_input(get(k, key, nothing), str, nextind(str, i))
-end
 
 # Pasted from LineEdit.jl but the writes to the Terminal have been removed.
 function refresh_multi_line(termbuf, terminal, buf, state)
