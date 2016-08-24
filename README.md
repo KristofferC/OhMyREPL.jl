@@ -1,6 +1,6 @@
 # PimpMyREPL
 
-A package that hooks into the Julia REPL and gives it syntax highlighting, bracket highlighting, [prompt paste mode](https://github.com/JuliaLang/julia/pull/17599) and other goodies.
+A package that hooks into the Julia REPL and gives it syntax highlighting, bracket highlighting, [prompt paste mode](https://github.com/JuliaLang/julia/pull/17599), colorized error messages and other goodies.
 
 ![repl](https://i.imgur.com/wtR0ASD.png)
 
@@ -21,6 +21,7 @@ and then just load with `using PimpMyREPL`.
 * Bracket highlighting - Will make matching brackets highlighted when the cursor is between an opening and closing bracket.
 * Automatic bracket insertion - Will insert a matching closing bracket to an opening bracket automatically unless the next character is the same opening bracket. Will also ignore an input closing bracket if the character under the cursor is that closing bracket. This can be enabled or disabled at will with `enable_autocomplete_brackets(::Bool)`.
 * Prompt pasting - If a pasted statement starts with `julia> ` any statement beginning with `julia> ` will have that part removed before getting parsed and any other statement will be removed. This makes easy to paste what others have copied from their REPL without the need to remove any prompts or output.
+* Colorized error messages [0.5 only]. Will write the error messages in a bit nicer way. To disable, put `ENV["LEGACY_ERRORS"] = true` in your `.juliarc` file.
 
 ### Automatically start with Julia.
 

@@ -5,12 +5,16 @@ bracket matching and other nifty features.
 module PimpMyREPL
 
 using Tokenize
-using Compat
-import Compat.String
-
 
 using Compat
 import Compat: UTF8String, String
+
+if VERSION > v"0.5-"
+    prev_stdout = STDERR
+    redirect_stderr()
+    include("ErrorMessages.jl")
+    redirect_stderr(prev_stdout)
+end
 
 include("ANSICodes.jl")
 include("repl_pass.jl")
