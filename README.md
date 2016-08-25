@@ -32,6 +32,7 @@ function setup()
     if isdir(Pkg.dir("PimpMyREPL"))
         @async while true
             if isdefined(Base, :active_repl)
+                sleep(0.05)
                 @eval using PimpMyREPL
                 break
             else
