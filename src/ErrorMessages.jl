@@ -22,7 +22,6 @@ function display_last_error(io::IO = STDOUT)
     end
 end
 
-
 err_linfo_color()   = repl_color("JULIA_ERR_LINFO_COLOR", :bold)
 err_funcdef_color() = repl_color("JULIA_ERR_FUNCDEF_COLOR", :bold)
 
@@ -71,11 +70,25 @@ function Base.showerror(io::IO, ex, bt; backtrace=true)
         end
     end
 end
+
+# TODO: Get rid of these globals..
+global n_frames = Ref{Int}(0)
+global linfos = []
+global stack_counter = 0
 # This is replaced because we want to have the option to not show inlined functions in backtrace
 function Base.show_backtrace(io::IO, t::Vector)
-    process_entry(last_frame, n) =
+    global stack_counter = 0
+    global n_frames
+    global linfos
+    resize!(linfos, 0)
+    n_frames[] = 1
+    process_backtrace((a,b) -> n_frames[] += 1, t)
+    process_entry(last_frame, n) = begin
         show_trace_entry(io, last_frame, n)
+        push!(linfos, (string(last_frame.file), last_frame.line))
+    end
     process_backtrace(process_entry, t, rev  = get(io, :REPLError, false))
+    reverse!(linfos)
 end
 
 
@@ -161,12 +174,13 @@ end
 # Want to be able to not show the argument type signature for a stack frame
 
 function Base.StackTraces.show(io::IO, frame::StackFrame; full_path::Bool=false)
+    global stack_counter
     isreplerror = get(io, :REPLError, false)
-    isreplerror ? print_with_color(:bold, io, " — ") : print(io, " at ")
+    isreplerror ? print_with_color(:bold, io, "[#$(n_frames[] - (stack_counter += 1))] — ") : print(io, " at ")
     show_spec_linfo(io, frame)
     if frame.file !== empty_sym
         file_info = full_path ? string(frame.file) : basename(string(frame.file))
-        isreplerror && print(io, "\n    ⌙")
+        isreplerror && print(io, "\n       ⌙")
         print(io, " at ")
         Base.with_output_color(isreplerror ? err_linfo_color() : :nothing, io) do io
             print(io, file_info, ":")
