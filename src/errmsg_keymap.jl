@@ -1,6 +1,5 @@
 import .ErrorMessages: linfos
 
-edit_line(n::Int) = Base.edit(linfos[n][1], linfos[n][2])
 
 function insert_keymap()
     global prev_er
@@ -17,11 +16,11 @@ function insert_keymap()
             return
         else
             n = get(n, false)
-            if (n <= 0 || n > length(linfos))
+            if n <= 0 || n > length(linfos) || startswith(linfos[n][1], "./REPL")
                 write(Base.LineEdit.buffer(s), str)
                 return
             end
-            edit_line(n)
+            Base.edit(linfos[n][1], linfos[n][2])
             Base.LineEdit.refresh_line(s)
             return
         end
