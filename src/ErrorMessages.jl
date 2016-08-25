@@ -4,8 +4,10 @@ export display_last_error, ErrorMessageSettings, test_error
 
 import Base.REPL: display_error, ip_matches_func
 import Base.StackTraces: empty_sym, show_spec_linfo
-import Base: process_backtrace, show_trace_entry, show_backtrace, default_color_warn, repl_color
+import Base: process_backtrace, show_trace_entry, show_backtrace, default_color_warn, repl_color, have_color,
+             text_colors, color_normal
 
+Base.text_colors[:nothing] = ""
 
 # We have a global variable that will always store the latest show backtrace
 # This is useful for debugging the package itself but also if you want to reprint
@@ -31,12 +33,14 @@ function Base.REPL.display_error(io::IO, er, bt)
     global prev_er
     prev_er = (er, bt)
     legacy_errs = haskey(ENV, "LEGACY_ERRORS")
+    # remove REPL-related frames from interactive printing
+    eval_ind = findlast(addr->Base.REPL.ip_matches_func(addr, :eval), bt)
+    if eval_ind != 0
+        bt = bt[1:eval_ind-1]
+    end
+
     Base.with_output_color(legacy_errs ? :red : :nothing, io) do io
-        # remove REPL-related frames from interactive printing
-        eval_ind = findlast(addr->Base.REPL.ip_matches_func(addr, :eval), bt)
-        if eval_ind != 0
-            bt = bt[1:eval_ind-1]
-        end
+        legacy_errs && print(io, "ERROR: ")
         Base.showerror(IOContext(io, :REPLError => !legacy_errs), er, bt)
     end
 end
@@ -164,7 +168,6 @@ function Base.StackTraces.show(io::IO, frame::StackFrame; full_path::Bool=false)
         file_info = full_path ? string(frame.file) : basename(string(frame.file))
         isreplerror && print(io, "\n    ⌙")
         print(io, " at ")
-        col = get(io, :REPLError, false)  ? err_linfo_color() : :nothing
         Base.with_output_color(isreplerror ? err_linfo_color() : :nothing, io) do io
             print(io, file_info, ":")
             if frame.line >= 0
@@ -176,6 +179,16 @@ function Base.StackTraces.show(io::IO, frame::StackFrame; full_path::Bool=false)
     end
     if frame.inlined
         print(io, " [inlined]")
+    end
+end
+
+function Base.with_output_color(f::Function, color::Symbol, io::IO, args...)
+    buf = IOBuffer()
+    have_color && print(buf, get(text_colors, color, color_normal))
+    try f(buf, args...)
+    finally
+        have_color && color != :nothing && print(buf, color_normal)
+        print(io, takebuf_string(buf))
     end
 end
 
