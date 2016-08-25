@@ -1,6 +1,6 @@
 # PimpMyREPL
 
-A package that hooks into the Julia REPL and gives it syntax highlighting, bracket highlighting, [prompt paste mode](https://github.com/JuliaLang/julia/pull/17599), colorized error messages and other goodies.
+A package that hooks into the Julia REPL and gives it syntax highlighting, bracket highlighting, [prompt paste mode](https://github.com/JuliaLang/julia/pull/17599), [colorized, structured error messages](https://github.com/JuliaLang/julia/pull/18228) and other goodies.
 
 ![repl](https://i.imgur.com/wtR0ASD.png)
 
@@ -32,6 +32,7 @@ function setup()
     if isdir(Pkg.dir("PimpMyREPL"))
         @async while true
             if isdefined(Base, :active_repl)
+                sleep(0.05)
                 @eval using PimpMyREPL
                 break
             else
