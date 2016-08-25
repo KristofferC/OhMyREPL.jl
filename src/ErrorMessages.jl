@@ -23,11 +23,8 @@ function display_last_error(io::IO = STDOUT)
 end
 
 
-
-err_arg_color()   = repl_color("JULIA_ERR_ARG_COLOR", :gray)
 err_linfo_color()   = repl_color("JULIA_ERR_LINFO_COLOR", :bold)
 err_funcdef_color() = repl_color("JULIA_ERR_FUNCDEF_COLOR", :bold)
-
 
 function Base.REPL.display_error(io::IO, er, bt)
     global prev_er
@@ -54,8 +51,8 @@ function Base.showerror(io::IO, ex, bt; backtrace=true)
             backtrace_str = takebuf_string(io_bt)
             # Only print the backtrace header if there actually is a printed backtrace
             if backtrace_str != ""
-                header = string(typeof(ex).name.name)
-                line_len = 76
+                header = string(typeof(ex).name.name, " ")
+                line_len = min(90, Base.Terminals.width(Base.active_repl.t))
                 print_with_color(default_color_warn, io, "-"^line_len * "\n", header)
                 print(io, lpad("Stacktrace (most recent call last)", line_len - strwidth(header), ' '))
                 print(io, backtrace_str, "\n")
@@ -119,9 +116,11 @@ end
 function Base.show_lambda_types(io::IO, li::LambdaInfo)
     isreplerror = get(io, :REPLError, false)
     local sig
+    returned_from_do = false
     Base.with_output_color(isreplerror  ? err_funcdef_color() : :nothing, io) do io
         if li.specTypes === Tuple
             print(io, li.def.name, "(...)")
+            returned_from_do = true
             return
         end
         sig = li.specTypes.parameters
@@ -137,6 +136,7 @@ function Base.show_lambda_types(io::IO, li::LambdaInfo)
             print(io, "(::", ft, ")")
         end
     end
+    returned_from_do && return
     first = true
     isreplerror ? print_with_color(:bold, io, "(") : print(io, '(')
     for i = 2:length(sig)  # fixme (iter): `eachindex` with offset?
