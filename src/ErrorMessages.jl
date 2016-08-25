@@ -4,7 +4,7 @@ export display_last_error, ErrorMessageSettings, test_error
 
 import Base.REPL: display_error, ip_matches_func
 import Base.StackTraces: empty_sym, show_spec_linfo
-import Base: process_backtrace, show_trace_entry, show_backtrace, default_color_warn
+import Base: process_backtrace, show_trace_entry, show_backtrace, default_color_warn, repl_color
 
 
 # We have a global variable that will always store the latest show backtrace
@@ -21,8 +21,11 @@ function display_last_error(io::IO = STDOUT)
 end
 
 
-file_color = :green
-funcdef_color = :yellow
+
+err_arg_color()   = repl_color("JULIA_ERR_ARG_COLOR", :gray)
+err_linfo_color()   = repl_color("JULIA_ERR_LINFO_COLOR", :bold)
+err_funcdef_color() = repl_color("JULIA_ERR_FUNCDEF_COLOR", :bold)
+
 
 function Base.REPL.display_error(io::IO, er, bt)
     global prev_er
@@ -49,11 +52,9 @@ function Base.showerror(io::IO, ex, bt; backtrace=true)
             if backtrace_str != ""
                 header = string(typeof(ex).name.name)
                 line_len = 76
-                print_with_color(default_color_warn, io, "-"^line_len * "\n")
-                print_with_color(default_color_warn, io, header)
+                print_with_color(default_color_warn, io, "-"^line_len * "\n", header)
                 print(io, lpad("Stacktrace (most recent call last)", line_len - strwidth(header), ' '))
-                print(io, backtrace_str)
-                println(io)
+                print(io, backtrace_str, "\n")
             end
         end
         try
@@ -111,6 +112,38 @@ function process_backtrace(process_func::Function, t::Vector, limit::Int=typemax
     end
 end
 
+function Base.show_lambda_types(io::IO, li::LambdaInfo)
+    isreplerror = get(io, :REPLError, false)
+    local sig
+    Base.with_output_color(isreplerror  ? err_funcdef_color() : :nothing, io) do io
+        if li.specTypes === Tuple
+            print(io, li.def.name, "(...)")
+            return
+        end
+        sig = li.specTypes.parameters
+        ft = sig[1]
+        if ft <: Function && isempty(ft.parameters) &&
+                isdefined(ft.name.module, ft.name.mt.name) &&
+                ft == typeof(getfield(ft.name.module, ft.name.mt.name))
+            print(io, ft.name.mt.name)
+        elseif isa(ft, DataType) && is(ft.name, Type.name) && isleaftype(ft)
+            f = ft.parameters[1]
+            print(io, f)
+        else
+            print(io, "(::", ft, ")")
+        end
+    end
+    first = true
+    isreplerror ? print_with_color(:bold, io, "(") : print(io, '(')
+    for i = 2:length(sig)  # fixme (iter): `eachindex` with offset?
+        first || print(io, ", ")
+        first = false
+        print(io, "::", sig[i])
+    end
+    isreplerror ? print_with_color(:bold, io, ")") : print(io, ')')
+    nothing
+end
+
 
 # Stackframes
 
@@ -124,17 +157,15 @@ end
 # Want to be able to not show the argument type signature for a stack frame
 
 function Base.StackTraces.show(io::IO, frame::StackFrame; full_path::Bool=false)
-    print(io, " in ")
-    col = get(io, :REPLError, false)  ? funcdef_color : :nothing
-    Base.with_output_color(col, io) do io
-        show_spec_linfo(io, frame)
-    end
+    isreplerror = get(io, :REPLError, false)
+    isreplerror ? print_with_color(:bold, io, " — ") : print(io, " at ")
+    show_spec_linfo(io, frame)
     if frame.file !== empty_sym
         file_info = full_path ? string(frame.file) : basename(string(frame.file))
-        get(io, :REPLError, false) && print(io, "\n    ⌙")
+        isreplerror && print(io, "\n    ⌙")
         print(io, " at ")
-        col = get(io, :REPLError, false)  ? file_color : :nothing
-        Base.with_output_color(col, io) do io
+        col = get(io, :REPLError, false)  ? err_linfo_color() : :nothing
+        Base.with_output_color(isreplerror ? err_linfo_color() : :nothing, io) do io
             print(io, file_info, ":")
             if frame.line >= 0
                 print(io, frame.line)

@@ -10,10 +10,10 @@ using Compat
 import Compat: UTF8String, String
 
 if VERSION > v"0.5-"
-    prev_stdout = STDERR
-    redirect_stderr()
+   # prev_stdout = STDERR
+    #redirect_stderr()
     include("ErrorMessages.jl")
-    redirect_stderr(prev_stdout)
+    #redirect_stderr(prev_stdout)
 end
 
 include("ANSICodes.jl")
