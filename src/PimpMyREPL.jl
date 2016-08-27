@@ -9,15 +9,14 @@ using Tokenize
 using Compat
 import Compat: UTF8String, String
 
-
-if VERSION > v"0.5-" && !haskey(ENV, "LEGACY_ERRORS")
-    #prev_stdout = STDERR
-    #redirect_stderr()
+# http://stackoverflow.com/a/39174202
+if VERSION > v"0.5-"
+    ORIGINAL_STDERR = STDERR
+    err_rd, err_wr = redirect_stderr()
     include("ErrorMessages.jl")
-    #redirect_stderr(prev_stdout)
+    REDIRECTED_STDERR = STDERR
+    err_stream = redirect_stderr(ORIGINAL_STDERR)
 end
-# Putting the below file into ErrorMessages.jl crashes julia on 0.6...
-include("errmsg_keymap.jl")
 
 include("ANSICodes.jl")
 include("repl_pass.jl")
