@@ -5,12 +5,6 @@ import Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, untokenize
 import Tokenize.Lexers
 
-#using Logging
-#@Logging.configure(level=DEBUG)
-
-macro debug(ex)
-    return :()
-end
 
 type Pass
     f!
