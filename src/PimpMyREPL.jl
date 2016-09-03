@@ -1,3 +1,4 @@
+__precompile__()
 """
 A package that provides a new REPL that has syntax highlighting,
 bracket matching and other nifty features.
@@ -37,8 +38,10 @@ export colorscheme!
 
 export enable_autocomplete_brackets
 
-if isdefined(Base, :active_repl)
-    Prompt.hijack_REPL()
+function __init__()
+    if isdefined(Base, :active_repl)
+        Prompt.hijack_REPL()
+    end
 end
 
 end # module
