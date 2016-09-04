@@ -12,6 +12,7 @@ import Compat: UTF8String, String
 
 # http://stackoverflow.com/a/39174202
 
+export colorscheme!, colorschemes, enable_autocomplete_brackets, test_colorscheme
 
 include("ANSICodes.jl")
 include("repl_pass.jl")
@@ -29,9 +30,32 @@ function colorscheme!(name::String)
                                        name)
 end
 
-export colorscheme!
+function colorschemes()
+    show(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS)
+end
 
-export enable_autocomplete_brackets
+const TEST_STR = """
+
+function funcdef(x::Float64, y::Int64)
+    y = 100_000
+    x = :foo
+    s = "I am a happy string"
+    @time 1+1
+    #= Comments look like this =#
+    z = funccall(x, y)
+    5 * 3 + 2 - 1
+end
+"""
+
+function test_colorscheme(name::String, str::String = TEST_STR)
+    syntaxpass = get_pass(PASS_HANDLER, "SyntaxHighlighter")
+    active = syntaxpass.active
+    colorscheme!(name)
+    test_pass(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS, str)
+    syntaxpass.active = active
+    return
+end
+
 
 function __init__()
     if isdefined(Base, :active_repl)
@@ -47,7 +71,5 @@ function __init__()
     REDIRECTED_STDERR = STDERR
     err_stream = redirect_stderr(ORIGINAL_STDERR)
 end
-
-
 
 end # module

@@ -41,7 +41,6 @@ end
 test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
     test_passes(STDOUT, rpc, str, cursorpos, cursormovement)
 
-# We need to pass in the buffer here so we know when to indent for a new line
 function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token})
     @assert length(tokens) == length(ansitokens)
     print("\e[0m")
@@ -101,6 +100,10 @@ function _check_pass_name(rpc::PassHandler, name::String, shouldexist::Bool)
     return idx
 end
 
+function get_pass(rpc::PassHandler, name::String)
+    idx = idx = _check_pass_name(rpc, name, true)
+    return rpc.passes[idx][2].f!
+end
 
 function add_pass!(rpc::PassHandler, name::String, f, update_on_cursormovement::Bool = true)
     idx = _check_pass_name(rpc, name, false)
