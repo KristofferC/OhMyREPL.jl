@@ -64,10 +64,12 @@ function __init__()
 
     ORIGINAL_STDERR = STDERR
     err_rd, err_wr = redirect_stderr()
+    reader = @async readstring(err_rd)
     Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); PimpMyREPL.Prompt.rewrite_with_ANSI(s))
     if VERSION > v"0.5-"
-       include(joinpath(dirname(@__FILE__), "ErrorMessages.jl"))
+        include(joinpath(dirname(@__FILE__), "ErrorMessages.jl"))
     end
+    wait(reader)
     REDIRECTED_STDERR = STDERR
     err_stream = redirect_stderr(ORIGINAL_STDERR)
 end
