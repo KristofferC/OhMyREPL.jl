@@ -109,10 +109,21 @@ function create_keybindings()
     # Hack around a bit to make enter not remove syntax highlighting above
     D["\r"] = (s, data, c) -> begin
         if on_enter(s) || (eof(buffer(s)) && s.key_repeats > 1)
+            # Disable bracket highlighting before entering
+            brackidx = PimpMyREPL._find_pass(PimpMyREPL.PASS_HANDLER, "BracketHighlighter")
+            if brackidx != -1
+                brackstatus = PimpMyREPL.PASS_HANDLER.passes[brackidx][2].enabled
+                PimpMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", false)
+                rewrite_with_ANSI(s)
+            end
+
             move_input_end(s)
             println(terminal(s))
             add_history(s)
             state(s, mode(s)).ias = InputAreaState(0, 0)
+            if brackidx != -1
+                PimpMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", true)
+            end
             return :done
         else
             edit_insert(s, '\n')
@@ -233,7 +244,7 @@ function create_keybindings()
                 return
             end
         end
-        complete_line(s)
+        LineEdit.complete_line(s)
         rewrite_with_ANSI(s)
     end
 
