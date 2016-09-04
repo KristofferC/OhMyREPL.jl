@@ -30,20 +30,20 @@ end
 ColorScheme() = ColorScheme([ANSIToken() for _ in 1:length(fieldnames(ColorScheme))]...)
 
 function _create_juliadefault()
-    monokai = ColorScheme()
-    monokai.symbol = ANSIToken(bold = true) # purpleish
-    monokai.comment = ANSIToken(bold = true) # greyish
-    monokai.string = ANSIToken(bold = true) # beigish
-    monokai.call = ANSIToken(bold = true) # cyanish
-    monokai.op = ANSIToken(bold = true) # redish
-    monokai.keyword = ANSIToken(bold = true) # redish
-    monokai.text = ANSIToken(bold = true)
-    monokai._macro = ANSIToken(bold = true) # cyanish
-    monokai.function_def = ANSIToken(bold = true)
-    monokai.error = ANSIToken(bold = true)
-    monokai.argdef = ANSIToken(bold = true)  # cyanish
-    monokai.number = ANSIToken(bold = true) # purpleish
-    return monokai
+    def = ColorScheme()
+    def.symbol = ANSIToken(bold = true)
+    def.comment = ANSIToken(bold = true)
+    def.string = ANSIToken(bold = true)
+    def.call = ANSIToken(bold = true)
+    def.op = ANSIToken(bold = true)
+    def.keyword = ANSIToken(bold = true)
+    def.text = ANSIToken(bold = true)
+    def._macro = ANSIToken(bold = true)
+    def.function_def = ANSIToken(bold = true)
+    def.error = ANSIToken(bold = true)
+    def.argdef = ANSIToken(bold = true)
+    def.number = ANSIToken(bold = true)
+    return def
 end
 
 
@@ -83,10 +83,41 @@ function _create_monokai_256()
 end
 
 
+function _create_boxymonokai_256()
+    boxymonokai = ColorScheme()
+    boxymonokai.symbol = ANSIToken(foreground = 148)
+    boxymonokai.comment = ANSIToken(foreground = 95)
+    boxymonokai.string = ANSIToken(foreground = 148)
+    boxymonokai.call = ANSIToken(foreground = 81)
+    boxymonokai.op = ANSIToken(foreground = 158)
+    boxymonokai.keyword = ANSIToken(foreground = 141)
+    boxymonokai.text = ANSIToken(foreground = :default)
+    boxymonokai._macro = ANSIToken(foreground = 81)
+    boxymonokai.function_def = ANSIToken(foreground = 81)
+    boxymonokai.error = ANSIToken(foreground = :default)
+    boxymonokai.argdef = ANSIToken(foreground = 186)
+    boxymonokai.number = ANSIToken(foreground = 208)
+    return boxymonokai
+end
+
 type SyntaxHighlighterSettings
     active::ColorScheme
     schemes::Dict{String, ColorScheme}
 end
+
+
+function Base.show(io::IO, sh::SyntaxHighlighterSettings)
+    k = collect(keys(sh.schemes))
+    first = true
+    for i in k
+        if !first
+            println(io)
+        end
+        first = false
+        print(io, i)
+    end
+end
+
 function SyntaxHighlighterSettings()
     def = _create_juliadefault()
     d = Dict("JuliaDefault" => def)
@@ -100,6 +131,7 @@ activate!(sh::SyntaxHighlighterSettings, name::String) = sh.active = sh.schemes[
 
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai256", _create_monokai_256())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai16", _create_monokai())
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "BoxyMonokai256", _create_boxymonokai_256())
 # Added by default
 # add!(SYNTAX_HIGHLIGHTER_SETTINGS, "JuliaDefault", _create_juliadefault())
 
