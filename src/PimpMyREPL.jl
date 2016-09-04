@@ -69,7 +69,7 @@ function __init__()
     if VERSION > v"0.5-"
         include(joinpath(dirname(@__FILE__), "ErrorMessages.jl"))
     end
-    wait(reader)
+    # wait(reader)
     REDIRECTED_STDERR = STDERR
     err_stream = redirect_stderr(ORIGINAL_STDERR)
 end
