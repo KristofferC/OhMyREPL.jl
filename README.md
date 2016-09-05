@@ -4,9 +4,9 @@ A package that hooks into the Julia REPL and gives it syntax highlighting, brack
 
 ![repl](https://i.imgur.com/wtR0ASD.png)
 
-If you like this package please give it a star. I like stars.
+**Note:** A video showing installation and features of the package is available [here](https://www.youtube.com/watch?v=lTLPAOLLbTU).
 
-**Note:** This is WIP in progress and are many things to fix. Issues with clear [MCVE](http://stackoverflow.com/help/mcve) are very welcome.
+If you like this package please give it a star. I like stars.
 
 ### Installation
 
