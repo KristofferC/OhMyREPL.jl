@@ -27,6 +27,14 @@ type ColorScheme
     number::ANSIToken
 end
 
+function Base.show(io::IO, cs::ColorScheme)
+    for n in fieldnames(cs)
+        tok = getfield(cs, n)
+        print(io, tok, "█ ")
+    end
+    print(io, ANSIToken(foreground = :default))
+end
+
 ColorScheme() = ColorScheme([ANSIToken() for _ in 1:length(fieldnames(ColorScheme))]...)
 
 function _create_juliadefault()
@@ -107,14 +115,15 @@ end
 
 
 function Base.show(io::IO, sh::SyntaxHighlighterSettings)
-    k = collect(keys(sh.schemes))
     first = true
-    for i in k
+    l = maximum(x->length(x), keys(sh.schemes))
+    for (k, v) in sh.schemes
         if !first
-            println(io)
+            print(io, "\n\n")
         end
         first = false
-        print(io, i)
+        print(io, rpad(k, l+1, " "))
+        print(io, v)
     end
 end
 

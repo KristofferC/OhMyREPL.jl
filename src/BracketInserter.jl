@@ -1,17 +1,21 @@
+module BracketInserter
+
+using PimpMyREPL
+using Compat
 # If a user writes an opening bracket
 # automatically complete it with a closing bracket
 # unless the next character is that closing bracket
-type BracketInserter
+type BracketInserterSettings
     complete_brackets::Bool
 end
 
 import Base.LineEdit: edit_insert, edit_move_left, edit_move_right, buffer, char_move_left,
-                      edit_backspace, terminal
+                      edit_backspace, terminal, transition, state
 
 import Base.Terminals.beep
 import PimpMyREPL.Prompt.rewrite_with_ANSI
 
-const BRACKET_INSERTER = BracketInserter(true)
+const BRACKET_INSERTER = BracketInserterSettings(true)
 
 function leftpeek(b::IOBuffer)
     p = position(b)
@@ -84,20 +88,32 @@ function insert_into_keymap!(D::Dict)
     left_brackets2 = ['(', '{', '[', '\"', '\'']
     right_brackets2 = [')', '}', ']', '\"', '\'']
     D['\b'] = (s, data, c) -> begin
-        b = buffer(s)
-        str = String(b)
-        if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) != 0
-            i = findfirst(left_brackets2, str[prevind(str, position(b) + 1)])
-            if i != 0 && peek(b) == right_brackets2[i]
-                edit_move_right(s)
-                edit_backspace(s)
-                edit_backspace(s)
-                return
+        repl = Base.active_repl
+        mirepl = isdefined(repl,:mi) ? repl.mi : repl
+        main_mode = mirepl.interface.modes[1]
+        if isempty(s) || position(buffer(s)) == 0
+            buf = copy(buffer(s))
+            transition(s, main_mode) do
+                state(s, main_mode).input_buffer = buf
             end
+        else
+            b = buffer(s)
+            str = Compat.String(b)
+            if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) != 0
+                i = findfirst(left_brackets2, str[prevind(str, position(b) + 1)])
+                if i != 0 && peek(b) == right_brackets2[i]
+                    edit_move_right(s)
+                    edit_backspace(s)
+                    edit_backspace(s)
+                    return
+                end
+            end
+            edit_backspace(s)
         end
-        edit_backspace(s)
         rewrite_with_ANSI(s)
     end
 end
 
 insert_into_keymap!(PimpMyREPL.Prompt.NEW_KEYBINDINGS)
+
+end # module

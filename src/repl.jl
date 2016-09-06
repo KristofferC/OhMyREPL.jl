@@ -23,6 +23,7 @@ import Base.Terminals: raw!, width, height, cmove, getX,
 using PimpMyREPL
 import PimpMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
+
 function rewrite_with_ANSI(s, cursormove::Bool = false)
         if isa(s, LineEdit.SearchState)
             return
@@ -70,8 +71,8 @@ function create_keybindings()
 
     D = Dict{Any, Any}()
 
-    D["*"]    = (s, data, c) ->  (LineEdit.edit_insert(s, c);rewrite_with_ANSI(s))
-    D['\b']   = (s, data, c) ->  (LineEdit.edit_backspace(s);rewrite_with_ANSI(s))
+    D["*"]    = (s, data, c) ->  (LineEdit.edit_insert(s, c); rewrite_with_ANSI(s))
+    D['\b']   = (s, data, c) ->  (LineEdit.edit_backspace(s); rewrite_with_ANSI(s))
     D["^B"]   = (s, data, c) -> (LineEdit.edit_move_left(s) ;rewrite_with_ANSI(s))
     D["^F"]   = (s, data, c) -> (LineEdit.edit_move_right(s) ;rewrite_with_ANSI(s))
     # Meta B
@@ -99,7 +100,7 @@ function create_keybindings()
 
     D["^D"] = (s, data, c)->begin
         if buffer(s).size > 0
-            edit_delete(s); rewrite_with_ANSI(s)
+            LineEdit.edit_delete(s); rewrite_with_ANSI(s)
         else
             println(terminal(s))
             return :abort
@@ -252,42 +253,22 @@ function create_keybindings()
 end
 NEW_KEYBINDINGS = create_keybindings()
 
+
 function insert_keybindings()
     repl = Base.active_repl
     mirepl = isdefined(repl,:mi) ? repl.mi : repl
     main_mode = mirepl.interface.modes[1]
-    shell_mode = mirepl.interface.modes[2]
-    help_mode = mirepl.interface.modes[3]
-    search_mode = mirepl.interface.modes[5]
 
-    NEW_KEYBINDINGS["\e[A"] = (s,o...)->((LineEdit.edit_move_up(s) || LineEdit.enter_prefix_search(s, search_mode, true)); rewrite_with_ANSI(s))
-        # Down Arrow
-    NEW_KEYBINDINGS["\e[B"] = (s,o...)->((LineEdit.edit_move_down(s) || LineEdit.enter_prefix_search(s, search_mode, false)) ; rewrite_with_ANSI(s))
-
-      # Hack around a bit to make changing repls work
-    NEW_KEYBINDINGS[";"] = (s, data, c) -> begin
-        if isempty(s) || position(LineEdit.buffer(s)) == 0
-            buf = copy(LineEdit.buffer(s))
-            transition(s, shell_mode) do
-                LineEdit.state(s, shell_mode).input_buffer = buf
-            end
-        else
-            edit_insert(s, ';')
-            rewrite_with_ANSI(s)
-        end
+    NEW_KEYBINDINGS["\e[A"] = (s,o...)-> begin
+        Base.LineEdit.edit_move_up(s) || Base.LineEdit.history_prev(s, Base.LineEdit.mode(s).hist)
+        Prompt.rewrite_with_ANSI(s)
+    end
+    # Down Arrow
+    NEW_KEYBINDINGS["\e[B"] = (s,o...)-> begin
+        Base.LineEdit.edit_move_down(s) || Base.LineEdit.history_next(s, Base.LineEdit.mode(s).hist)
+        Prompt.rewrite_with_ANSI(s)
     end
 
-    NEW_KEYBINDINGS["?"] = (s, data, c) -> begin
-        if isempty(s) || position(LineEdit.buffer(s)) == 0
-            buf = copy(LineEdit.buffer(s))
-            transition(s, help_mode) do
-                LineEdit.state(s, help_mode).input_buffer = buf
-            end
-        else
-            edit_insert(s, '?')
-            rewrite_with_ANSI(s)
-        end
-    end
     main_mode.keymap_dict = LineEdit.keymap([NEW_KEYBINDINGS, main_mode.keymap_dict])
 end
 
