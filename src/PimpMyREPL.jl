@@ -20,7 +20,9 @@ include("repl.jl")
 include(joinpath("passes", "Passes.jl"))
 
 include("BracketInserter.jl")
-include("ErrorMessages.jl")
+if VERSION > v"0.5-"
+    include("ErrorMessages.jl")
+end
 
 using .ANSICodes
 export ANSICodes

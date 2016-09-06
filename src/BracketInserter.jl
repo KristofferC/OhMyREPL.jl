@@ -1,7 +1,7 @@
 module BracketInserter
 
 using PimpMyREPL
-
+using Compat
 # If a user writes an opening bracket
 # automatically complete it with a closing bracket
 # unless the next character is that closing bracket
@@ -98,7 +98,7 @@ function insert_into_keymap!(D::Dict)
             end
         else
             b = buffer(s)
-            str = String(b)
+            str = Compat.String(b)
             if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) != 0
                 i = findfirst(left_brackets2, str[prevind(str, position(b) + 1)])
                 if i != 0 && peek(b) == right_brackets2[i]
