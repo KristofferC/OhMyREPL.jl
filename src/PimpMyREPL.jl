@@ -59,9 +59,27 @@ end
 
 
 function __init__()
-    # If "using" after REPL is loaded
     if isdefined(Base, :active_repl)
         Prompt.insert_keybindings()
+    else
+        atreplinit() do repl
+            repl.interface = Base.REPL.setup_interface(repl; extra_repl_keymap = Prompt.NEW_KEYBINDINGS)
+            main_mode = repl.interface.modes[1]
+            # These are inserted here because we only want to insert them for the Julia mode
+            d = Dict(
+            # Up Arrow
+            "\e[A" => (s,o...)-> begin
+                Base.LineEdit.edit_move_up(s) || Base.LineEdit.history_prev(s, Base.LineEdit.mode(s).hist)
+                Prompt.rewrite_with_ANSI(s)
+            end,
+            # Down Arrow
+            "\e[B" => (s,o...)-> begin
+                Base.LineEdit.edit_move_down(s) || Base.LineEdit.history_next(s, Base.LineEdit.mode(s).hist)
+                Prompt.rewrite_with_ANSI(s)
+            end
+            )
+            main_mode.keymap_dict = Base.LineEdit.keymap([d, main_mode.keymap_dict])
+        end
     end
 
     ORIGINAL_STDERR = STDERR

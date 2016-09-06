@@ -34,17 +34,7 @@ To activate a colorscheme use `colorscheme!(name::String)`. By default, "Monokai
 
 ### Automatically start with Julia.
 
-Put this in `.juliarc.jl`
-
-```jl
-if isdir(Pkg.dir("PimpMyREPL"))
-    using PimpMyREPL
-
-    atreplinit() do repl
-        repl.interface = Base.REPL.setup_interface(repl; extra_repl_keymap = PimpMyREPL.Prompt.NEW_KEYBINDINGS)
-    end
-end
-```
+Put `using PimpMyREPL` in your `.juliarc.jl` file
 
 ### Documentation
 
