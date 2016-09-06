@@ -258,6 +258,17 @@ function insert_keybindings()
     repl = Base.active_repl
     mirepl = isdefined(repl,:mi) ? repl.mi : repl
     main_mode = mirepl.interface.modes[1]
+
+    NEW_KEYBINDINGS["\e[A"] = (s,o...)-> begin
+        Base.LineEdit.edit_move_up(s) || Base.LineEdit.history_prev(s, Base.LineEdit.mode(s).hist)
+        Prompt.rewrite_with_ANSI(s)
+    end
+    # Down Arrow
+    NEW_KEYBINDINGS["\e[B"] = (s,o...)-> begin
+        Base.LineEdit.edit_move_down(s) || Base.LineEdit.history_next(s, Base.LineEdit.mode(s).hist)
+        Prompt.rewrite_with_ANSI(s)
+    end
+
     main_mode.keymap_dict = LineEdit.keymap([NEW_KEYBINDINGS, main_mode.keymap_dict])
 end
 
