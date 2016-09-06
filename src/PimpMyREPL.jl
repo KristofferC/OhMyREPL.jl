@@ -93,4 +93,9 @@ function __init__()
     err_stream = redirect_stderr(ORIGINAL_STDERR)
 end
 
+if VERSION >= v"0.4.0-dev+5512"
+    include("precompile.jl")
+    _precompile_()
+end
+
 end # module

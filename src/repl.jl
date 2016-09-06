@@ -23,6 +23,7 @@ import Base.Terminals: raw!, width, height, cmove, getX,
 using PimpMyREPL
 import PimpMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
+
 function rewrite_with_ANSI(s, cursormove::Bool = false)
         if isa(s, LineEdit.SearchState)
             return
