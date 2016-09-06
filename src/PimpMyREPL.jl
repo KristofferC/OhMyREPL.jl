@@ -19,7 +19,8 @@ include("repl_pass.jl")
 include("repl.jl")
 include(joinpath("passes", "Passes.jl"))
 
-include("bracket_inserter.jl")
+include("BracketInserter.jl")
+include("ErrorMessages.jl")
 
 using .ANSICodes
 export ANSICodes
@@ -58,6 +59,7 @@ end
 
 
 function __init__()
+    # If "using" after REPL is loaded
     if isdefined(Base, :active_repl)
         Prompt.insert_keybindings()
     end
@@ -67,9 +69,8 @@ function __init__()
     reader = @async readstring(err_rd)
     Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); PimpMyREPL.Prompt.rewrite_with_ANSI(s))
     if VERSION > v"0.5-"
-        include(joinpath(dirname(@__FILE__), "ErrorMessages.jl"))
+        include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
     end
-    # wait(reader)
     REDIRECTED_STDERR = STDERR
     err_stream = redirect_stderr(ORIGINAL_STDERR)
 end

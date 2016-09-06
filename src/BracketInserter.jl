@@ -1,7 +1,11 @@
+module BracketInserter
+
+using PimpMyREPL
+
 # If a user writes an opening bracket
 # automatically complete it with a closing bracket
 # unless the next character is that closing bracket
-type BracketInserter
+type BracketInserterSettings
     complete_brackets::Bool
 end
 
@@ -11,7 +15,7 @@ import Base.LineEdit: edit_insert, edit_move_left, edit_move_right, buffer, char
 import Base.Terminals.beep
 import PimpMyREPL.Prompt.rewrite_with_ANSI
 
-const BRACKET_INSERTER = BracketInserter(true)
+const BRACKET_INSERTER = BracketInserterSettings(true)
 
 function leftpeek(b::IOBuffer)
     p = position(b)
@@ -101,3 +105,5 @@ function insert_into_keymap!(D::Dict)
 end
 
 insert_into_keymap!(PimpMyREPL.Prompt.NEW_KEYBINDINGS)
+
+end # module

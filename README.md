@@ -37,26 +37,14 @@ To activate a colorscheme use `colorscheme!(name::String)`. By default, "Monokai
 Put this in `.juliarc.jl`
 
 ```jl
-function setup()
-    if isdir(Pkg.dir("PimpMyREPL"))
-        @async while true
-            if isdefined(Base, :active_repl)
-                sleep(0.05)
-                @eval using PimpMyREPL
-                break
-            else
-                sleep(0.1)
-            end
-        end
-    else
-        warn("PimpMyREPL not installed")
+if isdir(Pkg.dir("PimpMyREPL"))
+    using PimpMyREPL
+
+    atreplinit() do repl
+        repl.interface = Base.REPL.setup_interface(repl; extra_repl_keymap = PimpMyREPL.Prompt.NEW_KEYBINDINGS)
     end
 end
-
-setup()
 ```
-
-
 
 ### Documentation
 
