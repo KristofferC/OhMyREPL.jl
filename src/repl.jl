@@ -107,6 +107,7 @@ function create_keybindings()
         end
     end
 
+
     # Hack around a bit to make enter not remove syntax highlighting above
     D["\r"] = (s, data, c) -> begin
         if on_enter(s) || (eof(buffer(s)) && s.key_repeats > 1)
@@ -115,13 +116,8 @@ function create_keybindings()
             if brackidx != -1
                 brackstatus = OhMyREPL.PASS_HANDLER.passes[brackidx][2].enabled
                 OhMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", false)
-                rewrite_with_ANSI(s)
             end
-
-            move_input_end(s)
-            println(terminal(s))
-            add_history(s)
-            state(s, mode(s)).ias = InputAreaState(0, 0)
+            _commit_line(s, data, c)
             if brackidx != -1
                 OhMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", true)
             end
