@@ -1,4 +1,4 @@
-# PimpMyREPL
+# OhMyREPL
 
 *This is my REPL. There are many like it, but this one is mine.*
 
@@ -14,10 +14,10 @@ If you like this package please give it a star. I like stars.
 
 ```jl
 Pkg.clone("https://github.com/KristofferC/Tokenize.jl")
-Pkg.clone("https://github.com/KristofferC/PimpMyREPL.jl")
+Pkg.clone("https://github.com/KristofferC/OhMyREPL.jl")
 ```
 
-and then just load with `using PimpMyREPL`.
+and then just load with `using OhMyREPL`.
 
 ### Features
 
@@ -28,7 +28,7 @@ and then just load with `using PimpMyREPL`.
     * "BoxyMonokai256" - 256 colors
 
     To see an example output of a colorscheme use `test_colorscheme(name::String)`.
-To activate a colorscheme use `colorscheme!(name::String)`. By default, "Monokai16" will be used on Windows and "Monokai256" otherwise. To test the supported colors in your terminal you can use `PimpMyREPL.ANSICodes.test_ANSI()` and `PimpMyREPL.ANSICodes.test_ANSI_256()` to test 16 and 256 colors respectively.
+To activate a colorscheme use `colorscheme!(name::String)`. By default, "Monokai16" will be used on Windows and "Monokai256" otherwise. To test the supported colors in your terminal you can use `OhMyREPL.ANSICodes.test_ANSI()` and `OhMyREPL.ANSICodes.test_ANSI_256()` to test 16 and 256 colors respectively.
 * Bracket highlighting - Will make matching brackets highlighted when the cursor is between an opening and closing bracket.
 * Automatic bracket insertion - Will insert a matching closing bracket to an opening bracket automatically unless the next character is the same opening bracket. Will also ignore an input closing bracket if the character under the cursor is that closing bracket. This can be enabled or disabled at will with `enable_autocomplete_brackets(::Bool)`.
 * Prompt pasting - If a pasted statement starts with `julia> ` any statement beginning with `julia> ` will have that part removed before getting parsed and any other statement will be removed. This makes easy to paste what others have copied from their REPL without the need to remove any prompts or output.
@@ -36,17 +36,17 @@ To activate a colorscheme use `colorscheme!(name::String)`. By default, "Monokai
 
 ### Automatically start with Julia.
 
-One way of automatically starting the package with Julia is by simply putting `using PimpMyREPL` in your `.juliarc.jl` file. 
+One way of automatically starting the package with Julia is by simply putting `using OhMyREPL` in your `.juliarc.jl` file.
 
-You can also compile `PimpMyREPL` into the Julia system image. This will mean that there is no need to edit your `.juliarc` file and the Julia REPL will start a bit quicker since it does not have to parse and compile the package when it is loaded. The way to do this is described in the [Julia manual](http://docs.julialang.org/en/release-0.4/devdocs/sysimg/#building-the-julia-system-image) but is also summarized here:
+You can also compile `OhMyREPL` into the Julia system image. This will mean that there is no need to edit your `.juliarc` file and the Julia REPL will start a bit quicker since it does not have to parse and compile the package when it is loaded. The way to do this is described in the [Julia manual](http://docs.julialang.org/en/release-0.4/devdocs/sysimg/#building-the-julia-system-image) but is also summarized here:
 
-* Create a `userimg.jl` file that contains `Base.require(:PimpMyREPL)`.
+* Create a `userimg.jl` file that contains `Base.require(:OhMyREPL)`.
 * Run `include(joinpath(JULIA_HOME, Base.DATAROOTDIR, "julia", "build_sysimg.jl"))`
 * Run `build_sysimg(default_sysimg_path(), "native", userimg_path=USERIMGPATH; force=true)` where `USERIMGPATH` is the path to the `userimg.jl` file.
 
 If you are building Julia from source, the `userimg.jl` file can just be moved to the `Base` folder and then run `make` like normal.
 
-Note that you will have to redo this process if `PimpMyREPL` is updated.
+Note that you will have to redo this process if `OhMyREPL` is updated.
 
 ### Documentation
 
@@ -54,7 +54,7 @@ TODO: `ANSIToken`, `ANSIValue` docs.
 
 #### Pipeline
 
-The pipeline of how things are transformed from normal text to pimped text is as follows:
+The pipeline of how things are transformed from normal text to fancy text is as follows:
 
 * When a key is pressed, tokenize the full input string using `Tokenize.jl`.
 * To each token there is an associated `ANSIToken` which represents how the Token should be
@@ -70,7 +70,7 @@ It is simple to create your own pass. We will here show how to create a pass tha
 ```jl
 using Tokenize # Load the tokenization library
 # import the global pass handler that keep track of all passes
-import PimpMyREPL: PASS_HANDLER, ANSICodes.ANSIValue
+import OhMyREPL: PASS_HANDLER, ANSICodes.ANSIValue
 
 # Write the pass function, the cursor position is not used but it needs to be given an argument
 function underline_star(ansitokens, tokens, cursorposition::Int)
@@ -86,7 +86,7 @@ function underline_star(ansitokens, tokens, cursorposition::Int)
 end
 
 # Add the pass to the pass_handler
-PimpMyREPL.add_pass!(PASS_HANDLER, "Underline star", underline_star);
+OhMyREPL.add_pass!(PASS_HANDLER, "Underline star", underline_star);
 ```
 
 ![](https://i.imgur.com/MxVeA6j.png)

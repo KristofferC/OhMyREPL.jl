@@ -1,7 +1,5 @@
-import PimpMyREPL.ErrorMessages: prev_er, err_linfo_color, err_funcdef_color,
+import OhMyREPL.ErrorMessages: prev_er, err_linfo_color, err_funcdef_color,
                                 n_frames, linfos, stack_counter
-
-#import PimpMyREPL.ErrorMessages
 
 import Base.REPL: display_error, ip_matches_func
 import Base.StackTraces: empty_sym, show_spec_linfo

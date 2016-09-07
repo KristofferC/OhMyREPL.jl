@@ -10,7 +10,7 @@ import Tokenize.Tokens: Token, kind, exactkind, iskeyword
 using ...ANSICodes
 import ...ANSICodes: ANSIToken, ANSIValue, update!
 
-import PimpMyREPL: add_pass!, PASS_HANDLER
+import OhMyREPL: add_pass!, PASS_HANDLER
 
 type ColorScheme
     symbol::ANSIToken

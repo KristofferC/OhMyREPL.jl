@@ -3,7 +3,7 @@ __precompile__()
 A package that provides a new REPL that has syntax highlighting,
 bracket matching and other nifty features.
 """
-module PimpMyREPL
+module OhMyREPL
 
 using Tokenize
 
@@ -20,9 +20,7 @@ include("repl.jl")
 include(joinpath("passes", "Passes.jl"))
 
 include("BracketInserter.jl")
-if VERSION > v"0.5-"
-    include("ErrorMessages.jl")
-end
+include("ErrorMessages.jl")
 
 using .ANSICodes
 export ANSICodes
@@ -87,17 +85,12 @@ function __init__()
     ORIGINAL_STDERR = STDERR
     err_rd, err_wr = redirect_stderr()
     reader = @async readstring(err_rd)
-    Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); PimpMyREPL.Prompt.rewrite_with_ANSI(s))
+    Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
     if VERSION > v"0.5-"
         include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
     end
     REDIRECTED_STDERR = STDERR
     err_stream = redirect_stderr(ORIGINAL_STDERR)
-end
-
-if VERSION >= v"0.4.0-dev+5512"
-    include("precompile.jl")
-    _precompile_()
 end
 
 end # module

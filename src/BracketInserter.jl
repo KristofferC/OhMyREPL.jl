@@ -1,7 +1,8 @@
 module BracketInserter
 
-using PimpMyREPL
+using OhMyREPL
 using Compat
+
 # If a user writes an opening bracket
 # automatically complete it with a closing bracket
 # unless the next character is that closing bracket
@@ -13,7 +14,7 @@ import Base.LineEdit: edit_insert, edit_move_left, edit_move_right, buffer, char
                       edit_backspace, terminal, transition, state
 
 import Base.Terminals.beep
-import PimpMyREPL.Prompt.rewrite_with_ANSI
+import OhMyREPL.Prompt.rewrite_with_ANSI
 
 const BRACKET_INSERTER = BracketInserterSettings(true)
 
@@ -114,6 +115,6 @@ function insert_into_keymap!(D::Dict)
     end
 end
 
-insert_into_keymap!(PimpMyREPL.Prompt.NEW_KEYBINDINGS)
+insert_into_keymap!(OhMyREPL.Prompt.NEW_KEYBINDINGS)
 
 end # module

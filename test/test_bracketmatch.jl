@@ -3,8 +3,8 @@ module TestBracketHighlighter
 
 using Base.Test
 
-using PimpMyREPL
-import PimpMyREPL.ANSICodes: ANSIToken, ANSIValue
+using OhMyREPL
+import OhMyREPL.ANSICodes: ANSIToken, ANSIValue
 
 using Tokenize
 
@@ -13,7 +13,7 @@ using Tokenize
 b = IOBuffer()
 str = "(function :foobar, foobar )# foobar"
 idx = 3 #  ^
-PimpMyREPL.test_pass(b, PimpMyREPL.Passes.BracketHighlighter.BRACKETMATCHER_SETTINGS,
+OhMyREPL.test_pass(b, OhMyREPL.Passes.BracketHighlighter.BRACKETMATCHER_SETTINGS,
     str, idx)
 
 println("Original string: ", str)
