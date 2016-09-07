@@ -9,7 +9,7 @@ import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
 using ...ANSICodes
 import ...ANSICodes: ANSIToken, ANSIValue, update!
 
-import PimpMyREPL: add_pass!, PASS_HANDLER
+import OhMyREPL: add_pass!, PASS_HANDLER
 
 type BracketHighlighterSettings
     token::ANSIToken

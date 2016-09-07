@@ -1,6 +1,6 @@
 module ErrorMessages
 
-using PimpMyREPL
+using OhMyREPL
 
 import Base: repl_color
 
@@ -49,7 +49,7 @@ function insert_keymap!(D)
     end
 end
 
-insert_keymap!(PimpMyREPL.Prompt.NEW_KEYBINDINGS)
+insert_keymap!(OhMyREPL.Prompt.NEW_KEYBINDINGS)
 
 type ThisisALongTypeThatWeMightNotWantToSee end
 typealias TL ThisisALongTypeThatWeMightNotWantToSee

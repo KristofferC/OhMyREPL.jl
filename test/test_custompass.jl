@@ -2,8 +2,8 @@ module CustomPassTest
 
 using Base.Test
 
-using PimpMyREPL
-import PimpMyREPL.ANSICodes: ANSIToken, ANSIValue
+using OhMyREPL
+import OhMyREPL.ANSICodes: ANSIToken, ANSIValue
 
 using Tokenize
 
@@ -21,7 +21,7 @@ end
 b = IOBuffer()
 
 str = "function :foobar, foobar # foobar"
-PimpMyREPL.test_pass(b, foobar_bluify, str)
+OhMyREPL.test_pass(b, foobar_bluify, str)
 
 println("Original string: ", str)
 println("Bluified string: ", takebuf_string(b))

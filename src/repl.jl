@@ -20,8 +20,8 @@ import Base.Terminals: raw!, width, height, cmove, getX,
                        getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
 
 
-using PimpMyREPL
-import PimpMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
+using OhMyREPL
+import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
 
 function rewrite_with_ANSI(s, cursormove::Bool = false)
@@ -111,10 +111,10 @@ function create_keybindings()
     D["\r"] = (s, data, c) -> begin
         if on_enter(s) || (eof(buffer(s)) && s.key_repeats > 1)
             # Disable bracket highlighting before entering
-            brackidx = PimpMyREPL._find_pass(PimpMyREPL.PASS_HANDLER, "BracketHighlighter")
+            brackidx = OhMyREPL._find_pass(OhMyREPL.PASS_HANDLER, "BracketHighlighter")
             if brackidx != -1
-                brackstatus = PimpMyREPL.PASS_HANDLER.passes[brackidx][2].enabled
-                PimpMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", false)
+                brackstatus = OhMyREPL.PASS_HANDLER.passes[brackidx][2].enabled
+                OhMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", false)
                 rewrite_with_ANSI(s)
             end
 
@@ -123,7 +123,7 @@ function create_keybindings()
             add_history(s)
             state(s, mode(s)).ias = InputAreaState(0, 0)
             if brackidx != -1
-                PimpMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", true)
+                OhMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", true)
             end
             return :done
         else
