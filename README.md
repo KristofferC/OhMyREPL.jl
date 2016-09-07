@@ -1,3 +1,5 @@
+### Note: This package has been renamed from `PimpMyREPL` to `OhMyREPL`. The simplest way of updating is to remove the old package and reclone this one.
+
 # OhMyREPL
 
 *This is my REPL. There are many like it, but this one is mine.*
