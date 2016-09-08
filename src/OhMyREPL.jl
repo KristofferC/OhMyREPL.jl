@@ -70,7 +70,7 @@ function __init__()
             d = Dict(
             # Up Arrow
             "\e[A" => (s,o...)-> begin
-                Base.LineEdit.edit_move_down(s) || Base.LineEdit.enter_prefix_search(s, p, true)
+                Base.LineEdit.edit_move_up(s) || Base.LineEdit.enter_prefix_search(s, p, true)
                 Prompt.rewrite_with_ANSI(s)
             end,
             # Down Arrow
