@@ -44,7 +44,7 @@ You can also compile `OhMyREPL` into the Julia system image. This will mean that
 
 * Create a `userimg.jl` file that contains `Base.require(:OhMyREPL)`.
 * Run `include(joinpath(JULIA_HOME, Base.DATAROOTDIR, "julia", "build_sysimg.jl"))`
-* Run `build_sysimg(default_sysimg_path(), "native", userimg_path=USERIMGPATH; force=true)` where `USERIMGPATH` is the path to the `userimg.jl` file.
+* Run `build_sysimg(default_sysimg_path(), "native", USERIMGPATH; force=true)` where `USERIMGPATH` is the path to the `userimg.jl` file.
 
 If you are building Julia from source, the `userimg.jl` file can just be moved to the `Base` folder and then run `make` like normal.
 
