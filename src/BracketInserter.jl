@@ -106,6 +106,7 @@ function insert_into_keymap!(D::Dict)
                     edit_move_right(s)
                     edit_backspace(s)
                     edit_backspace(s)
+                    rewrite_with_ANSI(s)
                     return
                 end
             end

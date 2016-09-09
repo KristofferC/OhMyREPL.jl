@@ -1,10 +1,9 @@
 using .ANSICodes
 
-import .ANSICodes.ANSIToken
+import .ANSICodes: ANSIToken, ResetToken
 import Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, untokenize
 import Tokenize.Lexers
-
 
 type Pass
     f!
@@ -14,12 +13,11 @@ end
 
 immutable PassHandler
     ansitokens::Vector{ANSIToken}
-    passes::Vector{Tuple{Compat.UTF8String, Pass}}
+    passes::Vector{Tuple{Compat.UTF8String, Pass}} # This is a stupid type and I should feel stupid
 end
 
 PassHandler() = PassHandler(ANSIToken[], Tuple{String, Pass}[])
 const PASS_HANDLER = PassHandler(ANSIToken[], Tuple{String, Pass}[])
-
 
 function test_pass(io::IO, f, str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false)
     rpc = PassHandler()
@@ -28,9 +26,9 @@ function test_pass(io::IO, f, str::Union{String, IO}, cursorpos::Int = 1, cursor
     apply_passes!(rpc, tokens, cursorpos, cursormovement)
     untokenize_with_ANSI(io, rpc.ansitokens, tokens)
 end
+
 test_pass(f, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
         test_pass(STDOUT, f, str, cursorpos, cursormovement)
-
 
 function test_passes(io::IO, rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false)
     b = IOBuffer()
@@ -38,12 +36,13 @@ function test_passes(io::IO, rpc::PassHandler, str::Union{String, IOBuffer}, cur
     apply_passes!(rpc, tokens, cursorpos, cursormovement)
     untokenize_with_ANSI(io, rpc.ansitokens, tokens)
 end
+
 test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
     test_passes(STDOUT, rpc, str, cursorpos, cursormovement)
 
 function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token})
     @assert length(tokens) == length(ansitokens)
-    print("\e[0m")
+    print(io, ResetToken())
     z = 1
     for (token, ansitoken) in zip(tokens, ansitokens)
         print(io, ansitoken)
@@ -51,13 +50,12 @@ function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vec
             print(io, c)
             c == '\n' && print(io, " "^7)
         end
-        print(io, "\e[0m") # TODO Provide a user definable postfix?
+        print(io, ResetToken())
     end
 end
 untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}) = untokenize_with_ANSI(io, rpc.ansitokens, tokens)
 untokenize_with_ANSI(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}) =
     untokenize_with_ANSI(STDOUT, ansitokens, tokens)
-
 
 function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, cursorpos::Int = 1, cursormovement::Bool = false)
     resize!(rpc.ansitokens, length(tokens))
@@ -110,30 +108,33 @@ function add_pass!(rpc::PassHandler, name::String, f, update_on_cursormovement::
     push!(rpc.passes, (name, Pass(f, true, update_on_cursormovement)))
 end
 
-
 function enable_pass!(rpc::PassHandler, name::String, enabled::Bool)
     idx = _check_pass_name(rpc, name, true)
     rpc.passes[idx][2].enabled = enabled
 end
 
-#=
-function set_prescedence!(rpc::PassHandler, name::String, presc::Int)
-    error("TODO")
-    pass_idx = _check_pass_name(name, true)
-    if pass_idx == -1
-    end
-    presc = clamp(presc, 1, length(passes))
-end
-
 function Base.show(io::IO, rpc::PassHandler)
-
-    print(io, "+-----------------------+----------+")
-    print(io, "| Pass name             | Enabled  |")
-    print(io, "+-----------------------+----------+")
+    println(io, ANSIToken(bold = true),
+                "--------------------------------", ResetToken())
+    println(io, " Pass name             Enabled  ")
+    println(io, "--------------------------------")
     for pass in rpc.passes
         name = pass[1]
-        if length(name) >
-    print(io, "| ", @sprintf(pass[1], )
-    for pass in
+        if length(name) >= 21
+            name = name[1:21-3] * "..."
+        end
+        println(io, @sprintf(" %-21s %-8s ", name, pass[2].enabled))
+    end
+    print(io, ANSIToken(bold = true),
+                "--------------------------------", ResetToken())
 end
-=#
+
+function prescedence!(rpc::PassHandler, name::String, presc::Int)
+    pass_idx = _check_pass_name(rpc, name, true)
+    pass = rpc.passes[pass_idx]
+    presc = clamp(presc, 1, length(rpc.passes))
+    deleteat!(rpc.passes, pass_idx)
+    insert!(rpc.passes, presc, pass)
+    return rpc
+end
+

@@ -4,7 +4,6 @@
 module Prompt
 
 using Compat
-
 import Compat: UTF8String, String
 
 import Base: LineEdit, REPL
@@ -18,7 +17,6 @@ import Tokenize.Lexers
 import Base.Terminals
 import Base.Terminals: raw!, width, height, cmove, getX,
                        getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
-
 
 using OhMyREPL
 import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER

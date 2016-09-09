@@ -8,7 +8,7 @@ using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, exactkind, iskeyword
 
 using ...ANSICodes
-import ...ANSICodes: ANSIToken, ANSIValue, update!
+import ...ANSICodes: ANSIToken, ANSIValue, ResetToken, merge!
 
 import OhMyREPL: add_pass!, PASS_HANDLER
 
@@ -27,10 +27,23 @@ type ColorScheme
     number::ANSIToken
 end
 
+symbol!(cs, token::ANSIToken) = cs.symbol = token
+comment!(cs, token::ANSIToken) = cs.comment = token
+string!(cs, token::ANSIToken) = cs.string = token
+call!(cs, token::ANSIToken) = cs.call = token
+op!(cs, token::ANSIToken) = cs.op = token
+keyword!(cs, token::ANSIToken) = cs.keyword = token
+text!(cs, token::ANSIToken) = cs.text = token
+function_def!(cs, token::ANSIToken) = cs.function_def = token
+error!(cs, token::ANSIToken) = cs.error = token
+argdef!(cs, token::ANSIToken) = cs.argdef = token
+macro!(cs, token::ANSIToken) = cs._macro = token
+number!(cs, token::ANSIToken) = cs.number = token
+
 function Base.show(io::IO, cs::ColorScheme)
     for n in fieldnames(cs)
         tok = getfield(cs, n)
-        print(io, tok, "█ ")
+        print(io, tok, "█ ", ResetToken())
     end
     print(io, ANSIToken(foreground = :default))
 end
@@ -38,74 +51,74 @@ end
 ColorScheme() = ColorScheme([ANSIToken() for _ in 1:length(fieldnames(ColorScheme))]...)
 
 function _create_juliadefault()
-    def = ColorScheme()
-    def.symbol = ANSIToken(bold = true)
-    def.comment = ANSIToken(bold = true)
-    def.string = ANSIToken(bold = true)
-    def.call = ANSIToken(bold = true)
-    def.op = ANSIToken(bold = true)
-    def.keyword = ANSIToken(bold = true)
-    def.text = ANSIToken(bold = true)
-    def._macro = ANSIToken(bold = true)
-    def.function_def = ANSIToken(bold = true)
-    def.error = ANSIToken(bold = true)
-    def.argdef = ANSIToken(bold = true)
-    def.number = ANSIToken(bold = true)
-    return def
+    cs = ColorScheme()
+    symbol!(cs, ANSIToken(bold = true))
+    comment!(cs, ANSIToken(bold = true))
+    string!(cs, ANSIToken(bold = true))
+    call!(cs, ANSIToken(bold = true))
+    op!(cs, ANSIToken(bold = true))
+    keyword!(cs, ANSIToken(bold = true))
+    text!(cs, ANSIToken(bold = true))
+    macro!(cs, ANSIToken(bold = true))
+    function_def!(cs, ANSIToken(bold = true))
+    error!(cs, ANSIToken(bold = true))
+    argdef!(cs, ANSIToken(bold = true))
+    number!(cs, ANSIToken(bold = true))
+    return cs
 end
 
 
 # Try to represent the Monokai colorscheme.
 function _create_monokai()
-    monokai = ColorScheme()
-    monokai.symbol = ANSIToken(foreground = :magenta)
-    monokai.comment = ANSIToken(foreground = :dark_gray)
-    monokai.string = ANSIToken(foreground = :yellow)
-    monokai.call = ANSIToken(foreground = :cyan)
-    monokai.op = ANSIToken(foreground = :light_red)
-    monokai.keyword = ANSIToken(foreground = :light_red)
-    monokai.text = ANSIToken(foreground = :default)
-    monokai._macro = ANSIToken(foreground = :cyan)
-    monokai.function_def = ANSIToken(foreground = :green)
-    monokai.error = ANSIToken(foreground = :default)
-    monokai.argdef = ANSIToken(foreground = :cyan)
-    monokai.number = ANSIToken(foreground = :magenta)
-    return monokai
+    cs = ColorScheme()
+    symbol!(cs, ANSIToken(foreground = :magenta))
+    comment!(cs, ANSIToken(foreground = :dark_gray))
+    string!(cs, ANSIToken(foreground = :yellow))
+    call!(cs, ANSIToken(foreground = :cyan))
+    op!(cs, ANSIToken(foreground = :light_red))
+    keyword!(cs, ANSIToken(foreground = :light_red))
+    text!(cs, ANSIToken(foreground = :default))
+    macro!(cs, ANSIToken(foreground = :cyan))
+    function_def!(cs, ANSIToken(foreground = :green))
+    error!(cs, ANSIToken(foreground = :default))
+    argdef!(cs, ANSIToken(foreground = :cyan))
+    number!(cs, ANSIToken(foreground = :magenta))
+    return cs
 end
 
 function _create_monokai_256()
-    monokai = ColorScheme()
-    monokai.symbol = ANSIToken(foreground = 141) # purpleish
-    monokai.comment = ANSIToken(foreground = 60) # greyish
-    monokai.string = ANSIToken(foreground = 208) # beigish
-    monokai.call = ANSIToken(foreground = 81) # cyanish
-    monokai.op = ANSIToken(foreground = 197) # redish
-    monokai.keyword = ANSIToken(foreground = 197) # redish
-    monokai.text = ANSIToken(foreground = :default)
-    monokai._macro = ANSIToken(foreground = 208) # cyanish
-    monokai.function_def = ANSIToken(foreground = 148)
-    monokai.error = ANSIToken(foreground = :default)
-    monokai.argdef = ANSIToken(foreground = 81)  # cyanish
-    monokai.number = ANSIToken(foreground = 141) # purpleish
-    return monokai
+    cs = ColorScheme()
+    symbol!(cs, ANSIToken(foreground = 141)) # purpleish
+    comment!(cs, ANSIToken(foreground = 60)) # greyish
+    string!(cs, ANSIToken(foreground = 208)) # beigish
+    call!(cs, ANSIToken(foreground = 81)) # cyanish
+    op!(cs, ANSIToken(foreground = 197)) # redish
+    keyword!(cs, ANSIToken(foreground = 197)) # redish
+    text!(cs, ANSIToken(foreground = :default))
+    macro!(cs, ANSIToken(foreground = 208)) # cyanish
+    function_def!(cs, ANSIToken(foreground = 148))
+    error!(cs, ANSIToken(foreground = :default))
+    argdef!(cs, ANSIToken(foreground = 81))  # cyanish
+    number!(cs, ANSIToken(foreground = 141)) # purpleish
+    return cs
 end
 
 
 function _create_boxymonokai_256()
-    boxymonokai = ColorScheme()
-    boxymonokai.symbol = ANSIToken(foreground = 148)
-    boxymonokai.comment = ANSIToken(foreground = 95)
-    boxymonokai.string = ANSIToken(foreground = 148)
-    boxymonokai.call = ANSIToken(foreground = 81)
-    boxymonokai.op = ANSIToken(foreground = 158)
-    boxymonokai.keyword = ANSIToken(foreground = 141)
-    boxymonokai.text = ANSIToken(foreground = :default)
-    boxymonokai._macro = ANSIToken(foreground = 81)
-    boxymonokai.function_def = ANSIToken(foreground = 81)
-    boxymonokai.error = ANSIToken(foreground = :default)
-    boxymonokai.argdef = ANSIToken(foreground = 186)
-    boxymonokai.number = ANSIToken(foreground = 208)
-    return boxymonokai
+    cs = ColorScheme()
+    symbol!(cs, ANSIToken(foreground = 148))
+    comment!(cs, ANSIToken(foreground = 95))
+    string!(cs, ANSIToken(foreground = 148))
+    call!(cs, ANSIToken(foreground = 81))
+    op!(cs, ANSIToken(foreground = 158))
+    keyword!(cs, ANSIToken(foreground = 141))
+    text!(cs, ANSIToken(foreground = :default))
+    macro!(cs, ANSIToken(foreground = 81))
+    function_def!(cs, ANSIToken(foreground = 81))
+    error!(cs, ANSIToken(foreground = :default))
+    argdef!(cs, ANSIToken(foreground = 186))
+    number!(cs, ANSIToken(foreground = 208))
+    return cs
 end
 
 type SyntaxHighlighterSettings
@@ -125,6 +138,7 @@ function Base.show(io::IO, sh::SyntaxHighlighterSettings)
         print(io, rpad(k, l+1, " "))
         print(io, v)
     end
+    println(io)
 end
 
 function SyntaxHighlighterSettings()
@@ -158,44 +172,46 @@ add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
     for (i, t) in enumerate(tokens)
         # a::x
         if exactkind(prev_t) == Tokens.DECLARATION
-            update!(ansitokens[i-1], cscheme.argdef)
-            update!(ansitokens[i], cscheme.argdef)
+            merge!(ansitokens, i-1, cscheme.argdef)
+            merge!(ansitokens, i, cscheme.argdef)
         # :foo
         elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.COLON
-            update!(ansitokens[i-1], cscheme.symbol)
-            update!(ansitokens[i], cscheme.symbol)
+            merge!(ansitokens, i-1, cscheme.symbol)
+            merge!(ansitokens, i, cscheme.symbol)
         # function
         elseif iskeyword(kind(t))
             if kind(t) == Tokens.TRUE || kind(t) == Tokens.FALSE
-                update!(ansitokens[i], cscheme.symbol)
+                merge!(ansitokens, i, cscheme.symbol)
             else
-                update!(ansitokens[i], cscheme.keyword)
+                merge!(ansitokens, i, cscheme.keyword)
             end
         # "foo"
         elseif kind(t) == Tokens.STRING || kind(t) == Tokens.TRIPLE_STRING || kind(t) == Tokens.CHAR
-            update!(ansitokens[i], cscheme.string)
+            merge!(ansitokens, i, cscheme.string)
         # * -
         elseif Tokens.isoperator(kind(t))
-            update!(ansitokens[i], cscheme.op)
+            merge!(ansitokens, i, cscheme.op)
         # #= foo =#
         elseif kind(t) == Tokens.COMMENT
-            update!(ansitokens[i], cscheme.comment)
+            merge!(ansitokens, i, cscheme.comment)
         # function f(...)
         elseif kind(t) == Tokens.LPAREN && kind(prev_t) == Tokens.IDENTIFIER
-            update!(ansitokens[i-1], cscheme.call)
+            merge!(ansitokens, i-1, cscheme.call)
              # function f(...)
             if i > 3 && kind(tokens[i-2]) == Tokens.WHITESPACE && exactkind(tokens[i-3]) == Tokens.FUNCTION
-                update!(ansitokens[i-1], cscheme.function_def)
+                merge!(ansitokens, i-1, cscheme.function_def)
             end
         # @fdsafds
         elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.AT_SIGN
-            update!(ansitokens[i-1], cscheme._macro)
-            update!(ansitokens[i], cscheme._macro)
+            merge!(ansitokens, i-1, cscheme._macro)
+            merge!(ansitokens, i, cscheme._macro)
         # 2, 32.32
         elseif kind(t) == Tokens.INTEGER || kind(t) == Tokens.FLOAT
-            update!(ansitokens[i], cscheme.number)
+            merge!(ansitokens, i, cscheme.number)
+        elseif kind(t) == Tokens.WHITESPACE
+            merge!(ansitokens, i, ANSIToken())
         else
-            update!(ansitokens[i], cscheme.text)
+            merge!(ansitokens, i, cscheme.text)
         end
         prev_t = t
     end

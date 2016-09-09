@@ -6,11 +6,10 @@ bracket matching and other nifty features.
 module OhMyREPL
 
 using Tokenize
+using DocStringExtensions
 
 using Compat
 import Compat: UTF8String, String
-
-# http://stackoverflow.com/a/39174202
 
 export colorscheme!, colorschemes, enable_autocomplete_brackets, test_colorscheme
 
@@ -51,11 +50,35 @@ end
 function test_colorscheme(name::String, str::String = TEST_STR)
     syntaxpass = get_pass(PASS_HANDLER, "SyntaxHighlighter")
     active = syntaxpass.active
-    colorscheme!(name)
-    test_pass(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS, str)
-    syntaxpass.active = active
+    try
+        colorscheme!(name)
+        test_pass(syntaxpass, str)
+    finally
+        syntaxpass.active = active
+    end
     return
 end
+
+
+function test_colorscheme(cs::Passes.SyntaxHighlighter.ColorScheme, str::String = TEST_STR)
+    syntaxpass = get_pass(PASS_HANDLER, "SyntaxHighlighter")
+    active = syntaxpass.active
+    name = "plzdontnameyourcolorschemethis"
+    try
+        Passes.SyntaxHighlighter.add!(syntaxpass, name, cs)
+        colorscheme!(name)
+        test_pass(syntaxpass, str)
+    finally
+        syntaxpass.active = active
+        if haskey(syntaxpass.schemes, name)
+            delete!(syntaxpass.schemes, name)
+        end
+    end
+    return
+end
+
+
+showpasses(io::IO = STDOUT) = Base.show(io, PASS_HANDLER)
 
 
 function __init__()
@@ -82,7 +105,7 @@ function __init__()
             main_mode.keymap_dict = Base.LineEdit.keymap([d, main_mode.keymap_dict])
         end
     end
-
+    # http://stackoverflow.com/a/39174202
     ORIGINAL_STDERR = STDERR
     err_rd, err_wr = redirect_stderr()
     reader = @async readstring(err_rd)
