@@ -62,7 +62,7 @@ function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, cursorpos::Int =
     resize!(rpc.ansitokens, length(tokens))
     resize!(rpc.accum_ansitokens, length(tokens))
     fill!(rpc.accum_ansitokens, ANSIToken())
-    for i in 1:length(rpc.passes)
+    for i in reverse(1:length(rpc.passes))
         fill!(rpc.ansitokens, ANSIToken())
         pass = rpc.passes[i][2]
         if pass.enabled
@@ -106,36 +106,42 @@ end
 
 function add_pass!(rpc::PassHandler, name::String, f, update_on_cursormovement::Bool = true)
     idx = _check_pass_name(rpc, name, false)
-    push!(rpc.passes, (name, Pass(f, true, update_on_cursormovement)))
+    insert!(rpc.passes, 1, (name, Pass(f, true, update_on_cursormovement)))
 end
+add_pass!(name::String, f, update_on_cursormovement::Bool = true) = add_pass!(PASS_HANDLER, name, f, update_on_cursormovement)
 
 function enable_pass!(rpc::PassHandler, name::String, enabled::Bool)
     idx = _check_pass_name(rpc, name, true)
     rpc.passes[idx][2].enabled = enabled
 end
+enable_pass!(name::String, enabled::Bool) = enable_pass!(PASS_HANDLER, name, enabled)
 
 function Base.show(io::IO, rpc::PassHandler)
     println(io, ANSIToken(bold = true),
-                "--------------------------------", ResetToken())
-    println(io, " Pass name             Enabled  ")
-    println(io, "--------------------------------")
-    for pass in rpc.passes
+                "----------------------------------", ResetToken())
+    println(io, " #   Pass name             Enabled  ")
+    println(io, "----------------------------------")
+    for (i, pass) in enumerate(rpc.passes)
         name = pass[1]
         if length(name) >= 21
             name = name[1:21-3] * "..."
         end
-        println(io, @sprintf(" %-21s %-8s ", name, pass[2].enabled))
+        println(io, " $i   ", @sprintf("%-21s %-8s ", name, pass[2].enabled))
     end
     print(io, ANSIToken(bold = true),
-                "--------------------------------", ResetToken())
+                "----------------------------------", ResetToken())
 end
 
-function prescedence!(rpc::PassHandler, name::String, presc::Int)
-    pass_idx = _check_pass_name(rpc, name, true)
+prescedence!(rpc::PassHandler, name::String, presc::Int) = prescedence!(rpc, _check_pass_name(rpc, name, true), presc)
+prescedence!(name::String, presc::Int) = prescedence!(PASS_HANDLER, name, presc)
+
+function prescedence!(rpc::PassHandler, pass_idx::Int, presc::Int)
     pass = rpc.passes[pass_idx]
     presc = clamp(presc, 1, length(rpc.passes))
     deleteat!(rpc.passes, pass_idx)
     insert!(rpc.passes, presc, pass)
     return rpc
 end
+prescedence!(pass_idx::Int, presc::Int) = prescedence!(PASS_HANDLER, pass_idx, presc)
+
 

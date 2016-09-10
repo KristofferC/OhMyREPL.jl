@@ -32,7 +32,7 @@ It is simple to create your own pass. We will here show how to create a pass tha
 ```jl
 using Tokenize # Load the tokenization library
 # import the global pass handler that keep track of all passes
-import OhMyREPL: PASS_HANDLER, ANSICodes.ANSIToken
+import OhMyREPL: ANSICodes.ANSIToken
 
 # Write the pass function, the cursor position is not used but it needs to be given an argument
 function underline_star(ansitokens, tokens, cursorposition::Int)
@@ -47,7 +47,7 @@ function underline_star(ansitokens, tokens, cursorposition::Int)
 end
 
 # Add the pass to the pass_handler
-OhMyREPL.add_pass!(PASS_HANDLER, "Underline star", underline_star);
+OhMyREPL.add_pass!("Underline star", underline_star);
 ```
 
 ![](https://i.imgur.com/MxVeA6j.png)
