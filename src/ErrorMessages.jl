@@ -25,7 +25,6 @@ err_linfo_color()   = repl_color("JULIA_ERR_LINFO_COLOR", :bold)
 err_funcdef_color() = repl_color("JULIA_ERR_FUNCDEF_COLOR", :bold)
 
 # TODO: Get rid of these globals..
-n_frames = Ref{Int}(0)
 linfos = []
 stack_counter = Ref{Int}(0)
 
