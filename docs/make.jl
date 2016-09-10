@@ -9,6 +9,7 @@ makedocs(
             "features/syntax_highlighting.md",
             "features/bracket_highlighting.md",
             "features/prompt_pasting.md",
+            "features/error_messages.md",
             ],
         "Internals" => Any[
             "internals/ansitoken.md",

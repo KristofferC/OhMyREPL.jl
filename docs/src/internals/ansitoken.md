@@ -23,7 +23,7 @@ Too see how these colors look in your terminal there is the `ANSICodes.test_ANSI
 In case the argument type is an integer it should be between 0 and 256. To see what color each number represent there is the `ANSICodes.test_ANSI_256()` function.
 
 !!! note
-    Not all terminals support the 256 color version, for example the default Windows command prompt does not. On Windows you can install for example [mintty](https://mintty.github.io/) which has better color support. On other OS's consult google for how to enable 256 color support for the terminal.
+    Not all terminals support the 256 color version, for example the default Windows command prompt does not. On Windows you can install for example [mintty](https://mintty.github.io/) which has better color support. On other OS's consult Google for how to enable 256 color support for the terminal.
 
 If you want to convert between RGB hex codes and the 256 color codes the script [at this link](https://gist.github.com/MicahElliott/719710) is quite useful.
 
@@ -35,7 +35,7 @@ An `ANSIToken` can be `show`-ed which will print the ANSI code of it in the styl
 
 ## Using an `ANSIToken`
 
-By printing an ansitoken to the terminal it sets up the following printed text to be printed in the style defined by the token. To print a text in the format of the `ANSIToken` simply print the token first followed by the text:
+By printing an `ANSIToken` to the terminal it sets up the following printed text to be printed in the style defined by the token. To print a text in the format of the `ANSIToken` simply print the token first followed by the text:
 
 ![](ansitoken_print.png)
 
@@ -50,6 +50,12 @@ By printing an ansitoken to the terminal it sets up the following printed text t
     ![](bold_ex.png)
 
 ## Merging `ANSIToken`s
+
+Two or more `ANSIToken`s can be merged creating a new `ANSIToken` that has all properties of the merged ones. If two of the `ANSIToken` specify the same property (for example the foreground color) then the property of the last token in the argument list is used:
+
+![](merging.png)
+
+The resulting token in the figure above is green because the foreground of the `green` token overrides the foreground in the `underline_red` one.
 
 
 
