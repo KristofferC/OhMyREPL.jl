@@ -1,6 +1,6 @@
 using .ANSICodes
 
-import .ANSICodes: ANSIToken, ResetToken
+import .ANSICodes: ANSIToken, ResetToken, merge!
 import Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, untokenize
 import Tokenize.Lexers
@@ -12,19 +12,20 @@ type Pass
 end
 
 immutable PassHandler
+    accum_ansitokens::Vector{ANSIToken}
     ansitokens::Vector{ANSIToken}
     passes::Vector{Tuple{Compat.UTF8String, Pass}} # This is a stupid type and I should feel stupid
 end
 
-PassHandler() = PassHandler(ANSIToken[], Tuple{String, Pass}[])
-const PASS_HANDLER = PassHandler(ANSIToken[], Tuple{String, Pass}[])
+PassHandler() = PassHandler(ANSIToken[], ANSIToken[], Tuple{String, Pass}[])
+const PASS_HANDLER = PassHandler()
 
 function test_pass(io::IO, f, str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false)
     rpc = PassHandler()
     add_pass!(rpc, "TestPass", f)
     tokens = collect(Lexers.Lexer(str))
     apply_passes!(rpc, tokens, cursorpos, cursormovement)
-    untokenize_with_ANSI(io, rpc.ansitokens, tokens)
+    untokenize_with_ANSI(io, rpc.accum_ansitokens, tokens)
 end
 
 test_pass(f, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
@@ -34,7 +35,7 @@ function test_passes(io::IO, rpc::PassHandler, str::Union{String, IOBuffer}, cur
     b = IOBuffer()
     tokens = collect(Lexers.Lexer(str))
     apply_passes!(rpc, tokens, cursorpos, cursormovement)
-    untokenize_with_ANSI(io, rpc.ansitokens, tokens)
+    untokenize_with_ANSI(io, rpc.accum_ansitokens, tokens)
 end
 
 test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
@@ -53,17 +54,16 @@ function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vec
         print(io, ResetToken())
     end
 end
-untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}) = untokenize_with_ANSI(io, rpc.ansitokens, tokens)
+untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}) = untokenize_with_ANSI(io, rpc.accum_ansitokens, tokens)
 untokenize_with_ANSI(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}) =
     untokenize_with_ANSI(STDOUT, ansitokens, tokens)
 
 function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, cursorpos::Int = 1, cursormovement::Bool = false)
     resize!(rpc.ansitokens, length(tokens))
-    for i in 1:length(rpc.ansitokens)
-        rpc.ansitokens[i] = ANSIToken()
-    end
-
+    resize!(rpc.accum_ansitokens, length(tokens))
+    fill!(rpc.accum_ansitokens, ANSIToken())
     for i in 1:length(rpc.passes)
+        fill!(rpc.ansitokens, ANSIToken())
         pass = rpc.passes[i][2]
         if pass.enabled
             if cursormovement && !pass.update_on_cursormovement
@@ -71,12 +71,13 @@ function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, cursorpos::Int =
             end
             # This is an enabled pass that should be run, so run it!
             pass.f!(rpc.ansitokens, tokens, cursorpos)
+            merge!(rpc.accum_ansitokens, rpc.ansitokens)
         end
     end
 end
 
 write_results!(buff::IO, rpc::PassHandler, tokens::Vector{Token}) =
-    write_results(buff, rpc.ansitokens, tokens)
+    write_results(buff, rpc.accum_ansitokens, tokens)
 
 # Returns -1 if not found else index of where the pass is
 function _find_pass(rpc::PassHandler, name::String)

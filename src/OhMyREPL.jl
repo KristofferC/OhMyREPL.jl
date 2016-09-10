@@ -6,7 +6,6 @@ bracket matching and other nifty features.
 module OhMyREPL
 
 using Tokenize
-using DocStringExtensions
 
 using Compat
 import Compat: UTF8String, String

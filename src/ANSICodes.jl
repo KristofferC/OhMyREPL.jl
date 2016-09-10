@@ -165,8 +165,12 @@ function ANSIToken(;foreground::Union{Int, Symbol} = :nothing, background::Union
     return ANSIToken(tok_fg256colors, tok_bg256colors, tok_fg, tok_bg, tok_bold, tok_italics, tok_underline, tok_strikethrough)
 end
 
-function merge!(ansitokens::Vector{ANSIToken}, i, tok::ANSIToken)
-    ansitokens[i] = ANSICodes.merge(ansitokens[i], tok)
+function merge!(t1::Vector{ANSIToken}, t2::Vector{ANSIToken})
+    @assert length(t1) == length(t2)
+    for i in eachindex(t1)
+        t1[i] = merge(t1[i], t2[i])
+    end
+    return t1
 end
 
 # for 256 colors: <Esc>[38;5;ColorNumberm”

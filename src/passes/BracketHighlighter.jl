@@ -21,8 +21,8 @@ const BRACKETMATCHER_SETTINGS =
 @compat function (matcher::BracketHighlighterSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)
     left_bracket_match, right_bracket_match, matched = bracket_match(tokens, cursorpos)
     !matched && return
-    merge!(ansitokens, left_bracket_match, matcher.token)
-    merge!(ansitokens, right_bracket_match, matcher.token)
+    ansitokens[left_bracket_match] = matcher.token
+    ansitokens[right_bracket_match] = matcher.token
     return
 end
 

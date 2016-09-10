@@ -172,46 +172,46 @@ add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
     for (i, t) in enumerate(tokens)
         # a::x
         if exactkind(prev_t) == Tokens.DECLARATION
-            merge!(ansitokens, i-1, cscheme.argdef)
-            merge!(ansitokens, i, cscheme.argdef)
+            ansitokens[i-1] = cscheme.argdef
+            ansitokens[i] = cscheme.argdef
         # :foo
         elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.COLON
-            merge!(ansitokens, i-1, cscheme.symbol)
-            merge!(ansitokens, i, cscheme.symbol)
+            ansitokens[i-1] = cscheme.symbol
+            ansitokens[i] = cscheme.symbol
         # function
         elseif iskeyword(kind(t))
             if kind(t) == Tokens.TRUE || kind(t) == Tokens.FALSE
-                merge!(ansitokens, i, cscheme.symbol)
+                ansitokens[i] = cscheme.symbol
             else
-                merge!(ansitokens, i, cscheme.keyword)
+                ansitokens[i] = cscheme.keyword
             end
         # "foo"
         elseif kind(t) == Tokens.STRING || kind(t) == Tokens.TRIPLE_STRING || kind(t) == Tokens.CHAR
-            merge!(ansitokens, i, cscheme.string)
+            ansitokens[i] = cscheme.string
         # * -
         elseif Tokens.isoperator(kind(t))
-            merge!(ansitokens, i, cscheme.op)
+            ansitokens[i] = cscheme.op
         # #= foo =#
         elseif kind(t) == Tokens.COMMENT
-            merge!(ansitokens, i, cscheme.comment)
+            ansitokens[i] = cscheme.comment
         # function f(...)
         elseif kind(t) == Tokens.LPAREN && kind(prev_t) == Tokens.IDENTIFIER
-            merge!(ansitokens, i-1, cscheme.call)
+            ansitokens[i-1] = cscheme.call
              # function f(...)
             if i > 3 && kind(tokens[i-2]) == Tokens.WHITESPACE && exactkind(tokens[i-3]) == Tokens.FUNCTION
-                merge!(ansitokens, i-1, cscheme.function_def)
+                ansitokens[i-1] = cscheme.function_def
             end
         # @fdsafds
         elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.AT_SIGN
-            merge!(ansitokens, i-1, cscheme._macro)
-            merge!(ansitokens, i, cscheme._macro)
-        # 2, 32.32
+            ansitokens[i-1] = cscheme._macro
+            ansitokens[i] = cscheme._macro
+        # 2] = 32.32
         elseif kind(t) == Tokens.INTEGER || kind(t) == Tokens.FLOAT
-            merge!(ansitokens, i, cscheme.number)
+            ansitokens[i] = cscheme.number
         elseif kind(t) == Tokens.WHITESPACE
-            merge!(ansitokens, i, ANSIToken())
+            ansitokens[i] = ANSIToken()
         else
-            merge!(ansitokens, i, cscheme.text)
+            ansitokens[i] = cscheme.text
         end
         prev_t = t
     end

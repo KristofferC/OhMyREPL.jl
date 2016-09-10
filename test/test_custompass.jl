@@ -13,7 +13,7 @@ function foobar_bluify(ansitokens, tokens, ::Int)
         println(tok)
         if (Tokenize.Tokens.kind(tok) == Tokenize.Tokens.IDENTIFIER
                && Tokenize.Tokens.untokenize(tok) == "foobar")
-            merge!(ansitokens, i, ANSIToken(foreground = :blue))
+            ansitokens[i] = ANSIToken(foreground = :blue)
         end
     end
 end
