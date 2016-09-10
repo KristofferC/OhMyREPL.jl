@@ -1,5 +1,5 @@
 import OhMyREPL.ErrorMessages: prev_er, err_linfo_color, err_funcdef_color,
-                                n_frames, linfos, stack_counter
+                                linfos, stack_counter
 
 import Base.REPL: display_error, ip_matches_func
 import Base.StackTraces: empty_sym, show_spec_linfo
@@ -30,10 +30,11 @@ function Base.showerror(io::IO, ex, bt; backtrace=true)
             backtrace_str = takebuf_string(io_bt)
             # Only print the backtrace header if there actually is a printed backtrace
             if backtrace_str != ""
-                header = string(typeof(ex).name.name, " ")
-                line_len = min(90, Base.Terminals.width(Base.active_repl.t))
-                print_with_color(default_color_warn, io, "-"^line_len * "\n", header)
-                print(io, lpad("Stacktrace (most recent call last)", line_len - strwidth(header), ' '))
+                header = string("------ ", typeof(ex).name.name, " ")
+                stacktrace_str = " Stacktrace (most recent call last)"
+                line_len = min(75, Base.Terminals.width(Base.active_repl.t))
+                print_with_color(default_color_warn, io, header, "-"^(line_len - strwidth(header) - strwidth(stacktrace_str)))
+                print(io, stacktrace_str, "\n")
                 print(io, backtrace_str, "\n")
             end
         end
@@ -55,14 +56,11 @@ end
 function Base.show_backtrace(io::IO, t::Vector)
     stack_counter[] = 0
     resize!(linfos, 0)
-    n_frames[] = 1
-    process_backtrace((a,b) -> n_frames[] += 1, t)
     process_entry(last_frame, n) = begin
         show_trace_entry(io, last_frame, n)
         push!(linfos, (string(last_frame.file), last_frame.line))
     end
     process_backtrace(process_entry, t, rev  = get(io, :REPLError, false))
-    reverse!(linfos)
 end
 
 
@@ -149,11 +147,11 @@ end
 
 function Base.StackTraces.show(io::IO, frame::StackFrame; full_path::Bool=false)
     isreplerror = get(io, :REPLError, false)
-    isreplerror ? print_with_color(:bold, io, "[#$(n_frames[] - (stack_counter[] += 1))] — ") : print(io, " in ")
+    isreplerror ? print_with_color(:bold, io, " [$(stack_counter[] += 1)] — ") : print(io, " in ")
     show_spec_linfo(io, frame)
     if frame.file !== empty_sym
         file_info = full_path ? string(frame.file) : basename(string(frame.file))
-        isreplerror && print(io, "\n       ⌙")
+        isreplerror && haskey(ENV, "JULIA_ERR_LINFO_NEWLINE") && print(io, "\n       ⌙")
         print(io, " at ")
         Base.with_output_color(isreplerror ? err_linfo_color() : :nothing, io) do io
             print(io, file_info, ":")
