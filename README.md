@@ -40,7 +40,7 @@ function underline_star(ansitokens, tokens, cursorposition::Int)
     for (i, (ansitok, tok)) in enumerate(zip(ansitokens, tokens))
         # If the token is a STAR token
         if Tokenize.Tokens.exactkind(tok) == Tokenize.Tokens.STAR
-            # Update the ansi token
+            # Set the ansi token
             ansitokens[i] = ANSIToken(foreground = :green, underline = true, bold = true)
         end
     end
