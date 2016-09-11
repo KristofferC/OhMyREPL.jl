@@ -162,4 +162,4 @@ Rewriting the same string in the REPL as above we now get:
 
 ![](lower_presc.png)
 
-The foreground color of `Float64` is not determined by the Syntax highlighter pass. Note that the syntax highlighter does not touch the underlining so that one is still kept from the new pass.
+The foreground color of `Float64` is now determined by the Syntax highlighter pass. Note that the syntax highlighter does not touch the underlining so that one is still kept from the new pass.
