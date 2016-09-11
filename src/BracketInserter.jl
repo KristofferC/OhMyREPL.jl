@@ -38,7 +38,8 @@ enable_autocomplete_brackets(v::Bool) = AUTOMATIC_BRACKET_MATCH[] = v
 function insert_into_keymap!(D::Dict)
     left_brackets = ['(', '{', '[']
     right_brackets = [')', '}', ']']
-    right_brackets_ws = [')', '}', ']', ' ', '\t']
+    right_brackets_ws = vcat(right_brackets, [' ', '\t'])
+    left_brackets_ws = vcat(left_brackets, [' ', '\t'])
     all_brackets_ws = vcat(left_brackets, right_brackets_ws)
     for (l, r) in zip(left_brackets, right_brackets)
         # If we enter a left bracket automatically complete it if the next
@@ -69,11 +70,9 @@ function insert_into_keymap!(D::Dict)
             # Next char is the quote symbol so just move right
             if AUTOMATIC_BRACKET_MATCH[] && !eof(b) && peek(b) == v
                 edit_move_right(s)
-            # Prev char or next char is not whitespace
             elseif AUTOMATIC_BRACKET_MATCH[] &&
-                    ((position(b) > 0 && leftpeek(b) in all_brackets_ws) ||
-                     (!eof(b) && peek(b) in right_brackets_ws) ||
-                     b.size == 0)
+                    ((position(b) > 0 && leftpeek(b) in all_brackets_ws && (eof(b) || peek(b) in right_brackets_ws)) ||
+                     ((!eof(b) && peek(b) in right_brackets_ws) || b.size == 0) && (position(b) == 0 || leftpeek(b) in left_brackets_ws))
                 edit_insert(s, v)
                 edit_insert(s, v)
                 edit_move_left(s)
@@ -106,6 +105,7 @@ function insert_into_keymap!(D::Dict)
                     edit_move_right(s)
                     edit_backspace(s)
                     edit_backspace(s)
+                    rewrite_with_ANSI(s)
                     return
                 end
             end

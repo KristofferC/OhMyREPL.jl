@@ -3,17 +3,17 @@ module CustomPassTest
 using Base.Test
 
 using OhMyREPL
-import OhMyREPL.ANSICodes: ANSIToken, ANSIValue
+import OhMyREPL.ANSICodes: ANSIToken, ANSIValue, merge!
 
 using Tokenize
 
 
 function foobar_bluify(ansitokens, tokens, ::Int)
-    for (ansitok, tok) in zip(ansitokens, tokens)
+    for (i, (ansitok, tok)) in enumerate(zip(ansitokens, tokens))
         println(tok)
         if (Tokenize.Tokens.kind(tok) == Tokenize.Tokens.IDENTIFIER
                && Tokenize.Tokens.untokenize(tok) == "foobar")
-            ansitok.foreground = ANSIValue(:foreground, :blue)
+            ansitokens[i] = ANSIToken(foreground = :blue)
         end
     end
 end

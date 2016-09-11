@@ -6,6 +6,8 @@ import Base.StackTraces: empty_sym, show_spec_linfo
 import Base: process_backtrace, show_trace_entry, show_backtrace, default_color_warn, repl_color, have_color,
              text_colors, color_normal
 
+Base.text_colors[:nothing] = ""
+
 function Base.REPL.display_error(io::IO, er, bt)
     prev_er = (er, bt)
     legacy_errs = haskey(ENV, "LEGACY_ERRORS")

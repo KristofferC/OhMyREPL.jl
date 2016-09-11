@@ -49,6 +49,11 @@ const ITALICS = (3, 23)
 const UNDERLINE = (4, 24)
 const STRIKETHROUGH = (9, 29)
 
+immutable ResetToken
+end
+
+Base.show(io::IO, ::ResetToken) = print(io, "\e[0m\\e[0m")
+Base.print(io::IO, ::ResetToken) = print(io, "\e[0m")
 
 immutable ANSIValue
     val::Int
@@ -60,8 +65,6 @@ activate(x::ANSIValue, v::Bool = true) = ANSIValue(x.val, v)
 isactive(x::ANSIValue) = x.active
 set(x::ANSIValue, val::Int) = ANSIValue(val, x.active)
 
-
-# ANSIValue(layer, val) = ANSIValue(ANSIValue(), layer, val)
 function ANSIValue(layer::Symbol, val::Symbol)
     if layer == :foreground
         return ANSIValue(FOREGROUNDS[val])
@@ -77,6 +80,9 @@ function ANSIValue(val::Int)
     return ANSIValue(val, true)
 end
 
+DeactivatedANSI() = ANSIValue(-1, false)
+
+
 function ANSIValue(style::Symbol, val::Bool)
     if style == :bold
         return ANSIValue(BOLD[!val + 1])
@@ -91,8 +97,7 @@ function ANSIValue(style::Symbol, val::Bool)
     end
 end
 
-# make immutable?
-type ANSIToken
+immutable ANSIToken
     foreground256colors::Bool
     background256colors::Bool
     foreground::ANSIValue
@@ -103,52 +108,69 @@ type ANSIToken
     strikethrough::ANSIValue
 end
 
-function update!(a::ANSIToken, b::ANSIToken)
-    isactive(b.foreground) && (a.foreground = b.foreground; a.foreground256colors = b.foreground256colors)
-    isactive(b.background) && (a.background = b.background; a.foreground256colors = b.foreground256colors)
-    isactive(b.bold) && (a.bold = b.bold)
-    isactive(b.italics) && (a.italics = b.italics)
-    isactive(b.underline) && (a.underline = b.underline)
-    isactive(b.strikethrough) && (a.strikethrough = b.strikethrough)
+function merge(a::ANSIToken, b::ANSIToken)
+    fg = isactive(b.foreground) ? b.foreground : a.foreground
+    isfg256 = isactive(b.foreground) ? b.foreground256colors : a.foreground256colors
+    bg = isactive(b.background) ? b.background : a.background
+    isbg256 = isactive(b.background) ? b.background256colors : a.background256colors
+    bold = isactive(b.bold) ? b.bold : a.bold
+    italics = isactive(b.italics) ? b.italics : a.italics
+    underline = isactive(b.underline) ? b.underline : a.underline
+    strikethrough = isactive(b.strikethrough) ? b.strikethrough : a.strikethrough
+    return ANSIToken(isfg256, isbg256, fg, bg, bold, italics, underline, strikethrough)
 end
 
-# Some defaults, everything deactive
-function _ANSIToken()
-    ANSIToken(false, false,
-              ANSIValue(39, false),
-              ANSIValue(49, false),
-              ANSIValue(1, false),
-              ANSIValue(3, false),
-              ANSIValue(4, false),
-              ANSIValue(9, false))
+function merge(toks::ANSIToken...)
+    if length(toks) == 0
+        return ANSIToken()
+    end
+    tok = toks[1]
+    for i in 2:length(toks)
+        tok = merge(tok, toks[i])
+    end
+    return tok
 end
-
 
 function ANSIToken(;foreground::Union{Int, Symbol} = :nothing, background::Union{Int, Symbol} = :nothing,
                     bold = :nothing, italics = :nothing, underline = :nothing, strikethrough = :nothing)
-    x = _ANSIToken()
     if foreground != :nothing
         if isa(foreground, Symbol)
-            x.foreground = ANSIValue(FOREGROUNDS[foreground])
+            tok_fg256colors = false
+            tok_fg = ANSIValue(FOREGROUNDS[foreground])
         else
-            x.foreground = ANSIValue(foreground)
-            x.foreground256colors = true
+            tok_fg = ANSIValue(foreground)
+            tok_fg256colors = true
         end
+    else
+        tok_fg256colors = false
+        tok_fg = DeactivatedANSI()
     end
 
     if background != :nothing
         if isa(background, Symbol)
-            x.background = ANSIValue(BACKGROUNDS[background])
+            tok_bg = ANSIValue(BACKGROUNDS[background])
+            tok_bg256colors = false
         else
-            x.background = ANSIValue(background)
-            x.background256colors = true
+            tok_bg = ANSIValue(background)
+            tok_bg256colors = true
         end
+    else
+        tok_bg256colors = false
+        tok_bg = DeactivatedANSI()
     end
-    bold != :nothing && (x.bold = ANSIValue(BOLD[!bold + 1]))
-    italics != :nothing && (x.italics = ANSIValue(ITALICS[!italics + 1]))
-    underline != :nothing && (x.underline = ANSIValue(UNDERLINE[!underline + 1]))
-    strikethrough != :nothing && (x.strikethrough = ANSIValue(STRIKETHROUGH[!strikethrough + 1]))
-    return x
+    tok_bold = (bold != :nothing) ? ANSIValue(BOLD[!bold + 1]) : DeactivatedANSI()
+    tok_italics = (italics != :nothing) ? ANSIValue(ITALICS[!italics + 1]) : DeactivatedANSI()
+    tok_underline =  (underline != :nothing) ? ANSIValue(UNDERLINE[!underline + 1]) : DeactivatedANSI()
+    tok_strikethrough = (strikethrough != :nothing) ? ANSIValue(STRIKETHROUGH[!strikethrough + 1]) : DeactivatedANSI()
+    return ANSIToken(tok_fg256colors, tok_bg256colors, tok_fg, tok_bg, tok_bold, tok_italics, tok_underline, tok_strikethrough)
+end
+
+function merge!(t1::Vector{ANSIToken}, t2::Vector{ANSIToken})
+    @assert length(t1) == length(t2)
+    for i in eachindex(t1)
+        t1[i] = merge(t1[i], t2[i])
+    end
+    return t1
 end
 
 # for 256 colors: <Esc>[38;5;ColorNumberm”
@@ -189,9 +211,10 @@ function Base.print(io::IO, t::ANSIToken)
 end
 
 function Base.show(io::IO, t::ANSIToken)
+    print(io, ResetToken())
     _print(io, t, false)
     _print(io, t, true)
-    print(io, "\e[0m", Base.input_color())
+    print(io, ResetToken(), Base.input_color())
 end
 
 
@@ -246,7 +269,7 @@ function test_ANSI_256(io::IO = STDOUT)
             println(io)
         end
         print(io, ANSIToken(foreground = c), c)
-        print(io, "\e[0m")
+        print(io, ResetToken())
         pad(io, c)
     end
 
@@ -256,7 +279,7 @@ function test_ANSI_256(io::IO = STDOUT)
             println(io)
         end
         print(io, ANSIToken(background = c), c)
-        print(io, "\e[0m")
+        print(io, ResetToken())
         pad(io, c)
     end
 end

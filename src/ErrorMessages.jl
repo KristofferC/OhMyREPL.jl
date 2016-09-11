@@ -6,8 +6,6 @@ import Base: repl_color
 
 export display_last_error, test_error
 
-Base.text_colors[:nothing] = ""
-
 # We have a global variable that will always store the latest show backtrace
 # This is useful for debugging the package itself but also if you want to reprint
 # the latest error with different settings

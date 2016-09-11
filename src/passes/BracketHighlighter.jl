@@ -7,7 +7,7 @@ using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
 
 using ...ANSICodes
-import ...ANSICodes: ANSIToken, ANSIValue, update!
+import ...ANSICodes: ANSIToken, ANSIValue, merge!
 
 import OhMyREPL: add_pass!, PASS_HANDLER
 
@@ -21,10 +21,12 @@ const BRACKETMATCHER_SETTINGS =
 @compat function (matcher::BracketHighlighterSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)
     left_bracket_match, right_bracket_match, matched = bracket_match(tokens, cursorpos)
     !matched && return
-    update!(ansitokens[left_bracket_match], matcher.token)
-    update!(ansitokens[right_bracket_match], matcher.token)
+    ansitokens[left_bracket_match] = matcher.token
+    ansitokens[right_bracket_match] = matcher.token
     return
 end
+
+set_token!(token::ANSIToken) = BRACKETMATCHER_SETTINGS.token = token
 
 add_pass!(PASS_HANDLER, "BracketHighlighter", BRACKETMATCHER_SETTINGS, true)
 
