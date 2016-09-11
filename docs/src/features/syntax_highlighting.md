@@ -27,7 +27,6 @@ To activate a colorscheme use `colorscheme!(name::String)`
 
 ![](activate_colorscheme.png)
 
-
 ## Creating your own colorschemes.
 
 This section will describe how to create your own colorscheme.

@@ -107,12 +107,14 @@ end
 function add_pass!(rpc::PassHandler, name::String, f, update_on_cursormovement::Bool = true)
     idx = _check_pass_name(rpc, name, false)
     insert!(rpc.passes, 1, (name, Pass(f, true, update_on_cursormovement)))
+    return rpc
 end
 add_pass!(name::String, f, update_on_cursormovement::Bool = true) = add_pass!(PASS_HANDLER, name, f, update_on_cursormovement)
 
 function enable_pass!(rpc::PassHandler, name::String, enabled::Bool)
     idx = _check_pass_name(rpc, name, true)
     rpc.passes[idx][2].enabled = enabled
+    return rpc
 end
 enable_pass!(name::String, enabled::Bool) = enable_pass!(PASS_HANDLER, name, enabled)
 
