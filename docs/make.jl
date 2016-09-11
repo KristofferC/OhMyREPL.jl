@@ -21,5 +21,8 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/KristofferC/OhMyREPL.jl.git"
+    repo = "github.com/KristofferC/OhMyREPL.jl.git",
+    target = "build",
+    deps = nothing,
+    make = nothing,
 )
