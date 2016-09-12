@@ -3,7 +3,7 @@ import OhMyREPL.ErrorMessages: prev_er, err_linfo_color, err_funcdef_color,
 
 import Base.REPL: display_error, ip_matches_func
 import Base.StackTraces: empty_sym, show_spec_linfo
-import Base: process_backtrace, show_trace_entry, show_backtrace, default_color_warn, repl_color, have_color,
+import Base: process_backtrace, show_trace_entry, show_backtrace, repl_color, have_color,
              text_colors, color_normal
 
 Base.text_colors[:nothing] = ""
@@ -35,13 +35,13 @@ function Base.showerror(io::IO, ex, bt; backtrace=true)
                 header = string("------ ", typeof(ex).name.name, " ")
                 stacktrace_str = " Stacktrace (most recent call last)"
                 line_len = min(75, Base.Terminals.width(Base.active_repl.t))
-                print_with_color(default_color_warn, io, header, "-"^(line_len - strwidth(header) - strwidth(stacktrace_str)))
+                print_with_color(:red, io, header, "-"^(line_len - strwidth(header) - strwidth(stacktrace_str)))
                 print(io, stacktrace_str, "\n")
                 print(io, backtrace_str, "\n")
             end
         end
         try
-            Base.with_output_color(default_color_warn, io) do io
+            Base.with_output_color(:red, io) do io
                 showerror(io, ex)
             end
         end
