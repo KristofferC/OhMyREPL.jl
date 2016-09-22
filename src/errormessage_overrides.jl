@@ -5,6 +5,10 @@ import Base.REPL: display_error, ip_matches_func
 import Base.StackTraces: empty_sym, show_spec_linfo
 import Base: process_backtrace, show_trace_entry, show_backtrace, default_color_warn, repl_color, have_color,
              text_colors, color_normal
+             
+if VERSION > v"0.6.0-dev.615"
+    typealias LambdaInfo Core.MethodInstance
+end
 
 Base.text_colors[:nothing] = ""
 
