@@ -5,7 +5,7 @@ import Base.REPL: display_error, ip_matches_func
 import Base.StackTraces: empty_sym, show_spec_linfo
 import Base: process_backtrace, show_trace_entry, show_backtrace, default_color_warn, repl_color, have_color,
              text_colors, color_normal
-             
+
 if VERSION > v"0.6.0-dev.615"
     typealias LambdaInfo Core.MethodInstance
 end
@@ -120,7 +120,7 @@ function Base.show_lambda_types(io::IO, li::LambdaInfo)
                 isdefined(ft.name.module, ft.name.mt.name) &&
                 ft == typeof(getfield(ft.name.module, ft.name.mt.name))
             print(io, ft.name.mt.name)
-        elseif isa(ft, DataType) && is(ft.name, Type.name) && isleaftype(ft)
+        elseif isa(ft, DataType) && ft.name === Type.name && isleaftype(ft)
             f = ft.parameters[1]
             print(io, f)
         else
