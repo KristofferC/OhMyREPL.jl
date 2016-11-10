@@ -104,16 +104,19 @@ function __init__()
             main_mode.keymap_dict = Base.LineEdit.keymap([d, main_mode.keymap_dict])
         end
     end
-    # http://stackoverflow.com/a/39174202
-    ORIGINAL_STDERR = STDERR
-    err_rd, err_wr = redirect_stderr()
-    reader = @async readstring(err_rd)
-    Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
-    if VERSION > v"0.5-"
-        include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
+    # Thanks to @Ismael-VC for this code.   
+    if ccall(:jl_generating_output, Cint, ()) == 0
+        ORIGINAL_STDERR = STDERR
+        err_rd, err_wr = redirect_stderr()
+        err_reader = @async @compat readstring(err_rd)
+        Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
+        if VERSION > v"0.5-"
+            include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
+        end
+        @async wait(err_reader)
+        REDIRECTED_STDERR = STDERR
+        err_stream = redirect_stderr(ORIGINAL_STDERR)
     end
-    REDIRECTED_STDERR = STDERR
-    err_stream = redirect_stderr(ORIGINAL_STDERR)
 end
 
 end # module
