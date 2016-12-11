@@ -50,7 +50,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
             LineEdit.write_prompt(terminal(s), mode)
             LineEdit.write(terminal(s), "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
         end
-        write(terminal(s), takebuf_string(b))
+        write(terminal(s), String(take!(b)))
 
         # Reset the buffer since the Lexer messed with it (maybe the Lexer should reset it on done)
         seek(buffer(s), p)
@@ -60,7 +60,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         obuff = IOBuffer()
         q = Base.Terminals.TerminalBuffer(obuff)
         mode.ias = refresh_multi_line(q, terminal(s), buffer(s), mode.ias)
-        write(terminal(s), takebuf_array(obuff))
+        write(terminal(s), take!(obuff))
         flush(terminal(s))
 end
 

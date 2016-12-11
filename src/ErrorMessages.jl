@@ -28,7 +28,7 @@ stack_counter = Ref{Int}(0)
 
 function insert_keymap!(D)
     D["^Q"] = (s, o...) -> begin
-        str = takebuf_string(Base.LineEdit.buffer(s))
+        str = String(take!(Base.LineEdit.buffer(s)))
         n = tryparse(Int, str)
         if isnull(n)
             write(Base.LineEdit.buffer(s), str)
