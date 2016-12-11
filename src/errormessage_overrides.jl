@@ -29,7 +29,7 @@ function Base.showerror(io::IO, ex, bt; backtrace=true)
             io_bt = IOBuffer()
             io_bt_con = IOContext(io_bt, io)
             show_backtrace(io_bt_con, bt)
-            backtrace_str = takebuf_string(io_bt)
+            backtrace_str = String(take!(io_bt))
             # Only print the backtrace header if there actually is a printed backtrace
             if backtrace_str != ""
                 header = string("------ ", typeof(ex).name.name, " ")
@@ -175,6 +175,6 @@ function Base.with_output_color(f::Function, color::Symbol, io::IO, args...)
     try f(buf, args...)
     finally
         have_color && color != :nothing && print(buf, color_normal)
-        print(io, takebuf_string(buf))
+        print(io, String(take!(buf)))
     end
 end
