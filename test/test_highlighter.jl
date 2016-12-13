@@ -15,7 +15,7 @@ OhMyREPL.test_pass(b, SYNTAX_HIGHLIGHTER_SETTINGS, str)
 
 
 println("Original string: ", str)
-println("Highlighted string: ", takebuf_string(b))
+println("Highlighted string: ", String(take!(b)))
 
 println()
 
@@ -23,7 +23,7 @@ str = "(function :foobar, foobar )# foobar"
 OhMyREPL.test_passes(b, OhMyREPL.PASS_HANDLER, str, 3)
 
 println("Original string: ", str)
-println("Highlighted string: ", takebuf_string(b))
+println("Highlighted string: ", String(take!(b)))
 println()
 
 end

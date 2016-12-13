@@ -6,6 +6,10 @@ import Base.StackTraces: empty_sym, show_spec_linfo
 import Base: process_backtrace, show_trace_entry, show_backtrace, repl_color, have_color,
              text_colors, color_normal
 
+if VERSION > v"0.6.0-dev.615"
+    typealias LambdaInfo Core.MethodInstance
+end
+
 Base.text_colors[:nothing] = ""
 
 function Base.REPL.display_error(io::IO, er, bt)
@@ -29,7 +33,7 @@ function Base.showerror(io::IO, ex, bt; backtrace=true)
             io_bt = IOBuffer()
             io_bt_con = IOContext(io_bt, io)
             show_backtrace(io_bt_con, bt)
-            backtrace_str = takebuf_string(io_bt)
+            backtrace_str = String(take!(io_bt))
             # Only print the backtrace header if there actually is a printed backtrace
             if backtrace_str != ""
                 header = string("------ ", typeof(ex).name.name, " ")
@@ -116,7 +120,7 @@ function Base.show_lambda_types(io::IO, li::LambdaInfo)
                 isdefined(ft.name.module, ft.name.mt.name) &&
                 ft == typeof(getfield(ft.name.module, ft.name.mt.name))
             print(io, ft.name.mt.name)
-        elseif isa(ft, DataType) && is(ft.name, Type.name) && isleaftype(ft)
+        elseif isa(ft, DataType) && ft.name === Type.name && isleaftype(ft)
             f = ft.parameters[1]
             print(io, f)
         else
@@ -175,6 +179,6 @@ function Base.with_output_color(f::Function, color::Symbol, io::IO, args...)
     try f(buf, args...)
     finally
         have_color && color != :nothing && print(buf, color_normal)
-        print(io, takebuf_string(buf))
+        print(io, String(take!(buf)))
     end
 end

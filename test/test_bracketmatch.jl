@@ -17,7 +17,7 @@ OhMyREPL.test_pass(b, OhMyREPL.Passes.BracketHighlighter.BRACKETMATCHER_SETTINGS
     str, idx)
 
 println("Original string: ", str)
-println("BracketMatched string: ", takebuf_string(b))
+println("BracketMatched string: ", String(take!(b)))
 println()
 
 end
