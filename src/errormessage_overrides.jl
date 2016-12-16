@@ -46,12 +46,12 @@ function Base.showerror(io::IO, ex, bt; backtrace=true)
         end
         try
             Base.with_output_color(default_color_warn, io) do io
-                showerror(io, ex)
+                showerror(IOContext(io, :limit => true), ex)
             end
         end
     else
         try
-            showerror(io, ex)
+            showerror(IOContext(io, :limit => true), ex)
         finally
             backtrace && show_backtrace(io, bt)
         end
