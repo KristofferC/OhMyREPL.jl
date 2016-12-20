@@ -19,7 +19,7 @@ println("Highlighted string: ", String(take!(b)))
 
 println()
 
-str = "(function :foobar, foobar )# foobar"
+str = "(function :foobar, foobar @foobar())# foobar"
 OhMyREPL.test_passes(b, OhMyREPL.PASS_HANDLER, str, 3)
 
 println("Original string: ", str)

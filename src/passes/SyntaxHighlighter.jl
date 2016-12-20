@@ -197,7 +197,7 @@ add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
             ansitokens[i] = cscheme.comment
         # function f(...)
         elseif kind(t) == Tokens.LPAREN && kind(prev_t) == Tokens.IDENTIFIER
-            ansitokens[i-1] = cscheme.call
+            (i > 2 && exactkind(tokens[i-2]) == Tokens.AT_SIGN) || (ansitokens[i-1] = cscheme.call)
              # function f(...)
             if i > 3 && kind(tokens[i-2]) == Tokens.WHITESPACE && exactkind(tokens[i-3]) == Tokens.FUNCTION
                 ansitokens[i-1] = cscheme.function_def
