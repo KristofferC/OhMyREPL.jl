@@ -9,7 +9,17 @@ Pkg.clone("https://github.com/KristofferC/OhMyREPL.jl")
 
 ## Automatically start with Julia.
 
-One way of automatically starting the package with Julia is by simply putting `using OhMyREPL` in your `.juliarc.jl` file.
+One way of automatically starting the package with Julia is by putting
+
+```
+if isdir(Pkg.dir("OhMyREPL"))
+    @eval using OhMyREPL
+else
+    warn("OhMyREPL not installed")
+end
+```
+
+in your `.juliarc.jl` file.
 
 You can also compile `OhMyREPL` into the Julia system image. This will mean that there is no need to edit your `.juliarc` file and the Julia REPL will start a bit quicker since it does not have to parse and compile the package when it is loaded. The way to do this is described in the [Julia manual](http://docs.julialang.org/en/release-0.4/devdocs/sysimg/#building-the-julia-system-image) but is also summarized here:
 
