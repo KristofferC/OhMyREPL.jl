@@ -1,4 +1,4 @@
-__precompile__()
+    __precompile__()
 """
 A package that provides a new REPL that has syntax highlighting,
 bracket matching and other nifty features.
@@ -113,9 +113,8 @@ function __init__()
         if VERSION > v"0.5-"
             include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
         end
-        @async wait(err_reader)
-        REDIRECTED_STDERR = STDERR
-        err_stream = redirect_stderr(ORIGINAL_STDERR)
+        redirect_stderr(ORIGINAL_STDERR)
+        close(err_wr)
     end
 end
 
