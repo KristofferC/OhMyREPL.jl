@@ -12,20 +12,38 @@ end
 
 Base.text_colors[:nothing] = ""
 
-function Base.REPL.display_error(io::IO, er, bt)
-    prev_er = (er, bt)
-    legacy_errs = haskey(ENV, "LEGACY_ERRORS")
-    # remove REPL-related frames from interactive printing
-    eval_ind = findlast(addr->Base.REPL.ip_matches_func(addr, :eval), bt)
-    if eval_ind != 0
-        bt = bt[1:eval_ind-1]
-    end
+if isdefined(Base.REPL, :display_error)
+    function Base.REPL.display_error(io::IO, er, bt)
+        prev_er = (er, bt)
+        legacy_errs = haskey(ENV, "LEGACY_ERRORS")
+        # remove REPL-related frames from interactive printing
+        eval_ind = findlast(addr->Base.REPL.ip_matches_func(addr, :eval), bt)
+        if eval_ind != 0
+            bt = bt[1:eval_ind-1]
+        end
 
-    Base.with_output_color(legacy_errs ? :red : :nothing, io) do io
-        legacy_errs && print(io, "ERROR: ")
-        Base.showerror(IOContext(io, :REPLError => !legacy_errs), er, bt)
+        Base.with_output_color(legacy_errs ? :red : :nothing, io) do io
+            legacy_errs && print(io, "ERROR: ")
+            Base.showerror(IOContext(io, :REPLError => !legacy_errs), er, bt)
+        end
+    end
+else
+    function Basedisplay_error(io::IO, er, bt)
+        prev_er = (er, bt)
+        legacy_errs = haskey(ENV, "LEGACY_ERRORS")
+        # remove REPL-related frames from interactive printing
+        eval_ind = findlast(addr->Base.REPL.ip_matches_func(addr, :eval), bt)
+        if eval_ind != 0
+            bt = bt[1:eval_ind-1]
+        end
+
+        Base.with_output_color(legacy_errs ? :red : :nothing, io) do io
+            legacy_errs && print(io, "ERROR: ")
+            Base.showerror(IOContext(io, :REPLError => !legacy_errs), er, bt)
+        end
     end
 end
+
 
 function Base.showerror(io::IO, ex, bt; backtrace=true)
     if get(io, :REPLError, false)
