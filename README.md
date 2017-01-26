@@ -4,6 +4,9 @@
 
 ![repl](https://i.imgur.com/wtR0ASD.png)
 
+[![Build Status](https://travis-ci.org/KristofferC/OhMyREPL.jl.svg?branch=master)](https://travis-ci.org/KristofferC/OhMyREPL.jl) [![Build status](https://ci.appveyor.com/api/projects/status/4qlpyvwaggd1vrx7?svg=true)](https://ci.appveyor.com/project/KristofferC/ohmyrepl-jl)
+
+
 A package that hooks into the Julia REPL and gives it syntax highlighting, bracket highlighting, [prompt paste mode](https://github.com/JuliaLang/julia/pull/17599), [colorized, structured error messages](https://github.com/JuliaLang/julia/pull/18228) and other goodies.
 
 **Note:** A video showing installation and features of the package is available [here](https://www.youtube.com/watch?v=lTLPAOLLbTU).

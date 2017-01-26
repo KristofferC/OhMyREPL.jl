@@ -1,6 +1,5 @@
 module TestSyntaxHighlighter
 
-
 using Base.Test
 
 using OhMyREPL
@@ -8,6 +7,8 @@ import OhMyREPL.ANSICodes: ANSIToken, ANSIValue
 import  OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
 
 using Tokenize
+
+OhMyREPL.colorscheme!("Monokai16")
 
 b = IOBuffer()
 str = "function :foobar, foobar # foobar"
@@ -19,7 +20,7 @@ println("Highlighted string: ", String(take!(b)))
 
 println()
 
-str = "(function :foobar, foobar )# foobar"
+str = "(function :foobar, foobar @foobar())# foobar"
 OhMyREPL.test_passes(b, OhMyREPL.PASS_HANDLER, str, 3)
 
 println("Original string: ", str)
