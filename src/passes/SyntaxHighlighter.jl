@@ -190,7 +190,7 @@ add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
         elseif kind(t) == Tokens.STRING || kind(t) == Tokens.TRIPLE_STRING || kind(t) == Tokens.CHAR
             ansitokens[i] = cscheme.string
         # * -
-        elseif Tokens.isoperator(kind(t))
+        elseif Tokens.isoperator(kind(t)) || exactkind(t) == Tokens.TRUE || exactkind(t) == Tokens.FALSE
             ansitokens[i] = cscheme.op
         # #= foo =#
         elseif kind(t) == Tokens.COMMENT
