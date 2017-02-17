@@ -163,7 +163,7 @@ function create_keybindings()
             return
         end
         edit_insert(sbuffer, input)
-        input = takebuf_string(sbuffer)
+        input = String(take!(sbuffer))
         oldpos = start(input)
         firstline = true
         isprompt_paste = false

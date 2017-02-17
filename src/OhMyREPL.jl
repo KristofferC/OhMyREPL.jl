@@ -105,7 +105,7 @@ function __init__()
             main_mode.keymap_dict = Base.LineEdit.keymap([d, main_mode.keymap_dict])
         end
     end
-    # Thanks to @Ismael-VC for this code.   
+    # Thanks to @Ismael-VC for this code.
     if ccall(:jl_generating_output, Cint, ()) == 0
         ORIGINAL_STDERR = STDERR
         err_rd, err_wr = redirect_stderr()
