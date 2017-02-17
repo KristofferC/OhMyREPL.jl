@@ -1,6 +1,8 @@
 import OhMyREPL.ErrorMessages: prev_er, err_linfo_color, err_funcdef_color,
                                 linfos, stack_counter
 
+import OhMyREPL.OUTPUT_PROMPT
+
 import Base.REPL: display_error, ip_matches_func
 import Base.StackTraces: empty_sym, show_spec_linfo
 import Base: process_backtrace, show_trace_entry, show_backtrace, repl_color, have_color,
@@ -28,7 +30,7 @@ if isdefined(Base.REPL, :display_error)
         end
     end
 else
-    function Basedisplay_error(io::IO, er, bt)
+    function Base.display_error(io::IO, er, bt)
         prev_er = (er, bt)
         legacy_errs = haskey(ENV, "LEGACY_ERRORS")
         # remove REPL-related frames from interactive printing
@@ -43,6 +45,16 @@ else
         end
     end
 end
+
+function Base.REPL.display(d::Base.REPL.REPLDisplay, mime::MIME"text/plain", x)
+    global OUTPUT_PROMPT
+    io = Base.REPL.outstream(d.repl)
+    write(io, OUTPUT_PROMPT)
+    Base.have_color && write(io, Base.REPL.answer_color(d.repl))
+    show(IOContext(io, :limit => true), mime, x)
+    println(io)
+end
+
 
 
 function Base.showerror(io::IO, ex, bt; backtrace=true)

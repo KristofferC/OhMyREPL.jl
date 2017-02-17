@@ -19,6 +19,7 @@ include(joinpath("passes", "Passes.jl"))
 
 include("BracketInserter.jl")
 include("ErrorMessages.jl")
+include("prompt.jl")
 
 using .ANSICodes
 export ANSICodes
