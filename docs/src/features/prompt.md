@@ -12,7 +12,7 @@ can be used to change the way that the input and output prompts are displayed.
 As an example, after running:
 
 ```julia
-OhMyREPL.input_prompt!(">", :blue)
+OhMyREPL.input_prompt!(">", :magenta)
 OhMyREPL.output_prompt!(">", :red)
 ```
 
