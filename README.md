@@ -4,7 +4,7 @@
 
 ![repl](https://i.imgur.com/wtR0ASD.png)
 
-[![Build Status](https://travis-ci.org/KristofferC/OhMyREPL.jl.svg?branch=master)](https://travis-ci.org/KristofferC/OhMyREPL.jl) [![Build status](https://ci.appveyor.com/api/projects/status/4qlpyvwaggd1vrx7?svg=true)](https://ci.appveyor.com/project/KristofferC/ohmyrepl-jl)
+[![Build Status](https://travis-ci.org/KristofferC/OhMyREPL.jl.svg?branch=master)](https://travis-ci.org/KristofferC/OhMyREPL.jl) [![Build status](https://ci.appveyor.com/api/projects/status/4qlpyvwaggd1vrx7?svg=true)](https://ci.appveyor.com/project/KristofferC/ohmyrepl-jl) [![][docs-latest-img]][docs-latest-url]
 
 
 A package that hooks into the Julia REPL and gives it syntax highlighting, bracket highlighting, [prompt paste mode](https://github.com/JuliaLang/julia/pull/17599), [colorized, structured error messages](https://github.com/JuliaLang/julia/pull/18228) and other goodies.
@@ -34,3 +34,5 @@ and then just load with `using OhMyREPL` (preferably by putting it in the `.juli
 
 Please see [the documentation](https://KristofferC.github.io/OhMyREPL.jl/latest) for more extensive description of the features and their settings like how to change coloschemes, how to create your own colorschemes etc.
 
+[docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
+[docs-latest-url]: https://kristofferc.github.io/OhMyREPL.jl/latest/
