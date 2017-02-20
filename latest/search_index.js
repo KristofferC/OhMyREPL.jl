@@ -201,6 +201,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "features/prompt.html#",
+    "page": "Prompt changing",
+    "title": "Prompt changing",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "features/prompt.html#Prompt-changing-1",
+    "page": "Prompt changing",
+    "title": "Prompt changing",
+    "category": "section",
+    "text": "The functionsOhMyREPL.input_prompt!(str::String, color::Symbol)\nOhMyREPL.output_prompt!(str::String, color::Symbol)can be used to change the way that the input and output prompts are displayed.As an example, after running:OhMyREPL.input_prompt!(\">\", :blue)\nOhMyREPL.output_prompt!(\">\", :red)(Image: )The different possible colors can be found by typing Base.text_colors in the Julia REPL's help mode.hint: Hint\nYou can use something like OhMyREPL.input_prompt!(string(VERSION) * \">\", :green) to show which version of Julia you are currently running.(Image: )"
+},
+
+{
     "location": "internals/ansitoken.html#",
     "page": "ANSIToken",
     "title": "ANSIToken",
