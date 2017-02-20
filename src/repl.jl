@@ -41,11 +41,13 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         # Extract the cursor index in character count
         cursoridx = length(UTF8String(buffer(s).data[1:p]))
 
+        l = get_prompt_length(s)
+
         # Insert colorized text from running the passes
         b = IOBuffer()
         tokens = collect(Lexers.Lexer(buffer(s)))
         apply_passes!(PASS_HANDLER, tokens, cursoridx, cursormove)
-        untokenize_with_ANSI(b, PASS_HANDLER , tokens)
+        untokenize_with_ANSI(b, PASS_HANDLER , tokens, l)
         if !isa(s, LineEdit.SearchState)
             LineEdit.write_prompt(terminal(s), mode)
             LineEdit.write(terminal(s), "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
@@ -59,7 +61,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         # Maybe it is possible to save the cursor and just restore it but that is probably Terminal dependent...
         obuff = IOBuffer()
         q = Base.Terminals.TerminalBuffer(obuff)
-        mode.ias = refresh_multi_line(q, terminal(s), buffer(s), mode.ias)
+        mode.ias = refresh_multi_line(q, terminal(s), buffer(s), mode.ias, l)
         write(terminal(s), take!(obuff))
         flush(terminal(s))
 end
@@ -161,7 +163,7 @@ function create_keybindings()
             return
         end
         edit_insert(sbuffer, input)
-        input = takebuf_string(sbuffer)
+        input = String(take!(sbuffer))
         oldpos = start(input)
         firstline = true
         isprompt_paste = false
@@ -276,8 +278,23 @@ function _commit_line(s, data, c)
     state(s, mode(s)).ias = InputAreaState(0, 0)
 end
 
+function get_prompt_length(s)
+    if isa(s, LineEdit.PromptState)
+        _indent = strwidth(s.p.prompt)
+    elseif isa(s, LineEdit.MIState)
+        mode = s.current_mode
+        if isa(mode, LineEdit.PrefixHistoryPrompt)
+            _indent = strwidth(mode.parent_prompt.prompt)
+        else
+            _indent = strwidth(mode.prompt)
+        end
+    else
+        error("Bug: $(typeof(s)) not accounted for")
+    end
+end
+
 # Pasted from LineEdit.jl but the writes to the Terminal have been removed.
-function refresh_multi_line(termbuf, terminal, buf, state)
+function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
     cols = width(terminal)
     curs_row = -1 # relative to prompt (1-based)
     curs_pos = -1 # 1-based column position of the cursor
@@ -291,8 +308,8 @@ function refresh_multi_line(termbuf, terminal, buf, state)
     else
         miscountnl = false
     end
-    lindent = 7
-    indent = 7 # TODO this gets the cursor right but not the text
+    lindent = promptlength
+    indent = promptlength # TODO this gets the cursor right but not the text
     # Now go through the buffer line by line
     seek(buf, 0)
     moreinput = true # add a blank line if there is a trailing newline on the last line

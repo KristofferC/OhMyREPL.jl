@@ -41,7 +41,7 @@ end
 test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
     test_passes(STDOUT, rpc, str, cursorpos, cursormovement)
 
-function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token})
+function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, indent = 7)
     @assert length(tokens) == length(ansitokens)
     print(io, ResetToken())
     z = 1
@@ -49,14 +49,14 @@ function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vec
         print(io, ansitoken)
         for c in untokenize(token)
             print(io, c)
-            c == '\n' && print(io, " "^7)
+            c == '\n' && print(io, " "^indent)
         end
         print(io, ResetToken())
     end
 end
-untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}) = untokenize_with_ANSI(io, rpc.accum_ansitokens, tokens)
-untokenize_with_ANSI(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}) =
-    untokenize_with_ANSI(STDOUT, ansitokens, tokens)
+untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}, indent = 7) = untokenize_with_ANSI(io, rpc.accum_ansitokens, tokens, indent)
+untokenize_with_ANSI(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, indent = 7) =
+    untokenize_with_ANSI(STDOUT, ansitokens, tokens, indent)
 
 function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, cursorpos::Int = 1, cursormovement::Bool = false)
     resize!(rpc.ansitokens, length(tokens))
