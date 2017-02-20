@@ -20,7 +20,7 @@ Pkg.clone("https://github.com/KristofferC/Tokenize.jl")
 Pkg.clone("https://github.com/KristofferC/OhMyREPL.jl")
 ```
 
-and then just load with `using OhMyREPL` (preferably by putting it in the `.juliarc`)
+and then just load with `using OhMyREPL` (preferably by putting it in the `.juliarc.jl`)
 
 ### Features
 
