@@ -19,6 +19,7 @@ include(joinpath("passes", "Passes.jl"))
 
 include("BracketInserter.jl")
 include("ErrorMessages.jl")
+include("prompt.jl")
 
 using .ANSICodes
 export ANSICodes
@@ -86,6 +87,7 @@ function __init__()
     else
         atreplinit() do repl
             repl.interface = Base.REPL.setup_interface(repl; extra_repl_keymap = Prompt.NEW_KEYBINDINGS)
+            update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
             p = repl.interface.modes[5]
             # These are inserted here because we only want to insert them for the Julia mode
@@ -104,7 +106,7 @@ function __init__()
             main_mode.keymap_dict = Base.LineEdit.keymap([d, main_mode.keymap_dict])
         end
     end
-    # Thanks to @Ismael-VC for this code.   
+    # Thanks to @Ismael-VC for this code.
     if ccall(:jl_generating_output, Cint, ()) == 0
         ORIGINAL_STDERR = STDERR
         err_rd, err_wr = redirect_stderr()
