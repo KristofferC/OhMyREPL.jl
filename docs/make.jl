@@ -1,7 +1,7 @@
 using Documenter, OhMyREPL
 
 makedocs(
-    format = Documenter.Formats.HTML,
+    format = :html,
     sitename = "OhMyREPL",
     pages = Any[
         "Home" => "index.md",
@@ -12,6 +12,7 @@ makedocs(
             "features/prompt_pasting.md",
             "features/error_messages.md",
             "features/bracket_complete.md",
+            "features/prompt.md",
             ],
         "Internals" => Any[
             "internals/ansitoken.md",

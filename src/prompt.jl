@@ -8,16 +8,8 @@ function update_interface(interface)
 end
 
 function input_prompt!(s::String, col = :green)
-    if isdefined(Base, :active_repl)
-        repl = Base.active_repl
-        mirepl = isdefined(repl,:mi) ? repl.mi : repl
-        main_mode = mirepl.interface.modes[1]
-        main_mode.prompt_prefix = get(Base.text_colors, Symbol(col), "\e[2m")
-        main_mode.prompt = s * " "
-    else
-        global INPUT_PROMPT_PREFIX = get(Base.text_colors, Symbol(col), "\e[2m")
-        global INPUT_PROMPT = s * " "
-    end
+    global INPUT_PROMPT_PREFIX = get(Base.text_colors, Symbol(col), "\e[2m")
+    global INPUT_PROMPT = isa(s, String) ? s * " " : s
     return
 end
 

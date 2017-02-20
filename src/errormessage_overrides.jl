@@ -8,22 +8,6 @@ import Base.StackTraces: empty_sym, show_spec_linfo
 import Base: process_backtrace, show_trace_entry, show_backtrace, repl_color, have_color,
              text_colors, color_normal
 
-
-function Base.REPL.run_frontend(repl::Base.REPL.LineEditREPL, backend)
-    d = Base.REPL.REPLDisplay(repl)
-    dopushdisplay = repl.specialdisplay === nothing && !in(d,Base.Multimedia.displays)
-    dopushdisplay && Base.REPL.pushdisplay(d)
-    if !isdefined(repl,:interface)
-        interface = repl.interface = Base.REPL.setup_interface(repl)
-    else
-        interface = repl.interface
-    end
-    update_interface(interface)
-    repl.backendref = backend
-    Base.REPL.run_interface(repl.t, interface)
-    dopushdisplay && Base.REPL.popdisplay(d)
-end
-
 if VERSION > v"0.6.0-dev.615"
     typealias LambdaInfo Core.MethodInstance
 end

@@ -87,6 +87,7 @@ function __init__()
     else
         atreplinit() do repl
             repl.interface = Base.REPL.setup_interface(repl; extra_repl_keymap = Prompt.NEW_KEYBINDINGS)
+            update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
             p = repl.interface.modes[5]
             # These are inserted here because we only want to insert them for the Julia mode
