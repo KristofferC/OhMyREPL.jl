@@ -107,16 +107,15 @@ function __init__()
         end
     end
     # Thanks to @Ismael-VC for this code.
-    if ccall(:jl_generating_output, Cint, ()) == 0
-        ORIGINAL_STDERR = STDERR
-        err_rd, err_wr = redirect_stderr()
-        err_reader = @async @compat readstring(err_rd)
+     mktemp() do _, f
+        old_stderr = STDERR
+        redirect_stderr(f)
+
         Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
         if VERSION > v"0.5-"
             include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
         end
-        redirect_stderr(ORIGINAL_STDERR)
-        close(err_wr)
+        redirect_stderr(old_stderr)
     end
 end
 
