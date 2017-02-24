@@ -19,7 +19,6 @@ Pages = [
     "features/error_messages.md",
     "features/bracket_complete.md",
     "features/rainbow_brackets.md",
-    "internals/ansitoken.md",
     "internals/passes.md"
 ]
 Depth = 1

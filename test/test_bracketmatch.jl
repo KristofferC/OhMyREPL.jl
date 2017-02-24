@@ -4,11 +4,8 @@ module TestBracketHighlighter
 using Base.Test
 
 using OhMyREPL
-import OhMyREPL.ANSICodes: ANSIToken, ANSIValue
 
 using Tokenize
-
-
 
 b = IOBuffer()
 str = "(function :foobar, foobar )# foobar"
