@@ -70,9 +70,8 @@ end
 function create_keybindings()
 
     D = Dict{Any, Any}()
-
-    D["*"]    = (s, data, c) ->  (LineEdit.edit_insert(s, c); rewrite_with_ANSI(s))
     D['\b']   = (s, data, c) ->  (LineEdit.edit_backspace(s); rewrite_with_ANSI(s))
+    D["*"]    = (s, data, c) ->  (LineEdit.edit_insert(s, c); rewrite_with_ANSI(s))
     D["^B"]   = (s, data, c) -> (LineEdit.edit_move_left(s) ;rewrite_with_ANSI(s))
     D["^F"]   = (s, data, c) -> (LineEdit.edit_move_right(s) ;rewrite_with_ANSI(s))
     # Meta B
@@ -314,7 +313,11 @@ function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
     seek(buf, 0)
     moreinput = true # add a blank line if there is a trailing newline on the last line
     while moreinput
-        l = readline(buf)
+        if VERSION < v"0.6.0-dev.2283"
+            l = readline(buf)
+        else
+            l = readline(buf, chomp=false)
+        end
         moreinput = endswith(l, "\n")
         # We need to deal with on-screen characters, so use strwidth to compute occupied columns
         llength = strwidth(l)
