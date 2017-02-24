@@ -149,7 +149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Error Messages",
     "title": "Error Messages",
     "category": "section",
-    "text": "warn: Warn\nThis feature only works on Julia v0.5 and currently v0.6 master. Due to rapid changes of the master branch, stability on v0.6 can not be guaranteed.OhMyREPL provides what can be argued to be a bit nicer error messages than Julia's default ones.The difference between the standard error messages and the ones from OhMyREPL is shown below:"
+    "text": "warn: Warn\nThis feature only works on Julia v0.5. Error messages on 0.6 have been improved enough that this feature is not needed.OhMyREPL provides what can be argued to be a bit nicer error messages than Julia's default ones.The difference between the standard error messages and the ones from OhMyREPL is shown below:"
 },
 
 {
