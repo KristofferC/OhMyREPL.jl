@@ -34,4 +34,3 @@ There are a few environment variables that can be set to change the way the erro
 * `"JULIA_ERR_LINFO_NEWLINE` can be set to `true` or `false` and determines if the line info should be printed on a new line.
 
 ![](custom_error.png)
-
