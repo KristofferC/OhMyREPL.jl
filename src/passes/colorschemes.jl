@@ -69,5 +69,3 @@ function _create_boxymonokai_256()
     number!(cs, ANSIToken(foreground = 208))
     return cs
 end
-
-

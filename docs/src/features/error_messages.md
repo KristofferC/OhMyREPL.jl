@@ -1,7 +1,7 @@
 # Error Messages
 
 !!! warn
-    This feature only works on Julia v0.5. Error messages on 0.6 has been improved enough that this feature is not needed.
+    This feature only works on Julia v0.5. Error messages on 0.6 have been improved enough that this feature is not needed.
 
 `OhMyREPL` provides what can be argued to be a bit nicer error messages than Julia's default ones.
 
