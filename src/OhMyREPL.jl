@@ -18,7 +18,9 @@ include("repl.jl")
 include(joinpath("passes", "Passes.jl"))
 
 include("BracketInserter.jl")
-include("ErrorMessages.jl")
+if VERSION > v"0.5-" && VERSION.minor < 6
+    include("ErrorMessages.jl")
+end
 include("prompt.jl")
 
 using .ANSICodes
@@ -107,16 +109,29 @@ function __init__()
             main_mode.keymap_dict = Base.LineEdit.keymap([d, main_mode.keymap_dict])
         end
     end
-    # Thanks to @Ismael-VC for this code.
-     mktemp() do _, f
+    if false
+    mktemp() do _, f
         old_stderr = STDERR
         redirect_stderr(f)
 
         Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
-        if VERSION > v"0.5-"
+        if VERSION > v"0.5-" && VERSION.minor < 6
             include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
         end
+
+        @eval begin
+            function Base.REPL.display(d::Base.REPL.REPLDisplay, mime::MIME"text/plain", x)
+                global OUTPUT_PROMPT
+                io = Base.REPL.outstream(d.repl)
+                write(io, OUTPUT_PROMPT)
+                Base.have_color && write(io, Base.REPL.answer_color(d.repl))
+                show(IOContext(io, :limit => true), mime, x)
+                println(io)
+            end
+        end
+
         redirect_stderr(old_stderr)
+    end
     end
 end
 
