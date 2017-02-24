@@ -1,20 +1,16 @@
 module CustomPassTest
 
 using Base.Test
-
 using OhMyREPL
-import OhMyREPL.ANSICodes: ANSIToken, ANSIValue, merge!
-
 using Tokenize
-using Compat
+using Crayons
 
-
-function foobar_bluify(ansitokens, tokens, ::Int)
-    for (i, (ansitok, tok)) in enumerate(zip(ansitokens, tokens))
+function foobar_bluify(crayons, tokens, ::Int)
+    for (i, (crayon, tok)) in enumerate(zip(crayons, tokens))
         println(tok)
         if (Tokenize.Tokens.kind(tok) == Tokenize.Tokens.IDENTIFIER
                && Tokenize.Tokens.untokenize(tok) == "foobar")
-            ansitokens[i] = ANSIToken(foreground = :blue)
+            crayons[i] = Crayon(foreground = :blue)
         end
     end
 end
