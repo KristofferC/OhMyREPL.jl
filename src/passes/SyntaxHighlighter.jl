@@ -49,6 +49,8 @@ end
 
 ColorScheme() = ColorScheme([Crayon() for _ in 1:length(fieldnames(ColorScheme))]...)
 
+include("colorschemes.jl")
+
 type SyntaxHighlighterSettings
     active::ColorScheme
     schemes::Dict{String, ColorScheme}

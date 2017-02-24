@@ -39,7 +39,7 @@ end
 test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
     test_passes(STDOUT, rpc, str, cursorpos, cursormovement)
 
-function untokenize_with_ANSI(io::IO, crayons::Vector{Crayons}, tokens::Vector{Token}, indent = 7)
+function untokenize_with_ANSI(io::IO, crayons::Vector{Crayon}, tokens::Vector{Token}, indent = 7)
     @assert length(tokens) == length(crayons)
     print(io, RESET)
     z = 1
@@ -53,8 +53,9 @@ function untokenize_with_ANSI(io::IO, crayons::Vector{Crayons}, tokens::Vector{T
     end
 end
 untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}, indent = 7) = untokenize_with_ANSI(io, rpc.accum_crayons, tokens, indent)
-untokenize_with_ANSI(crayons::Vector{Crayons}, tokens::Vector{Token}, indent = 7) =
+untokenize_with_ANSI(crayons::Vector{Crayon}, tokens::Vector{Token}, indent = 7) =
     untokenize_with_ANSI(STDOUT, crayons, tokens, indent)
+
 function merge!(t1::Vector{Crayon}, t2::Vector{Crayon})
     @assert length(t1) == length(t2)
     for i in eachindex(t1)
