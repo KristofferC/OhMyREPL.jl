@@ -44,7 +44,6 @@ test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, 
 function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, indent = 7)
     @assert length(tokens) == length(ansitokens)
     print(io, ResetToken())
-    z = 1
     for (token, ansitoken) in zip(tokens, ansitokens)
         print(io, ansitoken)
         for c in untokenize(token)

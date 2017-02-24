@@ -18,7 +18,9 @@ include("repl.jl")
 include(joinpath("passes", "Passes.jl"))
 
 include("BracketInserter.jl")
-include("ErrorMessages.jl")
+if VERSION > v"0.5-" && VERSION.minor < 6
+    include("ErrorMessages.jl")
+end
 include("prompt.jl")
 
 using .ANSICodes
@@ -86,7 +88,8 @@ function __init__()
         Prompt.insert_keybindings()
     else
         atreplinit() do repl
-            repl.interface = Base.REPL.setup_interface(repl; extra_repl_keymap = Prompt.NEW_KEYBINDINGS)
+            repl.interface = Base.REPL.setup_interface(repl)
+            Prompt.insert_keybindings()
             update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
             p = repl.interface.modes[5]
@@ -106,15 +109,15 @@ function __init__()
             main_mode.keymap_dict = Base.LineEdit.keymap([d, main_mode.keymap_dict])
         end
     end
-    # Thanks to @Ismael-VC for this code.
-     mktemp() do _, f
+    mktemp() do _, f
         old_stderr = STDERR
         redirect_stderr(f)
 
         Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
-        if VERSION > v"0.5-"
+        if VERSION > v"0.5-" && VERSION.minor < 6
             include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
         end
+        include(joinpath(dirname(@__FILE__), "output_prompt_overwrite.jl"))
         redirect_stderr(old_stderr)
     end
 end

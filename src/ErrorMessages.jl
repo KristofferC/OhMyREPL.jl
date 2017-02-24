@@ -48,8 +48,8 @@ end
 
 insert_keymap!(OhMyREPL.Prompt.NEW_KEYBINDINGS)
 
-type ThisisALongTypeThatWeMightNotWantToSee end
-typealias TL ThisisALongTypeThatWeMightNotWantToSee
+type ThisIsALongTypeOhItIsSoLong end
+const TL = ThisIsALongTypeOhItIsSoLong
 
 @noinline ff(x) = (a = rand(5); a[6])
 @noinline function g(a::TL, b::TL, c, d::Float64, e::Float64, f::TL, n)
