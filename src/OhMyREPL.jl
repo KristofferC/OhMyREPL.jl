@@ -143,7 +143,6 @@ function __init__()
 
         redirect_stderr(old_stderr)
     end
-    end
 end
 
 end # module
