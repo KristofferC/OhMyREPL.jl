@@ -109,6 +109,7 @@ function __init__()
             main_mode.keymap_dict = Base.LineEdit.keymap([d, main_mode.keymap_dict])
         end
     end
+
     mktemp() do _, f
         old_stderr = STDERR
         redirect_stderr(f)
@@ -118,7 +119,20 @@ function __init__()
             include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
         end
         include(joinpath(dirname(@__FILE__), "output_prompt_overwrite.jl"))
+
+        @eval begin
+            function Base.REPL.display(d::Base.REPL.REPLDisplay, mime::MIME"text/plain", x)
+                global OUTPUT_PROMPT
+                io = Base.REPL.outstream(d.repl)
+                write(io, OUTPUT_PROMPT)
+                Base.have_color && write(io, Base.REPL.answer_color(d.repl))
+                show(IOContext(io, :limit => true), mime, x)
+                println(io)
+            end
+        end
+
         redirect_stderr(old_stderr)
+    end
     end
 end
 
