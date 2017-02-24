@@ -86,7 +86,8 @@ function __init__()
         Prompt.insert_keybindings()
     else
         atreplinit() do repl
-            repl.interface = Base.REPL.setup_interface(repl; extra_repl_keymap = Prompt.NEW_KEYBINDINGS)
+            repl.interface = Base.REPL.setup_interface(repl)
+            Prompt.insert_keybindings()
             update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
             p = repl.interface.modes[5]

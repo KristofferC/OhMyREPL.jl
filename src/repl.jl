@@ -70,9 +70,8 @@ end
 function create_keybindings()
 
     D = Dict{Any, Any}()
-
-    D["*"]    = (s, data, c) ->  (LineEdit.edit_insert(s, c); rewrite_with_ANSI(s))
     D['\b']   = (s, data, c) ->  (LineEdit.edit_backspace(s); rewrite_with_ANSI(s))
+    D["*"]    = (s, data, c) ->  (LineEdit.edit_insert(s, c); rewrite_with_ANSI(s))
     D["^B"]   = (s, data, c) -> (LineEdit.edit_move_left(s) ;rewrite_with_ANSI(s))
     D["^F"]   = (s, data, c) -> (LineEdit.edit_move_right(s) ;rewrite_with_ANSI(s))
     # Meta B
