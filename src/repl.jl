@@ -41,7 +41,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         # Extract the cursor index in character count
         cursoridx = length(UTF8String(buffer(s).data[1:p]))
 
-        l = get_prompt_length(s)
+        l = strwidth(get_prompt(s))
 
         # Insert colorized text from running the passes
         b = IOBuffer()
@@ -166,6 +166,7 @@ function create_keybindings()
         oldpos = start(input)
         firstline = true
         isprompt_paste = false
+        prompt = get_prompt(s)
         while !done(input, oldpos) # loop until all lines have been executed
             # 17599
             # Check if the next statement starts with "julia> ", in that case
@@ -176,10 +177,14 @@ function create_keybindings()
                 oldpos >= sizeof(input) && return
             end
             # Skip over prompt prefix if statement starts with it
-            jl_prompt_len = 7
-            if (firstline || isprompt_paste) && (oldpos + jl_prompt_len <= sizeof(input) && input[oldpos:oldpos+jl_prompt_len-1] == "julia> ")
+            jl_prompt_len = strwidth(prompt)
+            jl_default_len = strwidth("julia> ")
+            #if (firstline || isprompt_paste)
+            match_default = oldpos + jl_default_len <= sizeof(input) && input[oldpos:oldpos+jl_default_len-1] == "julia> "
+            match_prompt =  oldpos + jl_prompt_len  <= sizeof(input) && input[oldpos:oldpos+jl_prompt_len-1] == prompt
+            if (firstline || isprompt_paste) && (match_default || match_prompt)
                 isprompt_paste = true
-                oldpos += jl_prompt_len
+                match_prompt ? (oldpos += jl_prompt_len) : (oldpos += jl_default_len)
             # If we are prompt pasting and current statement does not begin with julia> , skip to next line
             elseif isprompt_paste
                 while input[oldpos] != '\n'
@@ -277,19 +282,20 @@ function _commit_line(s, data, c)
     state(s, mode(s)).ias = InputAreaState(0, 0)
 end
 
-function get_prompt_length(s)
+function get_prompt(s)
     if isa(s, LineEdit.PromptState)
-        _indent = strwidth(s.p.prompt)
+        prompt = s.p.prompt
     elseif isa(s, LineEdit.MIState)
         mode = s.current_mode
         if isa(mode, LineEdit.PrefixHistoryPrompt)
-            _indent = strwidth(mode.parent_prompt.prompt)
+            prompt = mode.parent_prompt.prompt
         else
-            _indent = strwidth(mode.prompt)
+            prompt = mode.prompt
         end
     else
         error("Bug: $(typeof(s)) not accounted for")
     end
+    isa(prompt, String) ? (return prompt) : (return prompt())
 end
 
 # Pasted from LineEdit.jl but the writes to the Terminal have been removed.
