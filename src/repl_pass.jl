@@ -119,9 +119,9 @@ enable_pass!(name::String, enabled::Bool) = enable_pass!(PASS_HANDLER, name, ena
 
 function Base.show(io::IO, rpc::PassHandler)
     println(io, ANSIToken(bold = true),
-                "----------------------------------", ResetToken())
+                "──────────────────────────────────", ResetToken())
     println(io, " #   Pass name             Enabled  ")
-    println(io, "----------------------------------")
+    println(io, "──────────────────────────────────")
     for (i, pass) in enumerate(rpc.passes)
         name = pass[1]
         if length(name) >= 21
@@ -130,7 +130,7 @@ function Base.show(io::IO, rpc::PassHandler)
         println(io, " $i   ", @sprintf("%-21s %-8s ", name, pass[2].enabled))
     end
     print(io, ANSIToken(bold = true),
-                "----------------------------------", ResetToken())
+                "──────────────────────────────────", ResetToken())
 end
 
 prescedence!(rpc::PassHandler, name::String, presc::Int) = prescedence!(rpc, _check_pass_name(rpc, name, true), presc)

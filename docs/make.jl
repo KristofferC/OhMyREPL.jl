@@ -13,6 +13,7 @@ makedocs(
             "features/error_messages.md",
             "features/bracket_complete.md",
             "features/prompt.md",
+            "features/rainbow_brackets.md",
             ],
         "Internals" => Any[
             "internals/ansitoken.md",

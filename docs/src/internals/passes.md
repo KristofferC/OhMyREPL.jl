@@ -20,7 +20,7 @@ A pass can be enabled or disabled at will with `OhMyREPL.enable_pass!(pass_name:
 
 ## How a pass works
 
-We will here show how text from the REPL get transformed into syntax highlighted text. The sample text used is:
+This section shows how text from the REPL get transformed into syntax highlighted text. The sample text used is:
 
 ```jl
 str = "function f(x::Float64) return :x + 'a' end"
@@ -55,7 +55,7 @@ julia> tokens = collect(Tokenize.tokenize(str))
   1,43-1,42:        ENDMARKER         "" 
 ```
 
-We then create a vector of `ANSIToken`s of the same length as the Julia tokens and fill it with empty tokens. .
+A vector of `ANSIToken`s  of the same length as the Julia tokens is then created and filled with empty tokens. .
 
 ```
 ansitokens = Vector{OhMyREPL.ANSIToken}(length(tokens));
@@ -80,7 +80,7 @@ Each registered and enabled pass does this updating and the contributions from e
 
 ## Creating a pass
 
-We will here show how to create a very pass that let the user define an `ANSIToken` for each type assertion / declaration that happens to be a `Float64`.
+This section shows how to create a very pass that let the user define an `ANSIToken` for each type assertion / declaration that happens to be a `Float64`.
 !!! info
     Please refer to the [Tokenize.jl API](https://github.com/KristofferC/Tokenize.jl#api) and  [ANSIToken](@ref) sections when reading this section.
 
@@ -118,7 +118,7 @@ end
 
 ### Testing the pass
 
-We can now test the pass with the `OhMyREPL.test_pass([io::IO], pass, str::String)` where `str` is a test string to test the pass on:
+A pass can be tested with the `OhMyREPL.test_pass([io::IO], pass, str::String)` where `str` is a test string to test the pass on:
 
 ![](test_pass.png)
 
