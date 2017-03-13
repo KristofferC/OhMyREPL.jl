@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Manual Outline",
     "category": "section",
-    "text": "Pages = [\n    \"installation.md\",\n    \"features/syntax_highlighting.md\",\n    \"features/bracket_highlighting.md\",\n    \"features/prompt_pasting.md\",\n    \"features/error_messages.md\",\n    \"features/bracket_complete.md\",\n    \"internals/ansitoken.md\",\n    \"internals/passes.md\"\n]\nDepth = 1"
+    "text": "Pages = [\n    \"installation.md\",\n    \"features/syntax_highlighting.md\",\n    \"features/bracket_highlighting.md\",\n    \"features/prompt_pasting.md\",\n    \"features/error_messages.md\",\n    \"features/bracket_complete.md\",\n    \"features/rainbow_brackets.md\",\n    \"internals/ansitoken.md\",\n    \"internals/passes.md\"\n]\nDepth = 1"
 },
 
 {
@@ -217,6 +217,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "features/rainbow_brackets.html#",
+    "page": "Rainbow Brackets",
+    "title": "Rainbow Brackets",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "features/rainbow_brackets.html#Rainbow-Brackets-1",
+    "page": "Rainbow Brackets",
+    "title": "Rainbow Brackets",
+    "category": "section",
+    "text": "Rainbow brackets is a feature that colors matching brackets in the same color (with non matching closing brackets are showed in bold red):(Image: rainbow brackets)There are two modes of this pass, one that uses 256 colors and one that uses only the 16 system colors. By default, we default to using the 16 color mode on Windows and 256 color mode otherwise. Changing between the modes is done by:OhMyREPL.Passes.RainbowBrackets.activate_16colors()\nOhMyREPL.Passes.RainbowBrackets.activate_256colors()As with all different passes, this can be enabled or disabled with the function OhMyREPL.enable_pass!(\"RainbowBrackets\", enable::Bool) where enable determines wether if the pass is enabled or disabled.Inspired by the VSCode plugin with the same name."
+},
+
+{
     "location": "internals/ansitoken.html#",
     "page": "ANSIToken",
     "title": "ANSIToken",
@@ -277,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Passes",
     "title": "How a pass works",
     "category": "section",
-    "text": "We will here show how text from the REPL get transformed into syntax highlighted text. The sample text used is:str = \"function f(x::Float64) return :x + 'a' end\"First the text is tokenized with Tokenize.jl:julia> using Tokenize\n\njulia> tokens = collect(Tokenize.tokenize(str))\n20-element Array{Tokenize.Tokens.Token,1}:\n  1,1-1,8:          KEYWORD           \"function\"\n  1,9-1,9:          WHITESPACE        \" \"       \n  1,10-1,10:        IDENTIFIER        \"f\"       \n  1,11-1,11:        LPAREN            \"(\"       \n  1,12-1,12:        IDENTIFIER        \"x\"       \n  1,13-1,14:        OP                \"::\"      \n  1,15-1,21:        IDENTIFIER        \"Float64\" \n  1,22-1,22:        RPAREN            \")\"       \n  1,23-1,23:        WHITESPACE        \" \"       \n  1,24-1,29:        KEYWORD           \"return\"  \n  1,30-1,30:        WHITESPACE        \" \"       \n  1,31-1,31:        OP                \":\"       \n  1,32-1,32:        IDENTIFIER        \"x\"       \n  1,33-1,33:        WHITESPACE        \" \"       \n  1,34-1,34:        OP                \"+\"       \n  1,35-1,35:        WHITESPACE        \" \"       \n  1,36-1,38:        CHAR              \"'a'\"     \n  1,39-1,39:        WHITESPACE        \" \"       \n  1,40-1,42:        KEYWORD           \"end\"     \n  1,43-1,42:        ENDMARKER         \"\" We then create a vector of ANSITokens of the same length as the Julia tokens and fill it with empty tokens. .ansitokens = Vector{OhMyREPL.ANSIToken}(length(tokens));\nfill!(ansitokens, OhMyREPL.ANSIToken()) # ANSIToken is a bits type so this is OKThese two vectors are then sent to the syntax highlighter pass together with an integer that represent what character offset the cursor currently is located. The syntax highlighter does not use this information but the bracket highlighter does.OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS(ansitokens, tokens, 0)Running this function has the effect of updating the ansitokens vector. If we print this vector we see that they have been updated:(Image: )To print the original string with the updated vector of ANSITokens we use the OhMyREPL.untoktenize_with_ANSI([io::IO], ansitokens, tokens) function as:(Image: )Each registered and enabled pass does this updating and the contributions from each pass to the ANSIToken vector is merged in to a separate vector. After each pass is done, the result is printed to the REPL."
+    "text": "This section shows how text from the REPL get transformed into syntax highlighted text. The sample text used is:str = \"function f(x::Float64) return :x + 'a' end\"First the text is tokenized with Tokenize.jl:julia> using Tokenize\n\njulia> tokens = collect(Tokenize.tokenize(str))\n20-element Array{Tokenize.Tokens.Token,1}:\n  1,1-1,8:          KEYWORD           \"function\"\n  1,9-1,9:          WHITESPACE        \" \"       \n  1,10-1,10:        IDENTIFIER        \"f\"       \n  1,11-1,11:        LPAREN            \"(\"       \n  1,12-1,12:        IDENTIFIER        \"x\"       \n  1,13-1,14:        OP                \"::\"      \n  1,15-1,21:        IDENTIFIER        \"Float64\" \n  1,22-1,22:        RPAREN            \")\"       \n  1,23-1,23:        WHITESPACE        \" \"       \n  1,24-1,29:        KEYWORD           \"return\"  \n  1,30-1,30:        WHITESPACE        \" \"       \n  1,31-1,31:        OP                \":\"       \n  1,32-1,32:        IDENTIFIER        \"x\"       \n  1,33-1,33:        WHITESPACE        \" \"       \n  1,34-1,34:        OP                \"+\"       \n  1,35-1,35:        WHITESPACE        \" \"       \n  1,36-1,38:        CHAR              \"'a'\"     \n  1,39-1,39:        WHITESPACE        \" \"       \n  1,40-1,42:        KEYWORD           \"end\"     \n  1,43-1,42:        ENDMARKER         \"\" A vector of ANSITokens  of the same length as the Julia tokens is then created and filled with empty tokens. .ansitokens = Vector{OhMyREPL.ANSIToken}(length(tokens));\nfill!(ansitokens, OhMyREPL.ANSIToken()) # ANSIToken is a bits type so this is OKThese two vectors are then sent to the syntax highlighter pass together with an integer that represent what character offset the cursor currently is located. The syntax highlighter does not use this information but the bracket highlighter does.OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS(ansitokens, tokens, 0)Running this function has the effect of updating the ansitokens vector. If we print this vector we see that they have been updated:(Image: )To print the original string with the updated vector of ANSITokens we use the OhMyREPL.untoktenize_with_ANSI([io::IO], ansitokens, tokens) function as:(Image: )Each registered and enabled pass does this updating and the contributions from each pass to the ANSIToken vector is merged in to a separate vector. After each pass is done, the result is printed to the REPL."
 },
 
 {
@@ -285,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Passes",
     "title": "Creating a pass",
     "category": "section",
-    "text": "We will here show how to create a very pass that let the user define an ANSIToken for each type assertion / declaration that happens to be a Float64.info: Info\nPlease refer to the Tokenize.jl API and  ANSIToken sections when reading this section.We start off with a few imports and creating a new type which will hold the setting for the pass:using Compat # For the call overloading syntax\nimport Tokenize.Tokens: Token, untokenize, exactkind\nimport OhMyREPL: ANSICodes.ANSIToken\n\ntype Float64Modifier\n    token::ANSIToken\nend\n\n# Default it the underlined red:\nconst FLOAT64_MODIFIER = Float64Modifier(ANSIToken(foreground = :red, underline= true))We then use call overloading to define a function for the type. The function will update the ANSIToken if the previous token was a :: operator and that the current token is a Float64 identifier, as in ::Float64.# The pass function, the cursor position is not used but it needs to be given an argument\n@compat function (float64modifier::Float64Modifier)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)\n    # Loop over all tokens and ansitokens\n    for i in 1:length(ansitokens)\n        if untokenize(tokens[i]) == \"Float64\"\n            if i > 1 && exactkind(tokens[i-1]) == Tokenize.Tokens.DECLARATION\n                # Update the ansi token\n                ansitokens[i] = float64modifier.token\n            end\n        end\n    end\nend"
+    "text": "This section shows how to create a very pass that let the user define an ANSIToken for each type assertion / declaration that happens to be a Float64.info: Info\nPlease refer to the Tokenize.jl API and  ANSIToken sections when reading this section.We start off with a few imports and creating a new type which will hold the setting for the pass:using Compat # For the call overloading syntax\nimport Tokenize.Tokens: Token, untokenize, exactkind\nimport OhMyREPL: ANSICodes.ANSIToken\n\ntype Float64Modifier\n    token::ANSIToken\nend\n\n# Default it the underlined red:\nconst FLOAT64_MODIFIER = Float64Modifier(ANSIToken(foreground = :red, underline= true))We then use call overloading to define a function for the type. The function will update the ANSIToken if the previous token was a :: operator and that the current token is a Float64 identifier, as in ::Float64.# The pass function, the cursor position is not used but it needs to be given an argument\n@compat function (float64modifier::Float64Modifier)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)\n    # Loop over all tokens and ansitokens\n    for i in 1:length(ansitokens)\n        if untokenize(tokens[i]) == \"Float64\"\n            if i > 1 && exactkind(tokens[i-1]) == Tokenize.Tokens.DECLARATION\n                # Update the ansi token\n                ansitokens[i] = float64modifier.token\n            end\n        end\n    end\nend"
 },
 
 {
@@ -293,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Passes",
     "title": "Testing the pass",
     "category": "section",
-    "text": "We can now test the pass with the OhMyREPL.test_pass([io::IO], pass, str::String) where str is a test string to test the pass on:(Image: )"
+    "text": "A pass can be tested with the OhMyREPL.test_pass([io::IO], pass, str::String) where str is a test string to test the pass on:(Image: )"
 },
 
 {
