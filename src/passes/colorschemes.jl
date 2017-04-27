@@ -69,3 +69,20 @@ function _create_boxymonokai_256()
     number!(cs, ANSIToken(foreground = 208))
     return cs
 end
+
+function _create_tomorrow_night_bright()
+    cs = ColorScheme()
+    symbol!(cs, ANSIToken(foreground = 185))
+    comment!(cs, ANSIToken(foreground = 246))
+    string!(cs, ANSIToken(foreground = 185))
+    call!(cs, ANSIToken(foreground = 73))
+    op!(cs, ANSIToken(foreground = 231))
+    keyword!(cs, ANSIToken(foreground = 140))
+    text!(cs, ANSIToken(foreground = :default))
+    macro!(cs, ANSIToken(foreground = 73))
+    function_def!(cs, ANSIToken(foreground = 110))
+    error!(cs, ANSIToken(foreground = :default))
+    argdef!(cs, ANSIToken(foreground = 255)) # nothing special added here
+    number!(cs, ANSIToken(foreground = 208))
+    return cs
+end
