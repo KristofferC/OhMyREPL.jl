@@ -4,7 +4,7 @@ Since the package is currently not registered `Pkg.clone` need to be used on thi
 
 ```jl
 Pkg.add("Crayons")
-Pkg.clone("https://github.com/KristofferC/Tokenize.jl")
+Pkg.add("Tokenize")
 Pkg.clone("https://github.com/KristofferC/OhMyREPL.jl")
 ```
 
