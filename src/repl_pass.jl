@@ -136,13 +136,8 @@ function Base.show(io::IO, rpc::PassHandler)
         end
         println(io, " $i   ", @sprintf("%-21s %-8s ", name, pass[2].enabled))
     end
-<<<<<<< 0dc38037a788dbbfb1dc0cc584c6eb75dfb922f9
-    print(io, ANSIToken(bold = true),
-                "──────────────────────────────────", ResetToken())
-=======
     print(io, Crayon(bold = true),
-                "----------------------------------", RESET)
->>>>>>> Merge remote-tracking branch 'origin/kc/craypms' into kc/06_preps
+                "──────────────────────────────────", RESET)
 end
 
 prescedence!(rpc::PassHandler, name::String, presc::Int) = prescedence!(rpc, _check_pass_name(rpc, name, true), presc)

@@ -71,17 +71,17 @@ end
 
 function _create_tomorrow_night_bright()
     cs = ColorScheme()
-    symbol!(cs, ANSIToken(foreground = 185))
-    comment!(cs, ANSIToken(foreground = 246))
-    string!(cs, ANSIToken(foreground = 185))
-    call!(cs, ANSIToken(foreground = 73))
-    op!(cs, ANSIToken(foreground = 231))
-    keyword!(cs, ANSIToken(foreground = 140))
-    text!(cs, ANSIToken(foreground = :default))
-    macro!(cs, ANSIToken(foreground = 73))
-    function_def!(cs, ANSIToken(foreground = 110))
-    error!(cs, ANSIToken(foreground = :default))
-    argdef!(cs, ANSIToken(foreground = 255)) # nothing special added here
-    number!(cs, ANSIToken(foreground = 208))
+    symbol!(cs, Crayon(foreground = 185))
+    comment!(cs, Crayon(foreground = 246))
+    string!(cs, Crayon(foreground = 185))
+    call!(cs, Crayon(foreground = 73))
+    op!(cs, Crayon(foreground = 231))
+    keyword!(cs, Crayon(foreground = 140))
+    text!(cs, Crayon(foreground = :default))
+    macro!(cs, Crayon(foreground = 73))
+    function_def!(cs, Crayon(foreground = 110))
+    error!(cs, Crayon(foreground = :default))
+    argdef!(cs, Crayon(foreground = 255)) # nothing special added here
+    number!(cs, Crayon(foreground = 208))
     return cs
 end
