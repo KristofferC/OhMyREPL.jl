@@ -82,6 +82,7 @@ add!(sh::SyntaxHighlighterSettings, name::String, scheme::ColorScheme) = sh.sche
 add!(name::String, scheme::ColorScheme) = add!(SYNTAX_HIGHLIGHTER_SETTINGS, name, scheme)
 activate!(sh::SyntaxHighlighterSettings, name::String) = sh.active = sh.schemes[name]
 
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai24bit", _create_monokai_24())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai256", _create_monokai_256())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai16", _create_monokai())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "BoxyMonokai256", _create_boxymonokai_256())

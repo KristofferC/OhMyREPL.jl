@@ -51,6 +51,23 @@ function _create_monokai_256()
     return cs
 end
 
+function _create_monokai_24()
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = (174,129,255)))
+    comment!(cs, Crayon(foreground = (89, 89, 89)))
+    string!(cs, Crayon(foreground = (253,151,31)))
+    call!(cs, Crayon(foreground = (102,217,239)))
+    op!(cs, Crayon(foreground = (249, 38, 114)))
+    keyword!(cs, Crayon(foreground = (249, 38, 114)))
+    text!(cs, Crayon(foreground = :default))
+    macro!(cs, Crayon(foreground = (253,151,31)))
+    function_def!(cs, Crayon(foreground = (166,226,42)))
+    error!(cs, Crayon(foreground = :default))
+    argdef!(cs, Crayon(foreground = (102,217,239)))
+    number!(cs, Crayon(foreground = (174,129,255)))
+    return cs
+end
+
 
 function _create_boxymonokai_256()
     cs = ColorScheme()
