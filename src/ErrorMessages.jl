@@ -1,6 +1,7 @@
 module ErrorMessages
 
 using OhMyREPL
+using Compat
 
 import Base: repl_color
 

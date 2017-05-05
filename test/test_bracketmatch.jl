@@ -7,7 +7,7 @@ using OhMyREPL
 import OhMyREPL.ANSICodes: ANSIToken, ANSIValue
 
 using Tokenize
-
+using Compat
 
 
 b = IOBuffer()
