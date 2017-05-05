@@ -6,6 +6,7 @@ using OhMyREPL
 import OhMyREPL.ANSICodes: ANSIToken, ANSIValue, merge!
 
 using Tokenize
+using Compat
 
 
 function foobar_bluify(ansitokens, tokens, ::Int)
