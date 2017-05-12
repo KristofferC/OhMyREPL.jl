@@ -7,48 +7,47 @@ using Tokenize
 using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, exactkind, iskeyword
 
-using ...ANSICodes
-import ...ANSICodes: ANSIToken, ANSIValue, ResetToken, merge!
+using Crayons
 
 import OhMyREPL: add_pass!, PASS_HANDLER
 
 type ColorScheme
-    symbol::ANSIToken
-    comment::ANSIToken
-    string::ANSIToken
-    call::ANSIToken
-    op::ANSIToken
-    keyword::ANSIToken
-    text::ANSIToken
-    function_def::ANSIToken
-    error::ANSIToken
-    argdef::ANSIToken
-    _macro::ANSIToken
-    number::ANSIToken
+    symbol::Crayon
+    comment::Crayon
+    string::Crayon
+    call::Crayon
+    op::Crayon
+    keyword::Crayon
+    text::Crayon
+    function_def::Crayon
+    error::Crayon
+    argdef::Crayon
+    _macro::Crayon
+    number::Crayon
 end
 
-symbol!(cs, token::ANSIToken) = cs.symbol = token
-comment!(cs, token::ANSIToken) = cs.comment = token
-string!(cs, token::ANSIToken) = cs.string = token
-call!(cs, token::ANSIToken) = cs.call = token
-op!(cs, token::ANSIToken) = cs.op = token
-keyword!(cs, token::ANSIToken) = cs.keyword = token
-text!(cs, token::ANSIToken) = cs.text = token
-function_def!(cs, token::ANSIToken) = cs.function_def = token
-error!(cs, token::ANSIToken) = cs.error = token
-argdef!(cs, token::ANSIToken) = cs.argdef = token
-macro!(cs, token::ANSIToken) = cs._macro = token
-number!(cs, token::ANSIToken) = cs.number = token
+symbol!(cs, crayon::Crayon) = cs.symbol = crayon
+comment!(cs, crayon::Crayon) = cs.comment = crayon
+string!(cs, crayon::Crayon) = cs.string = crayon
+call!(cs, crayon::Crayon) = cs.call = crayon
+op!(cs, crayon::Crayon) = cs.op = crayon
+keyword!(cs, crayon::Crayon) = cs.keyword = crayon
+text!(cs, crayon::Crayon) = cs.text = crayon
+function_def!(cs, crayon::Crayon) = cs.function_def = crayon
+error!(cs, crayon::Crayon) = cs.error = crayon
+argdef!(cs, crayon::Crayon) = cs.argdef = crayon
+macro!(cs, crayon::Crayon) = cs._macro = crayon
+number!(cs, crayon::Crayon) = cs.number = crayon
 
 function Base.show(io::IO, cs::ColorScheme)
     for n in fieldnames(cs)
-        tok = getfield(cs, n)
-        print(io, tok, "█ ", ResetToken())
+        crayon = getfield(cs, n)
+        print(io, crayon, "█ ", inv(crayon))
     end
-    print(io, ANSIToken(foreground = :default))
+    print(io, Crayon(foreground = :default))
 end
 
-ColorScheme() = ColorScheme([ANSIToken() for _ in 1:length(fieldnames(ColorScheme))]...)
+ColorScheme() = ColorScheme([Crayon() for _ in 1:length(fieldnames(ColorScheme))]...)
 
 include("colorschemes.jl")
 
@@ -83,6 +82,7 @@ add!(sh::SyntaxHighlighterSettings, name::String, scheme::ColorScheme) = sh.sche
 add!(name::String, scheme::ColorScheme) = add!(SYNTAX_HIGHLIGHTER_SETTINGS, name, scheme)
 activate!(sh::SyntaxHighlighterSettings, name::String) = sh.active = sh.schemes[name]
 
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai24bit", _create_monokai_24())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai256", _create_monokai_256())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai16", _create_monokai())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "BoxyMonokai256", _create_boxymonokai_256())
@@ -98,52 +98,52 @@ end
 add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
 
 
-@compat function (highlighter::SyntaxHighlighterSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, ::Int)
+@compat function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, tokens::Vector{Token}, ::Int)
     cscheme = highlighter.active
     prev_t = Tokens.Token()
     for (i, t) in enumerate(tokens)
         # a::x
         if exactkind(prev_t) == Tokens.DECLARATION
-            ansitokens[i-1] = cscheme.argdef
-            ansitokens[i] = cscheme.argdef
+            crayons[i-1] = cscheme.argdef
+            crayons[i] = cscheme.argdef
         # :foo
         elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.COLON
-            ansitokens[i-1] = cscheme.symbol
-            ansitokens[i] = cscheme.symbol
+            crayons[i-1] = cscheme.symbol
+            crayons[i] = cscheme.symbol
         # function
         elseif iskeyword(kind(t))
             if kind(t) == Tokens.TRUE || kind(t) == Tokens.FALSE
-                ansitokens[i] = cscheme.symbol
+                crayons[i] = cscheme.symbol
             else
-                ansitokens[i] = cscheme.keyword
+                crayons[i] = cscheme.keyword
             end
         # "foo"
         elseif kind(t) == Tokens.STRING || kind(t) == Tokens.TRIPLE_STRING || kind(t) == Tokens.CHAR
-            ansitokens[i] = cscheme.string
+            crayons[i] = cscheme.string
         # * -
         elseif Tokens.isoperator(kind(t)) || exactkind(t) == Tokens.TRUE || exactkind(t) == Tokens.FALSE
-            ansitokens[i] = cscheme.op
+            crayons[i] = cscheme.op
         # #= foo =#
         elseif kind(t) == Tokens.COMMENT
-            ansitokens[i] = cscheme.comment
-        # function f(...)
+            crayons[i] = cscheme.comment
+        # f(...)
         elseif kind(t) == Tokens.LPAREN && kind(prev_t) == Tokens.IDENTIFIER
-            (i > 2 && exactkind(tokens[i-2]) == Tokens.AT_SIGN) || (ansitokens[i-1] = cscheme.call)
+            (i > 2 && exactkind(tokens[i-2]) == Tokens.AT_SIGN) || (crayons[i-1] = cscheme.call)
              # function f(...)
             if i > 3 && kind(tokens[i-2]) == Tokens.WHITESPACE && exactkind(tokens[i-3]) == Tokens.FUNCTION
-                ansitokens[i-1] = cscheme.function_def
+                crayons[i-1] = cscheme.function_def
             end
         # @fdsafds
         elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.AT_SIGN
-            ansitokens[i-1] = cscheme._macro
-            ansitokens[i] = cscheme._macro
+            crayons[i-1] = cscheme._macro
+            crayons[i] = cscheme._macro
         # 2] = 32.32
         elseif kind(t) == Tokens.INTEGER || kind(t) == Tokens.FLOAT
-            ansitokens[i] = cscheme.number
+            crayons[i] = cscheme.number
         elseif kind(t) == Tokens.WHITESPACE
-            ansitokens[i] = ANSIToken()
+            crayons[i] = Crayon()
         else
-            ansitokens[i] = cscheme.text
+            crayons[i] = cscheme.text
         end
         prev_t = t
     end

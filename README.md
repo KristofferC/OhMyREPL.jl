@@ -16,7 +16,8 @@ If you like this package please give it a star. I like stars.
 ### Installation
 
 ```jl
-Pkg.clone("https://github.com/KristofferC/Tokenize.jl")
+Pkg.add("Crayons")
+Pkg.add("Tokenize")
 Pkg.clone("https://github.com/KristofferC/OhMyREPL.jl")
 ```
 
@@ -27,7 +28,7 @@ and then just load with `using OhMyREPL` (preferably by putting it in the `.juli
 * Syntax highlighting - Highlighting of keyword, operators, symbols, strings etc. in different colors.
 * Bracket highlighting - Will make matching brackets highlighted when the cursor is between an opening and closing bracket.
 * Automatic bracket insertion - Will insert matching closing bracket and quotation symbols when suitable.
-* Prompt pasting - If a pasted statement starts with `julia> ` any statement beginning with `julia> ` will have that part removed before getting parsed and any other statement will be removed. 
+* Prompt pasting - If a pasted statement starts with `julia> ` any statement beginning with `julia> ` will have that part removed before getting parsed and any other statement will be removed.
 * Colorized error messages [0.5 only]. Will write the error messages in a bit nicer way.
 * Prompt changing - Can change the text and color of the `julia>` prompt as well as add a prompt for output.
 * Rainbow brackets - Colorizes matching brackets in the same color.

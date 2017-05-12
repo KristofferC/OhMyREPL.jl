@@ -3,7 +3,8 @@
 Since the package is currently not registered `Pkg.clone` need to be used on this package and its dependencies.
 
 ```jl
-Pkg.clone("https://github.com/KristofferC/Tokenize.jl")
+Pkg.add("Crayons")
+Pkg.add("Tokenize")
 Pkg.clone("https://github.com/KristofferC/OhMyREPL.jl")
 ```
 

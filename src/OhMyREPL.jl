@@ -5,14 +5,14 @@ bracket matching and other nifty features.
 """
 module OhMyREPL
 
-using Tokenize
-
 using Compat
 import Compat: UTF8String, String
 
+using Tokenize
+using Crayons
+
 export colorscheme!, colorschemes, enable_autocomplete_brackets, test_colorscheme
 
-include("ANSICodes.jl")
 include("repl_pass.jl")
 include("repl.jl")
 include(joinpath("passes", "Passes.jl"))
@@ -23,9 +23,13 @@ if VERSION > v"0.5-" && VERSION.minor < 6
 end
 include("prompt.jl")
 
-using .ANSICodes
-export ANSICodes
+# Some backward compatability
+module ANSICodes
+    using Crayons
+    const ANSIToken = Crayon
+end
 
+export ANSITokens
 
 function colorscheme!(name::String)
     Passes.SyntaxHighlighter.activate!(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS,
@@ -109,6 +113,7 @@ function __init__()
             main_mode.keymap_dict = Base.LineEdit.keymap([d, main_mode.keymap_dict])
         end
     end
+
     mktemp() do _, f
         old_stderr = STDERR
         redirect_stderr(f)
@@ -118,6 +123,7 @@ function __init__()
             include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
         end
         include(joinpath(dirname(@__FILE__), "output_prompt_overwrite.jl"))
+
         redirect_stderr(old_stderr)
     end
 end
