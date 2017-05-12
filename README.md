@@ -15,9 +15,8 @@ If you like this package please give it a star. I like stars.
 
 ### Installation
 
-```jl
-Pkg.clone("https://github.com/KristofferC/Tokenize.jl")
-Pkg.clone("https://github.com/KristofferC/OhMyREPL.jl")
+```julia
+Pkg.add("OhMyREPL.jl")
 ```
 
 and then just load with `using OhMyREPL` (preferably by putting it in the `.juliarc.jl`)
