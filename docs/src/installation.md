@@ -1,10 +1,9 @@
 # Installation
 
-Since the package is currently not registered `Pkg.clone` need to be used on this package and its dependencies.
+The package is registered in `METADATA` so it is easily installed by
 
 ```jl
-Pkg.clone("https://github.com/KristofferC/Tokenize.jl")
-Pkg.clone("https://github.com/KristofferC/OhMyREPL.jl")
+Pkg.add("OhMyREPL.jl")
 ```
 
 ## Automatically start with Julia.
