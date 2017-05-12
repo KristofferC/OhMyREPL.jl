@@ -37,7 +37,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Installation",
     "title": "Installation",
     "category": "section",
-    "text": "Since the package is currently not registered Pkg.clone need to be used on this package and its dependencies.Pkg.clone(\"https://github.com/KristofferC/Tokenize.jl\")\nPkg.clone(\"https://github.com/KristofferC/OhMyREPL.jl\")"
+    "text": "The package is registered in METADATA so it is easily installed byPkg.add(\"OhMyREPL.jl\")"
 },
 
 {
