@@ -1,10 +1,10 @@
 module CustomPassTest
 
 using Base.Test
-
 using OhMyREPL
 using Tokenize
 using Crayons
+using Compat
 
 
 function foobar_bluify(crayons, tokens, ::Int)

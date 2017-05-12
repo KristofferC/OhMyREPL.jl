@@ -4,6 +4,7 @@ using Base.Test
 
 using OhMyREPL
 import  OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
+using Compat
 
 using Tokenize
 

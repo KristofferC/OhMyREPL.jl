@@ -2,10 +2,9 @@ module TestBracketHighlighter
 
 
 using Base.Test
-
 using OhMyREPL
-
 using Tokenize
+using Compat
 
 b = IOBuffer()
 str = "(function :foobar, foobar )# foobar"
