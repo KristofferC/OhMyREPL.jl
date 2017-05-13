@@ -15,7 +15,7 @@ If you like this package please give it a star. I like stars.
 
 ### Installation
 
-```julia
+```jl
 Pkg.add("OhMyREPL")
 ```
 
