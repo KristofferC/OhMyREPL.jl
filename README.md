@@ -16,7 +16,7 @@ If you like this package please give it a star. I like stars.
 ### Installation
 
 ```julia
-Pkg.add("OhMyREPL.jl")
+Pkg.add("OhMyREPL")
 ```
 
 and then just load with `using OhMyREPL` (preferably by putting it in the `.juliarc.jl`)
