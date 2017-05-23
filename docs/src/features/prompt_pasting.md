@@ -23,7 +23,8 @@ julia> @time rand(3)
 ```
 
 !!! warning
-    This feature does not work on the standard Windows command prompt.
+    This feature does not work on the standard Windows shells `cmd` or `powershell`.
+    Consider using e.g. `cygwin` or `cmder`.
 
 
 !!! note
