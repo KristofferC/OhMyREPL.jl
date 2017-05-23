@@ -133,7 +133,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Prompt pasting",
     "title": "Prompt pasting",
     "category": "section",
-    "text": "If a pasted statement starts with julia> any statement beginning with julia> will have that part removed before getting parsed and any other statement will also be removed. This makes easy to paste what others have copied from their REPL without the need to remove any prompts or output.You can try it out by copying and pasting the below straight into the REPL.julia> 1 + 1\n2\n\njulia> str = \"\"\" this\n       is\n       a\n       string \"\"\"\n\" this\\nis\\na\\nstring \"\n\njulia> @time rand(3)\n  0.000003 seconds (6 allocations: 288 bytes)\n3-element Array{Float64,1}:\n 0.560418\n 0.883501\n 0.27273warning: Warning\nThis feature does not work on the standard Windows command prompt.note: Note\nPrompt pasting has been upstreamed to Julia v0.6."
+    "text": "If a pasted statement starts with julia> any statement beginning with julia> will have that part removed before getting parsed and any other statement will also be removed. This makes easy to paste what others have copied from their REPL without the need to remove any prompts or output.You can try it out by copying and pasting the below straight into the REPL.julia> 1 + 1\n2\n\njulia> str = \"\"\" this\n       is\n       a\n       string \"\"\"\n\" this\\nis\\na\\nstring \"\n\njulia> @time rand(3)\n  0.000003 seconds (6 allocations: 288 bytes)\n3-element Array{Float64,1}:\n 0.560418\n 0.883501\n 0.27273warning: Warning\n   This feature does not work on the standard Windows shells cmd or powershell.     Consider using e.g. cygwin or cmder.note: Note\nPrompt pasting has been upstreamed to Julia v0.6."
 },
 
 {
