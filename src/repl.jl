@@ -3,9 +3,6 @@
 
 module Prompt
 
-using Compat
-import Compat: UTF8String, String
-
 import Base: LineEdit, REPL
 
 import Base.LineEdit: buffer, cmove_col, cmove_up, InputAreaState, transition,
@@ -39,7 +36,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
 
         LineEdit.clear_input_area(terminal(s), mode)
         # Extract the cursor index in character count
-        cursoridx = length(UTF8String(buffer(s).data[1:p]))
+        cursoridx = length(String(buffer(s).data[1:p]))
 
         l = strwidth(get_prompt(s))
 

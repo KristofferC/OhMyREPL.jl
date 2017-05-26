@@ -1,24 +1,21 @@
 module RainbowBrackets
 
-using Compat
+using Crayons
 
 using Tokenize
 using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
 
-using ...ANSICodes
-import ...ANSICodes: ANSIToken, ANSIValue, merge!
-
 import OhMyREPL: add_pass!, PASS_HANDLER
 
-type RainBowTokens
-    parenthesis_tokens::Vector{ANSIToken}
-    brackets_tokens::Vector{ANSIToken}
-    curly_tokens::Vector{ANSIToken}
-    error_token::ANSIToken
+mutable struct RainBowTokens
+    parenthesis_tokens::Vector{Crayon}
+    brackets_tokens::Vector{Crayon}
+    curly_tokens::Vector{Crayon}
+    error_token::Crayon
 end
 
-type RainbowBracketsSettings
+mutable struct RainbowBracketsSettings
     tokens_256::RainBowTokens
     tokens_16::RainBowTokens
     active::RainBowTokens
@@ -42,21 +39,21 @@ activate_256colors() = RAINBOWBRACKETS_SETTINGS.active = RAINBOWBRACKETS_SETTING
 
 
 const RAINBOW_TOKENS_16 =
- RainBowTokens([ANSIToken(foreground = :yellow), ANSIToken(foreground = :green)],
-                         [ANSIToken(foreground = :cyan), ANSIToken(foreground = :magenta)],
-                         [ANSIToken(foreground = :light_gray), ANSIToken(foreground = :default)],
-                          ANSIToken(foreground = :light_red))
+ RainBowTokens([Crayon(foreground = :yellow), Crayon(foreground = :green)],
+                         [Crayon(foreground = :cyan), Crayon(foreground = :magenta)],
+                         [Crayon(foreground = :light_gray), Crayon(foreground = :default)],
+                          Crayon(foreground = :light_red))
 
 const RAINBOW_TOKENS_256 =
- RainBowTokens([ANSIToken(foreground = 178), ANSIToken(foreground = 161), ANSIToken(foreground =  034), ANSIToken(foreground = 200)],
-                         [ANSIToken(foreground = 045), ANSIToken(foreground = 099), ANSIToken(foreground = 033)],
-                         [ANSIToken(foreground = 223), ANSIToken(foreground = 130), ANSIToken(foreground = 202)],
-                          ANSIToken(foreground = 196, bold = true))
+ RainBowTokens([Crayon(foreground = 178), Crayon(foreground = 161), Crayon(foreground =  034), Crayon(foreground = 200)],
+                         [Crayon(foreground = 045), Crayon(foreground = 099), Crayon(foreground = 033)],
+                         [Crayon(foreground = 223), Crayon(foreground = 130), Crayon(foreground = 202)],
+                          Crayon(foreground = 196, bold = true))
 
 const RAINBOWBRACKETS_SETTINGS = RainbowBracketsSettings(RAINBOW_TOKENS_256, RAINBOW_TOKENS_16, is_windows() ? RAINBOW_TOKENS_16 : RAINBOW_TOKENS_256)
 
 
-@compat function (rainbow::RainbowBracketsSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)
+function (rainbow::RainbowBracketsSettings)(ansitokens::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
     p, s, b = 0, 0, 0
     for (i, t) in enumerate(tokens)
         k = kind(t)
@@ -73,7 +70,7 @@ const RAINBOWBRACKETS_SETTINGS = RainbowBracketsSettings(RAINBOW_TOKENS_256, RAI
             ansitokens[i] = get_color(rainbow, k, s)
             s = max(0, s - 1)
         elseif k == Tokens.LBRACE
-            b += 1            
+            b += 1
             ansitokens[i] = get_color(rainbow, k, b)
         elseif k == Tokens.RBRACE
             ansitokens[i] = get_color(rainbow, k, b)

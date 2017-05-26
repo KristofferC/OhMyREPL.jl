@@ -1,23 +1,21 @@
-using .ANSICodes
-
-import .ANSICodes: ANSIToken, ResetToken, merge!
-import Tokenize.Tokens
+import Tokenize:Tokens, Lexers
 import Tokenize.Tokens: Token, kind, untokenize
-import Tokenize.Lexers
 
-type Pass
+const RESET = Crayon(reset = true)
+
+mutable struct Pass
     f!
     enabled::Bool
     update_on_cursormovement::Bool
 end
 
-immutable PassHandler
-    accum_ansitokens::Vector{ANSIToken}
-    ansitokens::Vector{ANSIToken}
-    passes::Vector{Tuple{Compat.UTF8String, Pass}} # This is a stupid type and I should feel stupid
+struct PassHandler
+    accum_crayons::Vector{Crayon}
+    crayons::Vector{Crayon}
+    passes::Vector{Tuple{String, Pass}} # This is a stupid type and I should feel stupid
 end
 
-PassHandler() = PassHandler(ANSIToken[], ANSIToken[], Tuple{String, Pass}[])
+PassHandler() = PassHandler(Crayon[], Crayon[], Tuple{String, Pass}[])
 const PASS_HANDLER = PassHandler()
 
 function test_pass(io::IO, f, str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false)
@@ -25,7 +23,7 @@ function test_pass(io::IO, f, str::Union{String, IO}, cursorpos::Int = 1, cursor
     add_pass!(rpc, "TestPass", f)
     tokens = collect(Lexers.Lexer(str))
     apply_passes!(rpc, tokens, cursorpos, cursormovement)
-    untokenize_with_ANSI(io, rpc.accum_ansitokens, tokens)
+    untokenize_with_ANSI(io, rpc.accum_crayons, tokens)
 end
 
 test_pass(f, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
@@ -35,48 +33,57 @@ function test_passes(io::IO, rpc::PassHandler, str::Union{String, IOBuffer}, cur
     b = IOBuffer()
     tokens = collect(Lexers.Lexer(str))
     apply_passes!(rpc, tokens, cursorpos, cursormovement)
-    untokenize_with_ANSI(io, rpc.accum_ansitokens, tokens)
+    untokenize_with_ANSI(io, rpc.accum_crayons, tokens)
 end
 
 test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
     test_passes(STDOUT, rpc, str, cursorpos, cursormovement)
 
-function untokenize_with_ANSI(io::IO, ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, indent = 7)
-    @assert length(tokens) == length(ansitokens)
-    print(io, ResetToken())
-    for (token, ansitoken) in zip(tokens, ansitokens)
-        print(io, ansitoken)
+function untokenize_with_ANSI(io::IO, crayons::Vector{Crayon}, tokens::Vector{Token}, indent = 7)
+    @assert length(tokens) == length(crayons)
+    print(io, RESET)
+    z = 1
+    for (token, crayon) in zip(tokens, crayons)
+        print(io, crayon)
         for c in untokenize(token)
             print(io, c)
             c == '\n' && print(io, " "^indent)
         end
-        print(io, ResetToken())
+        print(io, RESET)
     end
 end
-untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}, indent = 7) = untokenize_with_ANSI(io, rpc.accum_ansitokens, tokens, indent)
-untokenize_with_ANSI(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, indent = 7) =
-    untokenize_with_ANSI(STDOUT, ansitokens, tokens, indent)
+untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}, indent = 7) = untokenize_with_ANSI(io, rpc.accum_crayons, tokens, indent)
+untokenize_with_ANSI(crayons::Vector{Crayon}, tokens::Vector{Token}, indent = 7) =
+    untokenize_with_ANSI(STDOUT, crayons, tokens, indent)
+
+function merge!(t1::Vector{Crayon}, t2::Vector{Crayon})
+    @assert length(t1) == length(t2)
+    for i in eachindex(t1)
+        t1[i] = merge(t1[i], t2[i])
+    end
+    return t1
+end
 
 function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, cursorpos::Int = 1, cursormovement::Bool = false)
-    resize!(rpc.ansitokens, length(tokens))
-    resize!(rpc.accum_ansitokens, length(tokens))
-    fill!(rpc.accum_ansitokens, ANSIToken())
+    resize!(rpc.crayons, length(tokens))
+    resize!(rpc.accum_crayons, length(tokens))
+    fill!(rpc.accum_crayons, Crayon())
     for i in reverse(1:length(rpc.passes))
-        fill!(rpc.ansitokens, ANSIToken())
+        fill!(rpc.crayons, Crayon())
         pass = rpc.passes[i][2]
         if pass.enabled
             if cursormovement && !pass.update_on_cursormovement
                 continue
             end
             # This is an enabled pass that should be run, so run it!
-            pass.f!(rpc.ansitokens, tokens, cursorpos)
-            merge!(rpc.accum_ansitokens, rpc.ansitokens)
+            pass.f!(rpc.crayons, tokens, cursorpos)
+            merge!(rpc.accum_crayons, rpc.crayons)
         end
     end
 end
 
 write_results!(buff::IO, rpc::PassHandler, tokens::Vector{Token}) =
-    write_results(buff, rpc.accum_ansitokens, tokens)
+    write_results(buff, rpc.accum_crayons, tokens)
 
 # Returns -1 if not found else index of where the pass is
 function _find_pass(rpc::PassHandler, name::String)
@@ -118,8 +125,8 @@ end
 enable_pass!(name::String, enabled::Bool) = enable_pass!(PASS_HANDLER, name, enabled)
 
 function Base.show(io::IO, rpc::PassHandler)
-    println(io, ANSIToken(bold = true),
-                "──────────────────────────────────", ResetToken())
+    println(io, Crayon(bold = true),
+                "──────────────────────────────────", RESET)
     println(io, " #   Pass name             Enabled  ")
     println(io, "──────────────────────────────────")
     for (i, pass) in enumerate(rpc.passes)
@@ -129,8 +136,8 @@ function Base.show(io::IO, rpc::PassHandler)
         end
         println(io, " $i   ", @sprintf("%-21s %-8s ", name, pass[2].enabled))
     end
-    print(io, ANSIToken(bold = true),
-                "──────────────────────────────────", ResetToken())
+    print(io, Crayon(bold = true),
+                "──────────────────────────────────", RESET)
 end
 
 prescedence!(rpc::PassHandler, name::String, presc::Int) = prescedence!(rpc, _check_pass_name(rpc, name, true), presc)
@@ -144,5 +151,3 @@ function prescedence!(rpc::PassHandler, pass_idx::Int, presc::Int)
     return rpc
 end
 prescedence!(pass_idx::Int, presc::Int) = prescedence!(PASS_HANDLER, pass_idx, presc)
-
-

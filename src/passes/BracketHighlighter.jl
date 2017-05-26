@@ -1,32 +1,30 @@
 module BracketHighlighter
 
-using Compat
-
 using Tokenize
 using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
 
-using ...ANSICodes
-import ...ANSICodes: ANSIToken, ANSIValue, merge!
+using Crayons
 
 import OhMyREPL: add_pass!, PASS_HANDLER
 
-type BracketHighlighterSettings
-    token::ANSIToken
+mutable struct BracketHighlighterSettings
+    crayon::Crayon
 end
 
 const BRACKETMATCHER_SETTINGS =
- BracketHighlighterSettings(ANSIToken(bold = :true, underline = :true))
+ BracketHighlighterSettings(Crayon(bold = :true, underline = :true))
 
-@compat function (matcher::BracketHighlighterSettings)(ansitokens::Vector{ANSIToken}, tokens::Vector{Token}, cursorpos::Int)
+function (matcher::BracketHighlighterSettings)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
     left_bracket_match, right_bracket_match, matched = bracket_match(tokens, cursorpos)
     !matched && return
-    ansitokens[left_bracket_match] = matcher.token
-    ansitokens[right_bracket_match] = matcher.token
+    crayons[left_bracket_match] = matcher.crayon
+    crayons[right_bracket_match] = matcher.crayon
     return
 end
 
-set_token!(token::ANSIToken) = BRACKETMATCHER_SETTINGS.token = token
+setcrayon!(crayon::Crayon) = BRACKETMATCHER_SETTINGS.crayon = crayon
+set_token!(crayon::Crayon) = setcrayon!(crayon)
 
 add_pass!(PASS_HANDLER, "BracketHighlighter", BRACKETMATCHER_SETTINGS, true)
 
