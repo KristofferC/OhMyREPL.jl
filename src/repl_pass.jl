@@ -3,16 +3,16 @@ import Tokenize.Tokens: Token, kind, untokenize
 
 const RESET = Crayon(reset = true)
 
-type Pass
+mutable struct Pass
     f!
     enabled::Bool
     update_on_cursormovement::Bool
 end
 
-immutable PassHandler
+struct PassHandler
     accum_crayons::Vector{Crayon}
     crayons::Vector{Crayon}
-    passes::Vector{Tuple{Compat.UTF8String, Pass}} # This is a stupid type and I should feel stupid
+    passes::Vector{Tuple{String, Pass}} # This is a stupid type and I should feel stupid
 end
 
 PassHandler() = PassHandler(Crayon[], Crayon[], Tuple{String, Pass}[])

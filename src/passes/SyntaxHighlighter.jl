@@ -1,8 +1,5 @@
 module SyntaxHighlighter
 
-using Compat
-import Compat.String
-
 using Tokenize
 using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, exactkind, iskeyword
@@ -11,7 +8,7 @@ using Crayons
 
 import OhMyREPL: add_pass!, PASS_HANDLER
 
-type ColorScheme
+mutable struct ColorScheme
     symbol::Crayon
     comment::Crayon
     string::Crayon
@@ -51,7 +48,7 @@ ColorScheme() = ColorScheme([Crayon() for _ in 1:length(fieldnames(ColorScheme))
 
 include("colorschemes.jl")
 
-type SyntaxHighlighterSettings
+mutable struct SyntaxHighlighterSettings
     active::ColorScheme
     schemes::Dict{String, ColorScheme}
 end
@@ -98,7 +95,7 @@ end
 add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
 
 
-@compat function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, tokens::Vector{Token}, ::Int)
+function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, tokens::Vector{Token}, ::Int)
     cscheme = highlighter.active
     prev_t = Tokens.Token()
     for (i, t) in enumerate(tokens)

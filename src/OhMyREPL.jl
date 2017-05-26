@@ -5,9 +5,6 @@ bracket matching and other nifty features.
 """
 module OhMyREPL
 
-using Compat
-import Compat: UTF8String, String
-
 using Tokenize
 using Crayons
 
@@ -18,9 +15,6 @@ include("repl.jl")
 include(joinpath("passes", "Passes.jl"))
 
 include("BracketInserter.jl")
-if VERSION > v"0.5-" && VERSION.minor < 6
-    include("ErrorMessages.jl")
-end
 include("prompt.jl")
 
 # Some backward compatability
@@ -127,13 +121,8 @@ function __init__()
     mktemp() do _, f
         old_stderr = STDERR
         redirect_stderr(f)
-
         Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
-        if VERSION > v"0.5-" && VERSION.minor < 6
-            include(joinpath(dirname(@__FILE__), "errormessage_overrides.jl"))
-        end
         include(joinpath(dirname(@__FILE__), "output_prompt_overwrite.jl"))
-
         redirect_stderr(old_stderr)
     end
 end

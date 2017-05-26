@@ -1,7 +1,5 @@
 module BracketHighlighter
 
-using Compat
-
 using Tokenize
 using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
@@ -10,14 +8,14 @@ using Crayons
 
 import OhMyREPL: add_pass!, PASS_HANDLER
 
-type BracketHighlighterSettings
+mutable struct BracketHighlighterSettings
     crayon::Crayon
 end
 
 const BRACKETMATCHER_SETTINGS =
  BracketHighlighterSettings(Crayon(bold = :true, underline = :true))
 
-@compat function (matcher::BracketHighlighterSettings)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
+function (matcher::BracketHighlighterSettings)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
     left_bracket_match, right_bracket_match, matched = bracket_match(tokens, cursorpos)
     !matched && return
     crayons[left_bracket_match] = matcher.crayon

@@ -10,7 +10,7 @@ Pkg.add("OhMyREPL.jl")
 
 One way of automatically starting the package with Julia is by putting
 
-```
+```jl
 if isdir(Pkg.dir("OhMyREPL"))
     @eval using OhMyREPL
 else

@@ -1,6 +1,5 @@
 module RainbowBrackets
 
-using Compat
 using Crayons
 
 using Tokenize
@@ -9,14 +8,14 @@ import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
 
 import OhMyREPL: add_pass!, PASS_HANDLER
 
-type RainBowTokens
+mutable struct RainBowTokens
     parenthesis_tokens::Vector{Crayon}
     brackets_tokens::Vector{Crayon}
     curly_tokens::Vector{Crayon}
     error_token::Crayon
 end
 
-type RainbowBracketsSettings
+mutable struct RainbowBracketsSettings
     tokens_256::RainBowTokens
     tokens_16::RainBowTokens
     active::RainBowTokens
@@ -54,7 +53,7 @@ const RAINBOW_TOKENS_256 =
 const RAINBOWBRACKETS_SETTINGS = RainbowBracketsSettings(RAINBOW_TOKENS_256, RAINBOW_TOKENS_16, is_windows() ? RAINBOW_TOKENS_16 : RAINBOW_TOKENS_256)
 
 
-@compat function (rainbow::RainbowBracketsSettings)(ansitokens::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
+function (rainbow::RainbowBracketsSettings)(ansitokens::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
     p, s, b = 0, 0, 0
     for (i, t) in enumerate(tokens)
         k = kind(t)

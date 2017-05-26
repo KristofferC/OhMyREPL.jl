@@ -11,9 +11,10 @@ The current default colorschemes that comes with `OhMyREPL` are
 * "JuliaDefault" - the default Julia scheme, white and bold.
 * "Monokai16" - 16 color Monokai
 * "Monokai256" - 256 colors Monokai
+* "Monokai24bit" - 24 bit colored Monokai
 * "BoxyMonokai256" - 256 colors Monokai from [here](https://github.com/oivva/st-boxy)
 
- By default, "Monokai16" will be used on Windows and "Monokai256" otherwise. To test the supported colors in your terminal you can use `Crayons.test_system_colors()` and `Crayons.test_256_colors()` to test 16 and 256 colors respectively.
+ By default, "Monokai16" will be used on Windows and "Monokai256" otherwise. To test the supported colors in your terminal you can use `Crayons.test_system_colors()`, `Crayons.test_256_colors()`, `Crayons.test_24bit_colors()` to test 16, 256 and 24 bit colors respectively.
 
 ## Preview
 
@@ -91,7 +92,7 @@ For fun, the code below creates a truly random colorscheme:
 
 ```jl
 function rand_token()
-    Crayon(background = rand(Bool) ? :nothing : rand(1:256), 
+    Crayon(background = rand(Bool) ? :nothing : rand(1:256),
               foreground = rand(Bool) ? :nothing : rand(1:256),
               bold = rand(Bool), italics = rand(Bool), underline = rand(Bool))
 end
@@ -117,4 +118,3 @@ test_colorscheme(create_random_colorscheme())
 ```
 
 ![](random_scheme.png)
-

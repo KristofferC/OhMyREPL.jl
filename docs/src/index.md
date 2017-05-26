@@ -15,8 +15,6 @@ Pages = [
     "installation.md",
     "features/syntax_highlighting.md",
     "features/bracket_highlighting.md",
-    "features/prompt_pasting.md",
-    "features/error_messages.md",
     "features/bracket_complete.md",
     "features/rainbow_brackets.md",
     "internals/passes.md"

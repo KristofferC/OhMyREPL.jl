@@ -1,16 +1,20 @@
 # Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
+
 os:
   - linux
   - osx
 julia:
-  - 0.5
+  - 0.6
   - nightly
+
+matrix:
+  allow_failures:
+    - julia: nightly
+
 notifications:
   email: false
-script:
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e 'Pkg.clone(pwd()); Pkg.build("OhMyREPL"); Pkg.test("OhMyREPL"; coverage=true)'
+
 after_success:
   - julia -e 'Pkg.add("Documenter")'
   - julia -e 'cd(Pkg.dir("OhMyREPL")); include(joinpath("docs", "make.jl"))'

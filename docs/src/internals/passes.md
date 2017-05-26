@@ -80,20 +80,19 @@ Each registered and enabled pass does this updating and the contributions from e
 
 ## Creating a pass
 
-This section shows how to create a very pass that let the user define a `Crayon` for each type assertion / declaration that happens to be a `Float64`.
+This section shows how to create a very pass that let the user define a `Crayon` for each typeassertion / declaration that happens to be a `Float64`.
 
 !!! info
     Please refer to the [Tokenize.jl API](https://github.com/KristofferC/Tokenize.jl#api) section and the  [`Crayons.jl` documentation](https://github.com/KristofferC/Crayons.jl) while reading this section.
 
-We start off with a few imports and creating a new type which will hold the setting for the pass:
+We start off with a few imports and creating a new struct which will hold the setting for the pass:
 
 ```jl
-using Compat # For the call overloading syntax
 using Crayons
 import Tokenize.Tokens: Token, untokenize, exactkind
 using OhMyREPL
 
-type Float64Modifier
+mutable struct Float64Modifier
     crayon::Crayon
 end
 
@@ -105,7 +104,7 @@ We then use call overloading to define a function for the type. The function wil
 
 ```jl
 # The pass function, the cursor position is not used but it needs to be given an argument
-@compat function (float64modifier::Float64Modifier)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
+function (float64modifier::Float64Modifier)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
     # Loop over all tokens and crayons
     for i in 1:length(crayons)
         if untokenize(tokens[i]) == "Float64"
