@@ -11,9 +11,10 @@ The current default colorschemes that comes with `OhMyREPL` are
 * "JuliaDefault" - the default Julia scheme, white and bold.
 * "Monokai16" - 16 color Monokai
 * "Monokai256" - 256 colors Monokai
+* "Monokai24bit" - 24 bit colored Monokai
 * "BoxyMonokai256" - 256 colors Monokai from [here](https://github.com/oivva/st-boxy)
 
- By default, "Monokai16" will be used on Windows and "Monokai256" otherwise. To test the supported colors in your terminal you can use `OhMyREPL.ANSICodes.test_ANSI()` and `OhMyREPL.ANSICodes.test_ANSI_256()` to test 16 and 256 colors respectively.
+ By default, "Monokai16" will be used on Windows and "Monokai256" otherwise. To test the supported colors in your terminal you can use `Crayons.test_system_colors()`, `Crayons.test_256_colors()`, `Crayons.test_24bit_colors()` to test 16, 256 and 24 bit colors respectively.
 
 ## Preview
 
@@ -32,12 +33,13 @@ To activate a colorscheme use `colorscheme!(name::String)`
 This section will describe how to create your own colorscheme.
 
 !!! info
-    Please refer to the [ANSIToken](@ref) section while reading this section.
+    Please refer to the [Crayons.jl](https://github.com/KristofferC/Crayons.jl) documentation while reading this section.
 
-We start by importing the `SyntaxHighlighter` module and the `ANSIToken` type.
+We start by loading the `Crayons` package and importing the `SyntaxHighlighter` and the ..
 
 ```
-import OhMyREPL: Passes.SyntaxHighlighter, ANSICodes.ANSIToken
+using Crayons
+import OhMyREPL: Passes.SyntaxHighlighter
 ```
 
 We now create a default colorscheme:
@@ -50,7 +52,7 @@ By using the function `test_colorscheme` we can see that the default colorscheme
 
 ![](default_colorscheme.png)
 
-There are a number of setter function that updates the colorscheme. They are called like `setter!(cs::ColorScheme, token::ANSIToken)`. The different setters are:
+There are a number of setter function that updates the colorscheme. They are called like `setter!(cs::ColorScheme, crayon::Crayon)`. The different setters are:
 
 * `symbol!` - A symbol, ex `:symbol`
 * `comment!` - A comment, ex `# comment`, `#= block comment =#`
@@ -68,13 +70,13 @@ There are a number of setter function that updates the colorscheme. They are cal
 Let us set the strings to be printed in yellow, numbers to be printed in bold, and function calls to be printed in cyan:
 
 ```
-SyntaxHighlighter.string!(scheme, ANSIToken(foreground = :yellow))
-SyntaxHighlighter.number!(scheme, ANSIToken(bold = true))
-SyntaxHighlighter.call!(scheme, ANSIToken(foreground = :cyan))
+SyntaxHighlighter.string!(scheme, Crayon(foreground = :yellow))
+SyntaxHighlighter.number!(scheme, Crayon(bold = true))
+SyntaxHighlighter.call!(scheme, Crayon(foreground = :cyan))
 ```
 
 !!! info
-    Remember that you can also use integers for the `foreground` and `background` arguments to `ANSIToken` and they will then refer to the colors showed by `OhMyREPL.ANSICodes.test_ANSI_256()`. You can of course also specify many properties for the same `ANSIToken`.
+    Remember that you can also use integers for the `foreground` and `background` arguments to `Crayon` and they will then refer to the colors showed by `Crayons.test_256_colors()`. Also, you can of course specify many properties for the same `Crayon`.
 
 By recalling `test_colorscheme` on the scheme we can see it has been updated:
 
@@ -90,7 +92,8 @@ For fun, the code below creates a truly random colorscheme:
 
 ```jl
 function rand_token()
-    ANSIToken(background = rand(1:256), foreground = rand(1:256),
+    Crayon(background = rand(Bool) ? :nothing : rand(1:256),
+              foreground = rand(Bool) ? :nothing : rand(1:256),
               bold = rand(Bool), italics = rand(Bool), underline = rand(Bool))
 end
 
@@ -115,4 +118,3 @@ test_colorscheme(create_random_colorscheme())
 ```
 
 ![](random_scheme.png)
-

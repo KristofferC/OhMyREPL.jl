@@ -3,9 +3,7 @@ module TestSyntaxHighlighter
 using Base.Test
 
 using OhMyREPL
-import OhMyREPL.ANSICodes: ANSIToken, ANSIValue
 import  OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
-using Compat
 
 using Tokenize
 
