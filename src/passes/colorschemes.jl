@@ -119,3 +119,21 @@ function _create_tomorrow_night_bright_24()
     number!(cs, Crayon(foreground = (231, 140, 69)))
     return cs
 end
+
+
+function _create_tomorrow_24()
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = (113, 140, 0)))
+    comment!(cs, Crayon(foreground = (142, 144, 140)))
+    string!(cs, Crayon(foreground = (113, 140, 0)))
+    call!(cs, Crayon(foreground = (62, 153, 159)))
+    op!(cs, Crayon(foreground = (0, 0, 0)))
+    keyword!(cs, Crayon(foreground = (137, 89, 168)))
+    text!(cs, Crayon(foreground = :default))
+    macro!(cs, Crayon(foreground = (62, 153, 159)))
+    function_def!(cs, Crayon(foreground = (66, 113, 174)))
+    error!(cs, Crayon(foreground = :default))
+    argdef!(cs, Crayon(foreground = 0)) # nothing special added here
+    number!(cs, Crayon(foreground = (245, 135, 31)))
+    return cs
+end
