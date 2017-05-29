@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Syntax highlighting",
     "title": "Default schemes",
     "category": "section",
-    "text": "The current default colorschemes that comes with OhMyREPL are\"JuliaDefault\" - the default Julia scheme, white and bold.\n\"Monokai16\" - 16 color Monokai\n\"Monokai256\" - 256 colors Monokai\n\"Monokai24bit\" - 24 bit colored Monokai\n\"BoxyMonokai256\" - 256 colors Monokai from hereBy default, \"Monokai16\" will be used on Windows and \"Monokai256\" otherwise. To test the supported colors in your terminal you can use Crayons.test_system_colors(), Crayons.test_256_colors(), Crayons.test_24bit_colors() to test 16, 256 and 24 bit colors respectively."
+    "text": "The current default colorschemes that comes with OhMyREPL are\"JuliaDefault\" - the default Julia scheme, white and bold.\n\"Monokai16\" - 16 color Monokai\n\"Monokai256\" - 256 colors Monokai\n\"Monokai24bit\" - 24 bit colored Monokai\n\"BoxyMonokai256\" - 256 colors Monokai from here\n\"TomorrowNightBright\" - 256 colors Tomorrow Night Bright\n\"TomorrowNightBright24bit\" - 24 bit colored Tomorrow Night BrightBy default, \"Monokai16\" will be used on Windows and \"Monokai256\" otherwise. To test the supported colors in your terminal you can use Crayons.test_system_colors(), Crayons.test_256_colors(), Crayons.test_24bit_colors() to test 16, 256 and 24 bit colors respectively."
 },
 
 {
