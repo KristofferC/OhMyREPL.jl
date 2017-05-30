@@ -56,7 +56,7 @@ end
 function Base.show(io::IO, sh::SyntaxHighlighterSettings)
     first = true
     l = maximum(x->length(x), keys(sh.schemes))
-    for (k, v) in sh.schemes
+    for (k, v) in sort(collect(sh.schemes), by = x -> x[1])
         if !first
             print(io, "\n\n")
         end
@@ -85,6 +85,9 @@ add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai16", _create_monokai())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "BoxyMonokai256", _create_boxymonokai_256())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "TomorrowNightBright", _create_tomorrow_night_bright())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "TomorrowNightBright24bit", _create_tomorrow_night_bright_24())
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Tomorrow24bit", _create_tomorrow_24())
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Tomorrow", _create_tomorrow_256())
+
 # Added by default
 # add!(SYNTAX_HIGHLIGHTER_SETTINGS, "JuliaDefault", _create_juliadefault())
 
