@@ -34,6 +34,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
             mode = s
         end
 
+        LineEdit.write(terminal(s), "\e[?25l")  # Hide the cursor
         LineEdit.clear_input_area(terminal(s), mode)
         # Extract the cursor index in character count
         cursoridx = length(String(buffer(s).data[1:p]))
@@ -60,6 +61,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         q = Base.Terminals.TerminalBuffer(obuff)
         mode.ias = refresh_multi_line(q, terminal(s), buffer(s), mode.ias, l)
         write(terminal(s), take!(obuff))
+        LineEdit.write(terminal(s), "\e[?25h")  # Show the cursor
         flush(terminal(s))
 end
 
