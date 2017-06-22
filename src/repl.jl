@@ -112,12 +112,13 @@ function create_keybindings()
         if on_enter(s) || (eof(buffer(s)) && s.key_repeats > 1)
             # Disable bracket highlighting before entering
             brackidx = OhMyREPL._find_pass(OhMyREPL.PASS_HANDLER, "BracketHighlighter")
+            brackstatus = false
             if brackidx != -1
                 brackstatus = OhMyREPL.PASS_HANDLER.passes[brackidx][2].enabled
                 OhMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", false)
             end
             _commit_line(s, data, c)
-            if brackidx != -1
+            if brackidx != -1 && brackstatus == true
                 OhMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", true)
             end
             return :done
