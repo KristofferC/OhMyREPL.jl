@@ -34,6 +34,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
             mode = s
         end
 
+        LineEdit.write(terminal(s), "\e[?25l")  # Hide the cursor
         LineEdit.clear_input_area(terminal(s), mode)
         # Extract the cursor index in character count
         cursoridx = length(String(buffer(s).data[1:p]))
@@ -60,6 +61,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         q = Base.Terminals.TerminalBuffer(obuff)
         mode.ias = refresh_multi_line(q, terminal(s), buffer(s), mode.ias, l)
         write(terminal(s), take!(obuff))
+        LineEdit.write(terminal(s), "\e[?25h")  # Show the cursor
         flush(terminal(s))
 end
 
@@ -110,12 +112,13 @@ function create_keybindings()
         if on_enter(s) || (eof(buffer(s)) && s.key_repeats > 1)
             # Disable bracket highlighting before entering
             brackidx = OhMyREPL._find_pass(OhMyREPL.PASS_HANDLER, "BracketHighlighter")
+            brackstatus = false
             if brackidx != -1
                 brackstatus = OhMyREPL.PASS_HANDLER.passes[brackidx][2].enabled
                 OhMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", false)
             end
             _commit_line(s, data, c)
-            if brackidx != -1
+            if brackidx != -1 && brackstatus == true
                 OhMyREPL.enable_pass!(PASS_HANDLER, "BracketHighlighter", true)
             end
             return :done
