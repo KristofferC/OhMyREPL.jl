@@ -34,34 +34,33 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
             mode = s
         end
 
-        LineEdit.write(terminal(s), "\e[?25l")  # Hide the cursor
-        LineEdit.clear_input_area(terminal(s), mode)
+        outbuf = IOBuffer()
+        termbuf = Base.Terminals.TerminalBuffer(outbuf)
+        # Hide the cursor
+        LineEdit.write(outbuf, "\e[?25l")
+        LineEdit.clear_input_area(termbuf, mode)
         # Extract the cursor index in character count
         cursoridx = length(String(buffer(s).data[1:p]))
 
         l = strwidth(get_prompt(s))
+        if !isa(s, LineEdit.SearchState)
+            LineEdit.write_prompt(termbuf, mode)
+            LineEdit.write(termbuf, "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
+        end
 
         # Insert colorized text from running the passes
-        b = IOBuffer()
         tokens = collect(Lexers.Lexer(buffer(s)))
         apply_passes!(PASS_HANDLER, tokens, cursoridx, cursormove)
-        untokenize_with_ANSI(b, PASS_HANDLER , tokens, l)
-        if !isa(s, LineEdit.SearchState)
-            LineEdit.write_prompt(terminal(s), mode)
-            LineEdit.write(terminal(s), "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
-        end
-        write(terminal(s), String(take!(b)))
+        untokenize_with_ANSI(outbuf, PASS_HANDLER , tokens, l)
 
         # Reset the buffer since the Lexer messed with it (maybe the Lexer should reset it on done)
         seek(buffer(s), p)
 
         # Our cursor now seems to be out of place, we run the already existing refresh_multi_line code to put it where it belongs.
         # Maybe it is possible to save the cursor and just restore it but that is probably Terminal dependent...
-        obuff = IOBuffer()
-        q = Base.Terminals.TerminalBuffer(obuff)
-        mode.ias = refresh_multi_line(q, terminal(s), buffer(s), mode.ias, l)
-        write(terminal(s), take!(obuff))
-        LineEdit.write(terminal(s), "\e[?25h")  # Show the cursor
+        mode.ias = refresh_multi_line(termbuf, terminal(s), buffer(s), mode.ias, l)
+        LineEdit.write(outbuf, "\e[?25h")  # Show the cursor
+        write(terminal(s), take!(outbuf))
         flush(terminal(s))
 end
 
@@ -69,37 +68,41 @@ end
 function create_keybindings()
 
     D = Dict{Any, Any}()
-    D['\b']   = (s, data, c) ->  (LineEdit.edit_backspace(s); rewrite_with_ANSI(s))
-    D["*"]    = (s, data, c) ->  (LineEdit.edit_insert(s, c); rewrite_with_ANSI(s))
-    D["^B"]   = (s, data, c) -> (LineEdit.edit_move_left(s) ;rewrite_with_ANSI(s))
-    D["^F"]   = (s, data, c) -> (LineEdit.edit_move_right(s) ;rewrite_with_ANSI(s))
+    D['\b']   = (s, data, c) -> if LineEdit.edit_backspace(buffer(s))
+        rewrite_with_ANSI(s)
+    else
+        beep(terminal(s))
+    end
+    D["*"]    = (s, data, c) ->  (LineEdit.edit_insert(buffer(s), c); rewrite_with_ANSI(s))
+    D["^B"]   = (s, data, c) -> (LineEdit.edit_move_left(buffer(s)) ;rewrite_with_ANSI(s))
+    D["^F"]   = (s, data, c) -> (LineEdit.edit_move_right(buffer(s)) ;rewrite_with_ANSI(s))
     # Meta B
-    D["\eb"]  = (s, data, c) -> (LineEdit.edit_move_word_left(s) ; rewrite_with_ANSI(s))
+    D["\eb"]  = (s, data, c) -> (LineEdit.edit_move_word_left(buffer(s)) ; rewrite_with_ANSI(s))
     # Meta F
-     D["\ef"]  = (s, data, c) -> (LineEdit.edit_move_word_right(s); rewrite_with_ANSI(s))
+     D["\ef"]  = (s, data, c) -> (LineEdit.edit_move_word_right(buffer(s)); rewrite_with_ANSI(s))
     # Meta Enter
-    D["\e\r"] = (s, data, c) -> (LineEdit.edit_insert(s, '\n'); rewrite_with_ANSI(s))
+    D["\e\r"] = (s, data, c) -> (LineEdit.edit_insert(buffer(s), '\n'); rewrite_with_ANSI(s))
     D["^A"]   = (s, data, c) -> (LineEdit.move_line_start(s); rewrite_with_ANSI(s))
     D["^E"]   = (s, data, c) -> (LineEdit.move_line_end(s); rewrite_with_ANSI(s))
-    D["\e[H"] = (s, data, c) -> (LineEdit.move_input_start(s); rewrite_with_ANSI(s))
-    D["\e[F"] = (s, data, c) -> (LineEdit.move_input_end(s); rewrite_with_ANSI(s))
+    D["\e[H"] = (s, data, c) -> (LineEdit.move_input_start(buffer(s)); rewrite_with_ANSI(s))
+    D["\e[F"] = (s, data, c) -> (LineEdit.move_input_end(buffer(s)); rewrite_with_ANSI(s))
     D["^L"]   = (s, data, c) -> (Terminals.clear(terminal(s)); rewrite_with_ANSI(s))
-    D["^W"]   = (s, data, c) -> LineEdit.edit_werase(s)
+    D["^W"]   = (s, data, c) -> LineEdit.edit_werase(buffer(s))
     # Right Arrow
-    D["\e[C"] = (s, data, c)->(LineEdit.edit_move_right(s); rewrite_with_ANSI(s))
+    D["\e[C"] = (s, data, c)->(LineEdit.edit_move_right(buffer(s)); rewrite_with_ANSI(s))
     # Left Arrow
-    D["\e[D"] = (s, data, c)->(LineEdit.edit_move_left(s); rewrite_with_ANSI(s))
+    D["\e[D"] = (s, data, c)->(LineEdit.edit_move_left(buffer(s)); rewrite_with_ANSI(s))
     # Up Arrow
     # Delete
-    D["\e[3~"] = (s, data, c)->(LineEdit.edit_delete(s); rewrite_with_ANSI(s))
-    D["^T"] = (s, data, c)->(LineEdit.edit_transpose(s); rewrite_with_ANSI(s))
-    D["\ed"] = (s, data, c)->(LineEdit.edit_delete_next_word(s); rewrite_with_ANSI(s))
-    D["\e\b"] = (s, data, c)->edit_delete_prev_word(s)
+    D["\e[3~"] = (s, data, c)->(LineEdit.edit_delete(buffer(s)); rewrite_with_ANSI(s))
+    D["^T"] = (s, data, c)->(LineEdit.edit_transpose(buffer(s)); rewrite_with_ANSI(s))
+    D["\ed"] = (s, data, c)->(LineEdit.edit_delete_next_word(buffer(s)); rewrite_with_ANSI(s))
+    D["\e\b"] = (s, data, c)->(LineEdit.edit_delete_prev_word(buffer(s)); rewrite_with_ANSI(s))
     D["^N"]  = (s,data,c)->(LineEdit.history_next(s, mode(s).hist); rewrite_with_ANSI(s))
     D["^P"]  = (s,data,c)->(LineEdit.history_prev(s, mode(s).hist); rewrite_with_ANSI(s))
     D["^D"] = (s, data, c)->begin
         if buffer(s).size > 0
-            LineEdit.edit_delete(s); rewrite_with_ANSI(s)
+            LineEdit.edit_delete(buffer(s)); rewrite_with_ANSI(s)
         else
             println(terminal(s))
             return :abort
@@ -123,7 +126,7 @@ function create_keybindings()
             end
             return :done
         else
-            edit_insert(s, '\n')
+            edit_insert(buffer(s), '\n')
             rewrite_with_ANSI(s)
         end
     end
@@ -255,19 +258,18 @@ end
 NEW_KEYBINDINGS = create_keybindings()
 
 
-function insert_keybindings()
-    repl = Base.active_repl
+function insert_keybindings(repl = Base.active_repl)
     mirepl = isdefined(repl,:mi) ? repl.mi : repl
     main_mode = mirepl.interface.modes[1]
     p = mirepl.interface.modes[5]
 
     NEW_KEYBINDINGS["\e[A"] = (s,o...)-> begin
-        LineEdit.edit_move_up(s) || LineEdit.enter_prefix_search(s, p, true)
+        LineEdit.edit_move_up(buffer(s)) || LineEdit.enter_prefix_search(s, p, true)
         Prompt.rewrite_with_ANSI(s)
     end
     # Down Arrow
     NEW_KEYBINDINGS["\e[B"] = (s,o...)-> begin
-        LineEdit.edit_move_down(s) || LineEdit.enter_prefix_search(s, p, false)
+        LineEdit.edit_move_down(buffer(s)) || LineEdit.enter_prefix_search(s, p, false)
         Prompt.rewrite_with_ANSI(s)
     end
 
