@@ -1,5 +1,7 @@
 withenv("FORCE_COLOR" => true) do
-    include("flicker.jl")
+    if is_linux()
+        include("flicker.jl")
+    end
     include("test_custompass.jl")
     include("test_bracketmatch.jl")
     include("test_highlighter.jl")
