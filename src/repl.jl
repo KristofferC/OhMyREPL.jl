@@ -5,8 +5,8 @@ module Prompt
 
 import Base: LineEdit, REPL
 
-import Base.LineEdit: buffer, cmove_col, cmove_up, InputAreaState, transition,
-                      terminal, buffer, on_enter, move_input_end, add_history, state, mode, edit_insert
+import Base.LineEdit: cmove_col, cmove_up, InputAreaState, transition,
+                      terminal, on_enter, move_input_end, add_history, state, mode, edit_insert
 import Base.REPL: respond, LatexCompletions, return_callback
 
 import Tokenize.Lexers
@@ -16,7 +16,7 @@ import Base.Terminals: raw!, width, height, cmove, getX,
                        getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
 
 using OhMyREPL
-import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
+import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER, buffer
 
 
 function rewrite_with_ANSI(s, cursormove::Bool = false)
@@ -64,8 +64,6 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         flush(terminal(s))
 end
 
-
-buffer(io::IOBuffer) = io
 
 function create_keybindings()
 

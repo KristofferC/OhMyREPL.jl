@@ -17,6 +17,10 @@ include(joinpath("passes", "Passes.jl"))
 include("BracketInserter.jl")
 include("prompt.jl")
 
+# avoid type piracy on Base.LineEdit.buffer
+buffer(io::IOBuffer) = io
+buffer(x) = Base.LineEdit.buffer(x)
+
 # Some backward compatability
 module ANSICodes
     using Crayons
