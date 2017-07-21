@@ -65,6 +65,8 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
 end
 
 
+buffer(io::IOBuffer) = io
+
 function create_keybindings()
 
     D = Dict{Any, Any}()
