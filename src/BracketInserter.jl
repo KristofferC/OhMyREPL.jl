@@ -44,19 +44,19 @@ function insert_into_keymap!(D::Dict)
         # If we enter a left bracket automatically complete it if the next
         # char is a whitespace or a right bracket
         D[l] = (s, o...) -> begin
-            edit_insert(buffer(s), l)
+            edit_insert(s, l)
             if AUTOMATIC_BRACKET_MATCH[] && (eof(buffer(s)) || peek(buffer(s)) in right_brackets_ws)
-                edit_insert(buffer(s), r)
-                edit_move_left(buffer(s))
+                edit_insert(s, r)
+                edit_move_left(s)
             end
             rewrite_with_ANSI(s)
         end
         # If we enter a right bracket and the next char is that right bracket just move right
         D[r] = (s, o...) -> begin
             if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && peek(buffer(s)) == r
-                edit_move_right(buffer(s))
+                edit_move_right(s)
             else
-                edit_insert(buffer(s), r)
+                edit_insert(s, r)
             end
             rewrite_with_ANSI(s)
         end
@@ -68,15 +68,15 @@ function insert_into_keymap!(D::Dict)
             b = buffer(s)
             # Next char is the quote symbol so just move right
             if AUTOMATIC_BRACKET_MATCH[] && !eof(b) && peek(b) == v
-                edit_move_right(buffer(s))
+                edit_move_right(s)
             elseif AUTOMATIC_BRACKET_MATCH[] &&
                     ((position(b) > 0 && leftpeek(b) in all_brackets_ws && (eof(b) || peek(b) in right_brackets_ws)) ||
                      ((!eof(b) && peek(b) in right_brackets_ws) || b.size == 0) && (position(b) == 0 || leftpeek(b) in left_brackets_ws))
-                edit_insert(buffer(s), v)
-                edit_insert(buffer(s), v)
-                edit_move_left(buffer(s))
+                edit_insert(s, v)
+                edit_insert(s, v)
+                edit_move_left(s)
             else
-                edit_insert(buffer(s), v)
+                edit_insert(s, v)
             end
             rewrite_with_ANSI(s)
         end
@@ -101,14 +101,14 @@ function insert_into_keymap!(D::Dict)
             if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) != 0
                 i = findfirst(left_brackets2, str[prevind(str, position(b) + 1)])
                 if i != 0 && peek(b) == right_brackets2[i]
-                    edit_move_right(buffer(s))
-                    edit_backspace(buffer(s))
-                    edit_backspace(buffer(s))
+                    edit_move_right(s)
+                    edit_backspace(s)
+                    edit_backspace(s)
                     rewrite_with_ANSI(s)
                     return
                 end
             end
-            edit_backspace(buffer(s))
+            edit_backspace(s)
         end
         rewrite_with_ANSI(s)
     end
