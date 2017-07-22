@@ -77,17 +77,17 @@ function create_keybindings()
     D["^B"]   = (s, data, c) -> (LineEdit.edit_move_left(buffer(s)) ;rewrite_with_ANSI(s))
     D["^F"]   = (s, data, c) -> (LineEdit.edit_move_right(buffer(s)) ;rewrite_with_ANSI(s))
     # Meta B
-    D["\eb"]  = (s, data, c) -> (LineEdit.edit_move_word_left(buffer(s)) ; rewrite_with_ANSI(s))
+    D["\eb"]  = (s, data, c) -> (LineEdit.edit_move_word_left(s) ; rewrite_with_ANSI(s))
     # Meta F
-     D["\ef"]  = (s, data, c) -> (LineEdit.edit_move_word_right(buffer(s)); rewrite_with_ANSI(s))
+     D["\ef"]  = (s, data, c) -> (LineEdit.edit_move_word_right(s); rewrite_with_ANSI(s))
     # Meta Enter
     D["\e\r"] = (s, data, c) -> (LineEdit.edit_insert(buffer(s), '\n'); rewrite_with_ANSI(s))
     D["^A"]   = (s, data, c) -> (LineEdit.move_line_start(s); rewrite_with_ANSI(s))
     D["^E"]   = (s, data, c) -> (LineEdit.move_line_end(s); rewrite_with_ANSI(s))
-    D["\e[H"] = (s, data, c) -> (LineEdit.move_input_start(buffer(s)); rewrite_with_ANSI(s))
+    D["\e[H"] = (s, data, c) -> (LineEdit.move_input_start(s); rewrite_with_ANSI(s))
     D["\e[F"] = (s, data, c) -> (LineEdit.move_input_end(buffer(s)); rewrite_with_ANSI(s))
     D["^L"]   = (s, data, c) -> (Terminals.clear(terminal(s)); rewrite_with_ANSI(s))
-    D["^W"]   = (s, data, c) -> LineEdit.edit_werase(buffer(s))
+    D["^W"]   = (s, data, c) -> LineEdit.edit_werase(s)
     # Right Arrow
     D["\e[C"] = (s, data, c)->(LineEdit.edit_move_right(buffer(s)); rewrite_with_ANSI(s))
     # Left Arrow
