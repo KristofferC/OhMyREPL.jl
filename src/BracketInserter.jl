@@ -9,11 +9,12 @@ mutable struct BracketInserterSettings
     complete_brackets::Bool
 end
 
-import Base.LineEdit: edit_insert, edit_move_left, edit_move_right, buffer, char_move_left,
+import Base.LineEdit: edit_insert, edit_move_left, edit_move_right, char_move_left,
                       edit_backspace, terminal, transition, state
 
 import Base.Terminals.beep
 import OhMyREPL.Prompt.rewrite_with_ANSI
+import OhMyREPL.buffer
 
 const BRACKET_INSERTER = BracketInserterSettings(true)
 
