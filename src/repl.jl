@@ -49,6 +49,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         end
 
         # Insert colorized text from running the passes
+        seekstart(buffer(s))
         tokens = collect(Lexers.Lexer(buffer(s)))
         apply_passes!(PASS_HANDLER, tokens, cursoridx, cursormove)
         untokenize_with_ANSI(outbuf, PASS_HANDLER , tokens, l)
