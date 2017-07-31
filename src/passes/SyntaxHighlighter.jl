@@ -102,6 +102,7 @@ add_pass!(PASS_HANDLER, "SyntaxHighlighter", SYNTAX_HIGHLIGHTER_SETTINGS, false)
 function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, tokens::Vector{Token}, ::Int)
     cscheme = highlighter.active
     prev_t = Tokens.Token()
+    pprev_t = Tokens.Token()
     for (i, t) in enumerate(tokens)
         # a::x
         if exactkind(prev_t) == Tokens.DECLARATION
@@ -128,8 +129,13 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
         elseif kind(t) == Tokens.COMMENT
             crayons[i] = cscheme.comment
         # f(...)
-        elseif kind(t) == Tokens.LPAREN && kind(prev_t) == Tokens.IDENTIFIER
-            (i > 2 && exactkind(tokens[i-2]) == Tokens.AT_SIGN) || (crayons[i-1] = cscheme.call)
+        elseif kind(t) == Tokens.LPAREN
+            if kind(prev_t) == Tokens.IDENTIFIER && !(i > 2 && exactkind(tokens[i-2]) == Tokens.AT_SIGN)
+                crayons[i-1] = cscheme.call
+            elseif exactkind(prev_t) == Tokens.DOT && kind(pprev_t) == Tokens.IDENTIFIER
+                crayons[i-1] = cscheme.call
+                crayons[i-2] = cscheme.call
+            end
              # function f(...)
             if i > 3 && kind(tokens[i-2]) == Tokens.WHITESPACE && exactkind(tokens[i-3]) == Tokens.FUNCTION
                 crayons[i-1] = cscheme.function_def
@@ -146,6 +152,7 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
         else
             crayons[i] = cscheme.text
         end
+        pprev_t = prev_t
         prev_t = t
     end
     return
