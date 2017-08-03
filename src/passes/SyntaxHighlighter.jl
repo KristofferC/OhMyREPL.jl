@@ -5,6 +5,7 @@ using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, exactkind, iskeyword
 
 using Crayons
+using Compat
 
 import OhMyREPL: add_pass!, PASS_HANDLER
 
@@ -91,7 +92,7 @@ add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Tomorrow", _create_tomorrow_256())
 # Added by default
 # add!(SYNTAX_HIGHLIGHTER_SETTINGS, "JuliaDefault", _create_juliadefault())
 
-if !is_windows()
+if !Compat.Sys.iswindows()
     activate!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai256")
 else
     activate!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai16")
