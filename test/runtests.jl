@@ -1,5 +1,7 @@
+using Compat
+
 withenv("FORCE_COLOR" => true) do
-    if is_linux()
+    if Compat.Sys.islinux()
         include("flicker.jl")
     end
     include("test_custompass.jl")

@@ -15,6 +15,7 @@ import Base.Terminals
 import Base.Terminals: raw!, width, height, cmove, getX,
                        getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
 
+using Compat
 using OhMyREPL
 import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
@@ -312,7 +313,7 @@ function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
 
     # Count the '\n' at the end of the line if the terminal emulator does (specific to DOS cmd prompt)
     if VERSION > v"0.5.0-"
-        miscountnl = is_windows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
+        miscountnl = Compat.Sys.iswindows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
     else
         miscountnl = false
     end
