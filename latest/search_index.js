@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Manual Outline",
     "category": "section",
-    "text": "Pages = [\n    \"installation.md\",\n    \"features/syntax_highlighting.md\",\n    \"features/bracket_highlighting.md\",\n    \"features/bracket_complete.md\",\n    \"features/rainbow_brackets.md\",\n    \"internals/passes.md\"\n]\nDepth = 1"
+    "text": "Pages = [\n    \"installation.md\",\n    \"features/syntax_highlighting.md\",\n    \"features/bracket_highlighting.md\",\n    \"features/bracket_complete.md\",\n    \"features/rainbow_brackets.md\",\n    \"features/markdown_highlight.md\",\n    \"internals/passes.md\"\n]\nDepth = 1"
 },
 
 {
@@ -174,6 +174,30 @@ var documenterSearchIndex = {"docs": [
     "title": "Rainbow Brackets",
     "category": "section",
     "text": "Rainbow brackets is a feature that colors matching brackets in the same color (with non matching closing brackets are showed in bold red):(Image: rainbow brackets)There are two modes of this pass, one that uses 256 colors and one that uses only the 16 system colors. By default, we default to using the 16 color mode on Windows and 256 color mode otherwise. Changing between the modes is done by:OhMyREPL.Passes.RainbowBrackets.activate_16colors()\nOhMyREPL.Passes.RainbowBrackets.activate_256colors()As with all different passes, this can be enabled or disabled with the function OhMyREPL.enable_pass!(\"RainbowBrackets\", enable::Bool) where enable determines wether if the pass is enabled or disabled.Inspired by the VSCode plugin with the same name."
+},
+
+{
+    "location": "features/markdown_highlight.html#",
+    "page": "Markdown Syntax Highlighting",
+    "title": "Markdown Syntax Highlighting",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "features/markdown_highlight.html#Markdown-Syntax-Highlighting-1",
+    "page": "Markdown Syntax Highlighting",
+    "title": "Markdown Syntax Highlighting",
+    "category": "section",
+    "text": "(Image: )OhMyREPL will by default make code blocks written in markdown syntax (for example in docstrings) highlighted with the colorscheme used by the syntax highlighter."
+},
+
+{
+    "location": "features/markdown_highlight.html#Settings-1",
+    "page": "Markdown Syntax Highlighting",
+    "title": "Settings",
+    "category": "section",
+    "text": "Can be disabled or enabled with enable_highlight_markdown(::Bool)."
 },
 
 {
