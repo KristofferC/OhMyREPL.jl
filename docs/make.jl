@@ -23,6 +23,7 @@ makedocs(
 deploydocs(
     repo = "github.com/KristofferC/OhMyREPL.jl.git",
     target = "build",
+    julia = "0.6",
     deps = nothing,
     make = nothing,
 )
