@@ -8,14 +8,17 @@ module OhMyREPL
 using Tokenize
 using Crayons
 
-export colorscheme!, colorschemes, enable_autocomplete_brackets, test_colorscheme
+export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, test_colorscheme
 
 include("repl_pass.jl")
 include("repl.jl")
-include(joinpath("passes", "Passes.jl"))
+include("passes/Passes.jl")
 
 include("BracketInserter.jl")
 include("prompt.jl")
+
+import .BracketInserter.enable_autocomplete_brackets
+
 
 # Some backward compatability
 module ANSICodes
@@ -122,7 +125,8 @@ function __init__()
         old_stderr = STDERR
         redirect_stderr(f)
         Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
-        include(joinpath(dirname(@__FILE__), "output_prompt_overwrite.jl"))
+        include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
+        include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
         redirect_stderr(old_stderr)
     end
 end
