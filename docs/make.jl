@@ -12,6 +12,7 @@ makedocs(
             "features/bracket_complete.md",
             "features/prompt.md",
             "features/rainbow_brackets.md",
+            "features/markdown_highlight.md",
             ],
         "Internals" => Any[
             "internals/passes.md"
