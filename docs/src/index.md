@@ -17,6 +17,7 @@ Pages = [
     "features/bracket_highlighting.md",
     "features/bracket_complete.md",
     "features/rainbow_brackets.md",
+    "features/markdown_highlight.md",
     "internals/passes.md"
 ]
 Depth = 1
