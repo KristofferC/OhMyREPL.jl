@@ -34,3 +34,7 @@ Please see [the documentation](https://KristofferC.github.io/OhMyREPL.jl/latest)
 
 [docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
 [docs-latest-url]: https://kristofferc.github.io/OhMyREPL.jl/latest/
+
+### Warning
+
+Note that this package overwrites some methods from Julia Base. If you get a weird error when using OhMyREPL you should reproduce it without having OhMyREPL loaded before reporting it as a Julia bug.
