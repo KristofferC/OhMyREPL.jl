@@ -128,10 +128,10 @@ function __init__()
         include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
         include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
         redirect_stderr(old_stderr)
-        close(io)
-        for line in eachline(file)
+        seek(io, 0)
+        for line in eachline(io)
             if !ismatch(Regex("^WARNING: Method definition [refresh_line|display|term]" *
-                    ".* overwritten in module .* at $(@__DIR__).*\$"), line)
+                    ".* overwritten in module .* at $(escape_string(@__DIR__)).*\$"), line)
                 println(line)
             end
         end
