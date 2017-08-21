@@ -121,13 +121,20 @@ function __init__()
         end
     end
 
-    mktemp() do _, f
+    mktemp() do file, io
         old_stderr = STDERR
-        redirect_stderr(f)
+        redirect_stderr(io)
         Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
         include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
         include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
         redirect_stderr(old_stderr)
+        seek(io, 0)
+        for line in eachline(io)
+            if !ismatch(Regex("^WARNING: Method definition [refresh_line|display|term]" *
+                    ".* overwritten in module .* at $(escape_string(@__DIR__)).*\$"), line)
+                println(line)
+            end
+        end
     end
 end
 
