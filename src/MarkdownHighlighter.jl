@@ -16,7 +16,7 @@ function Base.Markdown.term(io::IO, md::Base.Markdown.Code, columns)
     do_syntax = false
     if lang == "jldoctest" || lang == "julia-repl"
         do_syntax = true
-        code_blocks = split("\n"*code, "\njulia> ")
+        code_blocks = split("\n" * code, "\njulia> ")
         for codeblock in code_blocks[2:end] #
             expr, pos = parse(codeblock, 1, raise = false);
             sourcecode, output = if pos > length(codeblock)
@@ -41,7 +41,7 @@ function Base.Markdown.term(io::IO, md::Base.Markdown.Code, columns)
             SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0)
             buff = IOBuffer()
             if lang == "jldoctest" || lang == "julia-repl"
-                print(buff, Crayon(foreground = :green, bold = true), "julia> ", Crayon(reset = true))
+                print(buff, Crayon(foreground = :yellow, bold = true), "julia> ", Crayon(reset = true))
             end
             for (token, crayon) in zip(tokens, crayons)
                 print(buff, crayon)
