@@ -88,6 +88,7 @@ add!(SYNTAX_HIGHLIGHTER_SETTINGS, "TomorrowNightBright", _create_tomorrow_night_
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "TomorrowNightBright24bit", _create_tomorrow_night_bright_24())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Tomorrow24bit", _create_tomorrow_24())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Tomorrow", _create_tomorrow_256())
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Distinguished", _create_distinguished())
 
 # Added by default
 # add!(SYNTAX_HIGHLIGHTER_SETTINGS, "JuliaDefault", _create_juliadefault())

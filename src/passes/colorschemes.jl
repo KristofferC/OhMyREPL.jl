@@ -154,3 +154,20 @@ function _create_tomorrow_256()
     number!(cs, Crayon(foreground = 208))
     return cs
 end
+
+function _create_distinguished()
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = 66, bold=true))
+    comment!(cs, Crayon(foreground = 243))
+    string!(cs, Crayon(foreground = 143))
+    call!(cs, Crayon(foreground = :default))
+    op!(cs, Crayon(foreground = 180))
+    keyword!(cs, Crayon(foreground = 173))
+    text!(cs, Crayon(foreground = :default))
+    macro!(cs, Crayon(foreground = 247))
+    function_def!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default))
+    argdef!(cs, Crayon(foreground = 67))
+    number!(cs, Crayon(foreground = 173))
+    return cs
+end
