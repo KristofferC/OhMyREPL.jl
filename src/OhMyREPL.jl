@@ -85,10 +85,6 @@ showpasses(io::IO = STDOUT) = Base.show(io, PASS_HANDLER)
 
 
 function __init__()
-    # Only load in interactive mode, see #68
-    if !isempty(ARGS) && !isempty(first(ARGS))
-        return
-    end
     options = Base.JLOptions()
     # command-line
     if (options.eval != C_NULL) || (options.print != C_NULL)
