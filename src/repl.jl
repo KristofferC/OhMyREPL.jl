@@ -312,22 +312,14 @@ function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
     line_pos = buf_pos
 
     # Count the '\n' at the end of the line if the terminal emulator does (specific to DOS cmd prompt)
-    if VERSION > v"0.5.0-"
-        miscountnl = Compat.Sys.iswindows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
-    else
-        miscountnl = false
-    end
+    miscountnl = Compat.Sys.iswindows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
     lindent = promptlength
     indent = promptlength # TODO this gets the cursor right but not the text
     # Now go through the buffer line by line
     seek(buf, 0)
     moreinput = true # add a blank line if there is a trailing newline on the last line
     while moreinput
-        if VERSION < v"0.6.0-dev.2283"
-            l = readline(buf)
-        else
-            l = readline(buf, chomp=false)
-        end
+        l = readline(buf, chomp=false)
         moreinput = endswith(l, "\n")
         # We need to deal with on-screen characters, so use strwidth to compute occupied columns
         llength = strwidth(l)
