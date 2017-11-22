@@ -87,7 +87,13 @@ showpasses(io::IO = STDOUT) = Base.show(io, PASS_HANDLER)
 function __init__()
     options = Base.JLOptions()
     # command-line
-    options.commands != C_NULL && return
+    if v"0.5.2" < VERSION < v"0.7-"
+         if (options.eval != C_NULL) || (options.print != C_NULL)
+            return
+        end
+    else
+        options.commands != C_NULL && return
+    end
 
     if isdefined(Base, :active_repl)
         Prompt.insert_keybindings()
