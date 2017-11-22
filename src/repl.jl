@@ -20,6 +20,10 @@ using OhMyREPL
 import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
 
+if v"0.5.2" < VERSION < v"0.7-"
+    const textwidth = strwidth
+end
+
 function rewrite_with_ANSI(s, cursormove::Bool = false)
         if isa(s, LineEdit.SearchState)
             return
@@ -43,6 +47,8 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         # Extract the cursor index in character count
         cursoridx = length(String(buffer(s).data[1:p]))
 
+        
+  
         l = textwidth(get_prompt(s))
         if !isa(s, LineEdit.SearchState)
             LineEdit.write_prompt(termbuf, mode)
