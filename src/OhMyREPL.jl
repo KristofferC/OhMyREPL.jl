@@ -88,7 +88,7 @@ function __init__()
     options = Base.JLOptions()
     # command-line
     if v"0.5.2" < VERSION < v"0.7-"
-         if (options.eval != C_NULL) || (options.print != C_NULL)
+        if (options.eval != C_NULL) || (options.print != C_NULL)
             return
         end
     else
