@@ -43,7 +43,9 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         # Extract the cursor index in character count
         cursoridx = length(String(buffer(s).data[1:p]))
 
-        l = strwidth(get_prompt(s))
+        
+  
+        l = textwidth(get_prompt(s))
         if !isa(s, LineEdit.SearchState)
             LineEdit.write_prompt(termbuf, mode)
             LineEdit.write(termbuf, "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
@@ -182,8 +184,8 @@ function create_keybindings()
                 oldpos >= sizeof(input) && return
             end
             # Skip over prompt prefix if statement starts with it
-            jl_prompt_len = strwidth(prompt)
-            jl_default_len = strwidth("julia> ")
+            jl_prompt_len = textwidth(prompt)
+            jl_default_len = textwidth("julia> ")
             #if (firstline || isprompt_paste)
             match_default = oldpos + jl_default_len <= sizeof(input) && input[oldpos:oldpos+jl_default_len-1] == "julia> "
             match_prompt =  oldpos + jl_prompt_len  <= sizeof(input) && input[oldpos:oldpos+jl_prompt_len-1] == prompt
@@ -321,8 +323,8 @@ function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
     while moreinput
         l = readline(buf, chomp=false)
         moreinput = endswith(l, "\n")
-        # We need to deal with on-screen characters, so use strwidth to compute occupied columns
-        llength = strwidth(l)
+        # We need to deal with on-screen characters, so use textwidth to compute occupied columns
+        llength = textwidth(l)
         slength = sizeof(l)
         cur_row += 1
         cmove_col(termbuf, lindent + 1)
@@ -332,7 +334,7 @@ function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
             # in this case, we haven't yet written the cursor position
             line_pos -= slength # '\n' gets an extra pos
             if line_pos < 0 || !moreinput
-                num_chars = (line_pos >= 0 ? llength : strwidth(l[1:(line_pos + slength)]))
+                num_chars = (line_pos >= 0 ? llength : textwidth(l[1:(line_pos + slength)]))
                 curs_row, curs_pos = divrem(lindent + num_chars - 1, cols)
                 curs_row += cur_row
                 curs_pos += 1

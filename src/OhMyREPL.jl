@@ -87,8 +87,12 @@ showpasses(io::IO = STDOUT) = Base.show(io, PASS_HANDLER)
 function __init__()
     options = Base.JLOptions()
     # command-line
-    if (options.eval != C_NULL) || (options.print != C_NULL)
-        return
+    if v"0.5.2" < VERSION < v"0.7-"
+        if (options.eval != C_NULL) || (options.print != C_NULL)
+            return
+        end
+    else
+        options.commands != C_NULL && return
     end
 
     if isdefined(Base, :active_repl)
@@ -120,7 +124,7 @@ function __init__()
     mktemp() do file, io
         old_stderr = STDERR
         redirect_stderr(io)
-        Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
+        include(joinpath(@__DIR__, "refresh_lines.jl"))
         include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
         include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
         redirect_stderr(old_stderr)
