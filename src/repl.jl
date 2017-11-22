@@ -20,10 +20,6 @@ using OhMyREPL
 import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
 
-if v"0.5.2" < VERSION < v"0.7-"
-    const textwidth = strwidth
-end
-
 function rewrite_with_ANSI(s, cursormove::Bool = false)
         if isa(s, LineEdit.SearchState)
             return
