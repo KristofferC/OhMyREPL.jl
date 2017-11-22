@@ -2,7 +2,7 @@
 using Crayons
 using Tokenize
 
-import OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
+using OhMyREPL.Passes.SyntaxHighlighter: SYNTAX_HIGHLIGHTER_SETTINGS
 
 HIGHLIGHT_MARKDOWN = Ref(true)
 enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
