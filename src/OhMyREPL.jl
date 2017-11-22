@@ -80,9 +80,7 @@ function test_colorscheme(cs::Passes.SyntaxHighlighter.ColorScheme, str::String 
     return
 end
 
-
 showpasses(io::IO = STDOUT) = Base.show(io, PASS_HANDLER)
-
 
 const HIGHLIGHT_MARKDOWN = Ref(true)
 enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
@@ -90,7 +88,7 @@ enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
 function __init__()
     options = Base.JLOptions()
     # command-line
-    if (options.isinteractive != 1) && ((options.eval != C_NULL) || (options.print != C_NULL))
+    if (options.isinteractive != 1) && options.commands != C_NULL
         return
     end
 
@@ -123,7 +121,7 @@ function __init__()
     mktemp() do file, io
         old_stderr = STDERR
         redirect_stderr(io)
-        Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
+        include(joinpath(@__DIR__, "refresh_lines.jl"))
         include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
         include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
         redirect_stderr(old_stderr)

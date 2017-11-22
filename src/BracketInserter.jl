@@ -99,7 +99,7 @@ function insert_into_keymap!(D::Dict)
             b = buffer(s)
             str = String(take!(copy(b)))
             if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) != 0
-                i = findfirst(left_brackets2, str[prevind(str, position(b) + 1)])
+                i = findfirst(equalto(str[prevind(str, position(b) + 1)]), left_brackets2)
                 if i != 0 && peek(b) == right_brackets2[i]
                     edit_move_right(buffer(s))
                     edit_backspace(buffer(s))
