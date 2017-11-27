@@ -87,7 +87,7 @@ showpasses(io::IO = STDOUT) = Base.show(io, PASS_HANDLER)
 function __init__()
     options = Base.JLOptions()
     # command-line
-    if (options.eval != C_NULL) || (options.print != C_NULL)
+    if (options.isinteractive != 1) && ((options.eval != C_NULL) || (options.print != C_NULL))
         return
     end
 
