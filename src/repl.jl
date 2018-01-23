@@ -341,6 +341,7 @@ function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
                 if curs_pos == cols
                     # only emit the newline if the cursor is at the end of the line we're writing
                     if line_pos == 0
+                        write(termbuf, '\n')
                         cur_row += 1
                     end
                     curs_row += 1
