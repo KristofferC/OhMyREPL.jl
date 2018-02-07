@@ -39,7 +39,7 @@ function Base.Markdown.term(io::IO, md::Base.Markdown.Code, columns)
             SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0)
             buff = IOBuffer()
             if lang == "jldoctest" || lang == "julia-repl"
-                print(buff, Crayon(foreground = :yellow, bold = true), "julia> ", Crayon(reset = true))
+                print(buff, Crayon(foreground = :red, bold = true), "julia> ", Crayon(reset = true))
             end
             for (token, crayon) in zip(tokens, crayons)
                 print(buff, crayon)
