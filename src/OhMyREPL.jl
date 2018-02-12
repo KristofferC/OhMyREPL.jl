@@ -84,6 +84,9 @@ end
 showpasses(io::IO = STDOUT) = Base.show(io, PASS_HANDLER)
 
 
+const HIGHLIGHT_MARKDOWN = Ref(true)
+enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
+
 function __init__()
     options = Base.JLOptions()
     # command-line
