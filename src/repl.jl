@@ -3,19 +3,19 @@
 
 module Prompt
 
-import Base: LineEdit, REPL
+import REPL
+import REPL.LineEdit
+import REPL.Terminals
 
-import Base.LineEdit: buffer, cmove_col, cmove_up, InputAreaState, transition,
+import REPL: respond, return_callback
+import REPL.LineEdit: buffer, cmove_col, cmove_up, InputAreaState, transition,
                       terminal, buffer, on_enter, move_input_end, add_history, state, mode, edit_insert
-import Base.REPL: respond, LatexCompletions, return_callback
 
 import Tokenize.Lexers
 
-import Base.Terminals
-import Base.Terminals: raw!, width, height, cmove, getX,
-                       getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
+import REPL.Terminals: raw!, width, height, cmove, getX, TerminalBuffer,
+                  getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
 
-using Compat
 using OhMyREPL
 import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
@@ -36,15 +36,15 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         end
 
         outbuf = IOBuffer()
-        termbuf = Base.Terminals.TerminalBuffer(outbuf)
+        termbuf = Terminals.TerminalBuffer(outbuf)
         # Hide the cursor
         LineEdit.write(outbuf, "\e[?25l")
         LineEdit.clear_input_area(termbuf, mode)
         # Extract the cursor index in character count
         cursoridx = length(String(buffer(s).data[1:p]))
 
-        
-  
+
+
         l = textwidth(get_prompt(s))
         if !isa(s, LineEdit.SearchState)
             LineEdit.write_prompt(termbuf, mode)
@@ -154,7 +154,7 @@ function create_keybindings()
         sbuffer = LineEdit.buffer(s)
         curspos = position(sbuffer)
         seek(sbuffer, 0)
-        shouldeval = (nb_available(sbuffer) == curspos && search(sbuffer, UInt8('\n')) == 0)
+        shouldeval = (bytesavailable(sbuffer) == curspos && findfirst(equalto(UInt8('\n')), sbuffer) === nothing)
         seek(sbuffer, curspos)
         if curspos == 0
             # if pasting at the beginning, strip leading whitespace
@@ -200,9 +200,7 @@ function create_keybindings()
                 end
                 continue
             end
-            ast, pos = Base.syntax_deprecation_warnings(false) do
-                Base.parse(input, oldpos, raise=false)
-            end
+            ast, pos = Meta.parse(input, oldpos, raise=false, depwarn=false)
             if (isa(ast, Expr) && (ast.head == :erdisable_ror || ast.head == :continue || ast.head == :incomplete)) ||
                     (done(input, pos) && !endswith(input, '\n'))
                 # remaining text is incomplete (an error, or parser ran to the end but didn't stop with a newline):
@@ -314,14 +312,14 @@ function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
     line_pos = buf_pos
 
     # Count the '\n' at the end of the line if the terminal emulator does (specific to DOS cmd prompt)
-    miscountnl = Compat.Sys.iswindows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
+    miscountnl = @static Sys.iswindows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
     lindent = promptlength
     indent = promptlength # TODO this gets the cursor right but not the text
     # Now go through the buffer line by line
     seek(buf, 0)
     moreinput = true # add a blank line if there is a trailing newline on the last line
     while moreinput
-        l = readline(buf, chomp=false)
+        l = readline(buf, keep=true)
         moreinput = endswith(l, "\n")
         # We need to deal with on-screen characters, so use textwidth to compute occupied columns
         llength = textwidth(l)
@@ -334,7 +332,7 @@ function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
             # in this case, we haven't yet written the cursor position
             line_pos -= slength # '\n' gets an extra pos
             if line_pos < 0 || !moreinput
-                num_chars = (line_pos >= 0 ? llength : textwidth(l[1:(line_pos + slength)]))
+                num_chars = (line_pos >= 0 ? llength : textwidth(l[1:prevind(l, line_pos + slength + 1)]))
                 curs_row, curs_pos = divrem(lindent + num_chars - 1, cols)
                 curs_row += cur_row
                 curs_pos += 1

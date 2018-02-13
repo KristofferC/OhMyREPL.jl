@@ -9,10 +9,11 @@ mutable struct BracketInserterSettings
     complete_brackets::Bool
 end
 
-import Base.LineEdit: edit_insert, edit_move_left, edit_move_right, buffer, char_move_left,
+import REPL
+import REPL.LineEdit: edit_insert, edit_move_left, edit_move_right, buffer, char_move_left,
                       edit_backspace, terminal, transition, state
 
-import Base.Terminals.beep
+import REPL.Terminals.beep
 import OhMyREPL.Prompt.rewrite_with_ANSI
 
 const BRACKET_INSERTER = BracketInserterSettings(true)
@@ -98,9 +99,9 @@ function insert_into_keymap!(D::Dict)
         else
             b = buffer(s)
             str = String(take!(copy(b)))
-            if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) != 0
+            if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) != nothing
                 i = findfirst(equalto(str[prevind(str, position(b) + 1)]), left_brackets2)
-                if i != 0 && peek(b) == right_brackets2[i]
+                if i != nothing && peek(b) == right_brackets2[i]
                     edit_move_right(buffer(s))
                     edit_backspace(buffer(s))
                     edit_backspace(buffer(s))

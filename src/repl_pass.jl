@@ -1,5 +1,6 @@
 import Tokenize:Tokens, Lexers
 import Tokenize.Tokens: Token, kind, untokenize
+using Printf
 
 const RESET = Crayon(reset = true)
 

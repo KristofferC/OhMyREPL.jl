@@ -1,4 +1,6 @@
-function Base.LineEdit.refresh_line(s)
-    Base.LineEdit.refresh_multi_line(s)
+import REPL.LineEdit
+
+function LineEdit.refresh_line(s)
+    LineEdit.refresh_multi_line(s)
     OhMyREPL.Prompt.rewrite_with_ANSI(s)
 end
