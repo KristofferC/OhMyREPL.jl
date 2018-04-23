@@ -2,7 +2,7 @@ module SyntaxHighlighter
 
 using Tokenize
 using Tokenize.Tokens
-import Tokenize.Tokens: Token, kind, exactkind, iskeyword
+import Tokenize.Tokens: Token, kind, exactkind, iskeyword, untokenize
 
 using Crayons
 using Compat
@@ -147,7 +147,7 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
             crayons[i-1] = cscheme._macro
             crayons[i] = cscheme._macro
         # 2] = 32.32
-        elseif kind(t) == Tokens.INTEGER || kind(t) == Tokens.FLOAT
+    elseif (kind(t) == Tokens.INTEGER || kind(t) == Tokens.FLOAT) || (kind(t) == Tokens.IDENTIFIER && untokenize(t) == "NaN")
             crayons[i] = cscheme.number
         elseif kind(t) == Tokens.WHITESPACE
             crayons[i] = Crayon()
