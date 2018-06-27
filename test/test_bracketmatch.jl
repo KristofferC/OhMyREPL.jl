@@ -1,6 +1,6 @@
 module TestBracketHighlighter
 
-using Base.Test
+using Test
 using OhMyREPL
 using Tokenize
 

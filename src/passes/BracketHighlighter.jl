@@ -55,9 +55,9 @@ function bracket_match(tokens::Vector{Token}, cursoridx::Int)
     for idx in enclosing_token_idx:-1:0
         idx == 0 && return 0, 0, false
         token = tokens[idx]
-        (i = findfirst(equalto(kind(token)), RIGHT_DELIMS)) != nothing && (counts[i] -= 1)
+        (i = findfirst(isequal(kind(token)), RIGHT_DELIMS)) != nothing && (counts[i] -= 1)
 
-        if (i = findfirst(equalto(kind(token)), LEFT_DELIMS)) != nothing
+        if (i = findfirst(isequal(kind(token)), LEFT_DELIMS)) != nothing
             if counts[i] == 0
                 left_match = i
                 left_idx = idx
