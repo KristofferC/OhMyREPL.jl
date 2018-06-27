@@ -33,7 +33,7 @@ function peek(b::IOBuffer)
     return c
 end
 
-AUTOMATIC_BRACKET_MATCH = Ref(true)
+const AUTOMATIC_BRACKET_MATCH = Ref(!Sys.iswindows())
 enable_autocomplete_brackets(v::Bool) = AUTOMATIC_BRACKET_MATCH[] = v
 
 const pkgmode = Ref{Any}()
