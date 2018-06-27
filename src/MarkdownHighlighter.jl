@@ -1,11 +1,12 @@
 
 using Crayons
 using Tokenize
+import Markdown
 
-import OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
-import OhMyREPL.HIGHLIGHT_MARKDOWN
+import .OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
+import .OhMyREPL.HIGHLIGHT_MARKDOWN
 
-function Base.Markdown.term(io::IO, md::Base.Markdown.Code, columns)
+function Markdown.term(io::IO, md::Markdown.Code, columns)
     code = md.code
     # Want to remove potential.
     lang = md.language == "" ? "" : first(split(md.language))
@@ -16,11 +17,11 @@ function Base.Markdown.term(io::IO, md::Base.Markdown.Code, columns)
         do_syntax = true
         code_blocks = split("\n" * code, "\njulia> ")
         for codeblock in code_blocks[2:end] #
-            expr, pos = parse(codeblock, 1, raise = false);
+            expr, pos = Meta.parse(codeblock, 1, raise = false);
             sourcecode, output = if pos > length(codeblock)
                 codeblock, ""
             else
-                ind = Base.chr2ind(codeblock, pos)
+                ind = Base.nextind(codeblock, 0, pos)
                 codeblock[1:ind-1], codeblock[ind:end]
             end
             push!(sourcecodes, string(sourcecode))
@@ -49,15 +50,15 @@ function Base.Markdown.term(io::IO, md::Base.Markdown.Code, columns)
             print(buff, output)
 
             str = String(take!(buff))
-            for line in Base.Markdown.lines(str)
-                print(io, " "^Base.Markdown.margin)
+            for line in Markdown.lines(str)
+                print(io, " "^Markdown.margin)
                 println(io, line)
             end
         end
     else
-        Base.Markdown.with_output_format(:cyan, io) do io
-            for line in Base.Markdown.lines(md.code)
-                print(io, " "^Base.Markdown.margin)
+        Markdown.with_output_format(:cyan, io) do io
+            for line in Markdown.lines(md.code)
+                print(io, " "^Markdown.margin)
                 println(io, line)
             end
         end

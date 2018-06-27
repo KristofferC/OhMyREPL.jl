@@ -1,7 +1,6 @@
 module RainbowBrackets
 
 using Crayons
-using Compat
 using Tokenize
 using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
@@ -50,7 +49,7 @@ const RAINBOW_TOKENS_256 =
                          [Crayon(foreground = 223), Crayon(foreground = 130), Crayon(foreground = 202)],
                           Crayon(foreground = 196, bold = true))
 
-const RAINBOWBRACKETS_SETTINGS = RainbowBracketsSettings(RAINBOW_TOKENS_256, RAINBOW_TOKENS_16, Compat.Sys.iswindows() ? RAINBOW_TOKENS_16 : RAINBOW_TOKENS_256)
+const RAINBOWBRACKETS_SETTINGS = RainbowBracketsSettings(RAINBOW_TOKENS_256, RAINBOW_TOKENS_16, Sys.iswindows() ? RAINBOW_TOKENS_16 : RAINBOW_TOKENS_256)
 
 
 function (rainbow::RainbowBracketsSettings)(ansitokens::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)

@@ -1,6 +1,6 @@
 module CustomPassTest
 
-using Base.Test
+using Test
 using OhMyREPL
 using Tokenize
 using Crayons

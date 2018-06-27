@@ -1,4 +1,4 @@
-    __precompile__()
+__precompile__()
 """
 A package that provides a new REPL that has syntax highlighting,
 bracket matching and other nifty features.
@@ -18,15 +18,6 @@ include("BracketInserter.jl")
 include("prompt.jl")
 
 import .BracketInserter.enable_autocomplete_brackets
-
-
-# Some backward compatability
-module ANSICodes
-    using Crayons
-    const ANSIToken = Crayon
-end
-
-export ANSITokens
 
 function colorscheme!(name::String)
     Passes.SyntaxHighlighter.activate!(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS,
@@ -80,9 +71,7 @@ function test_colorscheme(cs::Passes.SyntaxHighlighter.ColorScheme, str::String 
     return
 end
 
-
-showpasses(io::IO = STDOUT) = Base.show(io, PASS_HANDLER)
-
+showpasses(io::IO = stdout) = Base.show(io, PASS_HANDLER)
 
 const HIGHLIGHT_MARKDOWN = Ref(true)
 enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
@@ -90,7 +79,7 @@ enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
 function __init__()
     options = Base.JLOptions()
     # command-line
-    if (options.isinteractive != 1) && ((options.eval != C_NULL) || (options.print != C_NULL))
+    if (options.isinteractive != 1) && options.commands != C_NULL
         return
     end
 
@@ -98,7 +87,7 @@ function __init__()
         Prompt.insert_keybindings()
     else
         atreplinit() do repl
-            repl.interface = Base.REPL.setup_interface(repl)
+            repl.interface = REPL.setup_interface(repl)
             Prompt.insert_keybindings()
             update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
@@ -107,33 +96,23 @@ function __init__()
             d = Dict(
             # Up Arrow
             "\e[A" => (s,o...)-> begin
-                Base.LineEdit.edit_move_up(s) || Base.LineEdit.enter_prefix_search(s, p, true)
+                REPL.LineEdit.edit_move_up(s) || LineEdit.enter_prefix_search(s, p, true)
                 Prompt.rewrite_with_ANSI(s)
             end,
             # Down Arrow
             "\e[B" => (s,o...)-> begin
-                 Base.LineEdit.edit_move_down(s) || Base.LineEdit.enter_prefix_search(s, p, false)
+                 REPL.LineEdit.edit_move_down(s) || LineEdit.enter_prefix_search(s, p, false)
                  Prompt.rewrite_with_ANSI(s)
             end
             )
-            main_mode.keymap_dict = Base.LineEdit.keymap([d, main_mode.keymap_dict])
+            main_mode.keymap_dict = LineEdit.keymap([d, main_mode.keymap_dict])
         end
     end
 
-    mktemp() do file, io
-        old_stderr = STDERR
-        redirect_stderr(io)
-        Base.LineEdit.refresh_line(s) = (Base.LineEdit.refresh_multi_line(s); OhMyREPL.Prompt.rewrite_with_ANSI(s))
+    if ccall(:jl_generating_output, Cint, ()) == 0
+        include(joinpath(@__DIR__, "refresh_lines.jl"))
         include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
         include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
-        redirect_stderr(old_stderr)
-        seek(io, 0)
-        for line in eachline(io)
-            if !ismatch(Regex("^WARNING: Method definition [refresh_line|display|term]" *
-                    ".* overwritten in module .* at $(escape_string(@__DIR__)).*\$"), line)
-                println(line)
-            end
-        end
     end
 end
 
