@@ -5,7 +5,6 @@ using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, exactkind, iskeyword, untokenize
 
 using Crayons
-using Compat
 
 import OhMyREPL: add_pass!, PASS_HANDLER
 
@@ -38,7 +37,7 @@ macro!(cs, crayon::Crayon) = cs._macro = crayon
 number!(cs, crayon::Crayon) = cs.number = crayon
 
 function Base.show(io::IO, cs::ColorScheme)
-    for n in fieldnames(cs)
+    for n in fieldnames(ColorScheme)
         crayon = getfield(cs, n)
         print(io, crayon, "█ ", inv(crayon))
     end
@@ -89,11 +88,10 @@ add!(SYNTAX_HIGHLIGHTER_SETTINGS, "TomorrowNightBright24bit", _create_tomorrow_n
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Tomorrow24bit", _create_tomorrow_24())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Tomorrow", _create_tomorrow_256())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Distinguished", _create_distinguished())
-
 # Added by default
 # add!(SYNTAX_HIGHLIGHTER_SETTINGS, "JuliaDefault", _create_juliadefault())
 
-if !Compat.Sys.iswindows()
+if !Sys.iswindows()
     activate!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai256")
 else
     activate!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai16")

@@ -9,10 +9,12 @@ mutable struct BracketInserterSettings
     complete_brackets::Bool
 end
 
-import Base.LineEdit: edit_insert, edit_move_left, edit_move_right, buffer, char_move_left,
+import REPL
+import REPL.LineEdit
+import REPL.LineEdit: edit_insert, edit_move_left, edit_move_right, buffer, char_move_left,
                       edit_backspace, terminal, transition, state
 
-import Base.Terminals.beep
+import REPL.Terminals.beep
 import OhMyREPL.Prompt.rewrite_with_ANSI
 
 const BRACKET_INSERTER = BracketInserterSettings(true)
@@ -31,9 +33,11 @@ function peek(b::IOBuffer)
     return c
 end
 
-AUTOMATIC_BRACKET_MATCH = Ref(true)
+const AUTOMATIC_BRACKET_MATCH = Ref(!Sys.iswindows())
 enable_autocomplete_brackets(v::Bool) = AUTOMATIC_BRACKET_MATCH[] = v
 
+const pkgmode = Ref{Any}()
+import Pkg
 function insert_into_keymap!(D::Dict)
     left_brackets = ['(', '{', '[']
     right_brackets = [')', '}', ']']
@@ -59,6 +63,36 @@ function insert_into_keymap!(D::Dict)
                 edit_insert(buffer(s), r)
             end
             rewrite_with_ANSI(s)
+        end
+    end
+
+    f = D[']']
+    D[']'] = (s, o...) -> begin
+        if isempty(s) || position(LineEdit.buffer(s)) == 0
+            if !isassigned(pkgmode)
+                found_pkg = false
+                for mode in Base.active_repl.interface.modes
+                    if mode isa LineEdit.Prompt
+                        if mode.prompt == Pkg.REPLMode.promptf
+                            found_pkg = true
+                            pkgmode[] = mode
+                        end
+                    end
+                end
+                if !found_pkg
+                    pkgmode[] = nothing
+                end
+            end
+            if pkgmode[] !== nothing
+                buf = copy(LineEdit.buffer(s))
+                transition(s, pkgmode[]) do
+                    LineEdit.state(s, pkgmode[]).input_buffer = buf
+                end
+            else
+                f(s, o...)
+            end
+        else
+            f(s, o...)
         end
     end
 
@@ -98,9 +132,9 @@ function insert_into_keymap!(D::Dict)
         else
             b = buffer(s)
             str = String(take!(copy(b)))
-            if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) != 0
-                i = findfirst(left_brackets2, str[prevind(str, position(b) + 1)])
-                if i != 0 && peek(b) == right_brackets2[i]
+            if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) != nothing
+                i = findfirst(isequal(str[prevind(str, position(b) + 1)]), left_brackets2)
+                if i != nothing && peek(b) == right_brackets2[i]
                     edit_move_right(buffer(s))
                     edit_backspace(buffer(s))
                     edit_backspace(buffer(s))

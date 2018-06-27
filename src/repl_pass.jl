@@ -1,5 +1,6 @@
 import Tokenize:Tokens, Lexers
 import Tokenize.Tokens: Token, kind, untokenize
+using Printf
 
 const RESET = Crayon(reset = true)
 
@@ -27,7 +28,7 @@ function test_pass(io::IO, f, str::Union{String, IO}, cursorpos::Int = 1, cursor
 end
 
 test_pass(f, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
-        test_pass(STDOUT, f, str, cursorpos, cursormovement)
+        test_pass(stdout, f, str, cursorpos, cursormovement)
 
 function test_passes(io::IO, rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false)
     b = IOBuffer()
@@ -37,7 +38,7 @@ function test_passes(io::IO, rpc::PassHandler, str::Union{String, IOBuffer}, cur
 end
 
 test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
-    test_passes(STDOUT, rpc, str, cursorpos, cursormovement)
+    test_passes(stdout, rpc, str, cursorpos, cursormovement)
 
 function untokenize_with_ANSI(io::IO, crayons::Vector{Crayon}, tokens::Vector{Token}, indent = 7)
     @assert length(tokens) == length(crayons)
@@ -54,7 +55,7 @@ function untokenize_with_ANSI(io::IO, crayons::Vector{Crayon}, tokens::Vector{To
 end
 untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}, indent = 7) = untokenize_with_ANSI(io, rpc.accum_crayons, tokens, indent)
 untokenize_with_ANSI(crayons::Vector{Crayon}, tokens::Vector{Token}, indent = 7) =
-    untokenize_with_ANSI(STDOUT, crayons, tokens, indent)
+    untokenize_with_ANSI(stdout, crayons, tokens, indent)
 
 function merge!(t1::Vector{Crayon}, t2::Vector{Crayon})
     @assert length(t1) == length(t2)

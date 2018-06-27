@@ -5,16 +5,12 @@ os:
   - linux
   - osx
 julia:
-  - 0.6
+  - 0.7
   - nightly
-
-matrix:
-  allow_failures:
-    - julia: nightly
 
 notifications:
   email: false
-
+script:
+  - julia -e 'import Pkg; Pkg.build(); Pkg.test(; coverage=true)'
 after_success:
-  - julia -e 'Pkg.add("Documenter")'
-  - julia -e 'cd(Pkg.dir("OhMyREPL")); include(joinpath("docs", "make.jl"))'
+  - julia -e 'Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'

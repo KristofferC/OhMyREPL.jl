@@ -3,19 +3,19 @@
 
 module Prompt
 
-import Base: LineEdit, REPL
+import REPL
+import REPL.LineEdit
+import REPL.Terminals
 
-import Base.LineEdit: buffer, cmove_col, cmove_up, InputAreaState, transition,
+import REPL: respond, return_callback
+import REPL.LineEdit: buffer, cmove_col, cmove_up, InputAreaState, transition,
                       terminal, buffer, on_enter, move_input_end, add_history, state, mode, edit_insert
-import Base.REPL: respond, LatexCompletions, return_callback
 
 import Tokenize.Lexers
 
-import Base.Terminals
-import Base.Terminals: raw!, width, height, cmove, getX,
-                       getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
+import REPL.Terminals: raw!, width, height, cmove, getX, TerminalBuffer,
+                  getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
 
-using Compat
 using OhMyREPL
 import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
@@ -36,14 +36,16 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         end
 
         outbuf = IOBuffer()
-        termbuf = Base.Terminals.TerminalBuffer(outbuf)
+        termbuf = Terminals.TerminalBuffer(outbuf)
         # Hide the cursor
         LineEdit.write(outbuf, "\e[?25l")
         LineEdit.clear_input_area(termbuf, mode)
         # Extract the cursor index in character count
         cursoridx = length(String(buffer(s).data[1:p]))
 
-        l = strwidth(get_prompt(s))
+
+
+        l = textwidth(get_prompt(s))
         if !isa(s, LineEdit.SearchState)
             LineEdit.write_prompt(termbuf, mode)
             LineEdit.write(termbuf, "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
@@ -137,6 +139,7 @@ function create_keybindings()
     D["^C"] = (s, data, c) -> begin
         try # raise the debugger if present
             ccall(:jl_raise_debugger, Int, ())
+        catch
         end
         move_input_end(s)
         rewrite_with_ANSI(s)
@@ -152,7 +155,7 @@ function create_keybindings()
         sbuffer = LineEdit.buffer(s)
         curspos = position(sbuffer)
         seek(sbuffer, 0)
-        shouldeval = (nb_available(sbuffer) == curspos && search(sbuffer, UInt8('\n')) == 0)
+        shouldeval = (bytesavailable(sbuffer) == curspos && !occursin(UInt8('\n'), sbuffer))
         seek(sbuffer, curspos)
         if curspos == 0
             # if pasting at the beginning, strip leading whitespace
@@ -166,25 +169,23 @@ function create_keybindings()
             rewrite_with_ANSI(s)
             return
         end
+        LineEdit.push_undo(s)
         edit_insert(sbuffer, input)
         input = String(take!(sbuffer))
-        oldpos = start(input)
+        oldpos = firstindex(input)
         firstline = true
         isprompt_paste = false
         prompt = get_prompt(s)
-        while !done(input, oldpos) # loop until all lines have been executed
-            # 17599
+        while oldpos <= lastindex(input) # loop until all lines have been executed
             # Check if the next statement starts with "julia> ", in that case
             # skip it. But first skip whitespace
-            while (input[oldpos] == '\n' || input[oldpos] == ' ' || input[oldpos] == '\t')
+            while input[oldpos] in ('\n', ' ', '\t')
                 oldpos = nextind(input, oldpos)
-                # Hit end of input while removing whitespace => we are done here
                 oldpos >= sizeof(input) && return
             end
             # Skip over prompt prefix if statement starts with it
-            jl_prompt_len = strwidth(prompt)
-            jl_default_len = strwidth("julia> ")
-            #if (firstline || isprompt_paste)
+            jl_prompt_len = textwidth(prompt)
+            jl_default_len = textwidth("julia> ")
             match_default = oldpos + jl_default_len <= sizeof(input) && input[oldpos:oldpos+jl_default_len-1] == "julia> "
             match_prompt =  oldpos + jl_prompt_len  <= sizeof(input) && input[oldpos:oldpos+jl_prompt_len-1] == prompt
             if (firstline || isprompt_paste) && (match_default || match_prompt)
@@ -198,11 +199,9 @@ function create_keybindings()
                 end
                 continue
             end
-            ast, pos = Base.syntax_deprecation_warnings(false) do
-                Base.parse(input, oldpos, raise=false)
-            end
-            if (isa(ast, Expr) && (ast.head == :erdisable_ror || ast.head == :continue || ast.head == :incomplete)) ||
-                    (done(input, pos) && !endswith(input, '\n'))
+            ast, pos = Meta.parse(input, oldpos, raise=false, depwarn=false)
+            if (isa(ast, Expr) && (ast.head == :error || ast.head == :continue || ast.head == :incomplete)) ||
+                    (pos > ncodeunits(input) && !endswith(input, '\n'))
                 # remaining text is incomplete (an error, or parser ran to the end but didn't stop with a newline):
                 # Insert all the remaining text as one line (might be empty)
                 tail = input[oldpos:end]
@@ -211,13 +210,19 @@ function create_keybindings()
                     # (avoids modifying the user's current leading wip line)
                     tail = lstrip(tail)
                 end
-                LineEdit.replace_line(s, tail)
+                if isprompt_paste # remove indentation spaces corresponding to the prompt
+                    tail = replace(tail, r"^ {7}"m => "") # 7: jl_prompt_len
+                end
+                LineEdit.replace_line(s, tail, true)
                 rewrite_with_ANSI(s)
                 break
             end
             # get the line and strip leading and trailing whitespace
             line = strip(input[oldpos:prevind(input, pos)])
             if !isempty(line)
+                if isprompt_paste # remove indentation spaces corresponding to the prompt
+                    line = replace(line, r"^ {7}"m => "") # 7: jl_prompt_len
+                end
                 # put the line on the screen and history
                 LineEdit.replace_line(s, line)
                 _commit_line(s, data, c)
@@ -226,6 +231,7 @@ function create_keybindings()
                 raw!(terminal, false) && disable_bracketed_paste(terminal)
                 LineEdit.mode(s).on_done(s, LineEdit.buffer(s), true)
                 raw!(terminal, true) && enable_bracketed_paste(terminal)
+                LineEdit.push_undo(s) # when the last line is incomplete
             end
             oldpos = pos
             firstline = false
@@ -259,7 +265,7 @@ function create_keybindings()
 end
 NEW_KEYBINDINGS = create_keybindings()
 
-
+import Pkg
 function insert_keybindings(repl = Base.active_repl)
     mirepl = isdefined(repl,:mi) ? repl.mi : repl
     main_mode = mirepl.interface.modes[1]
@@ -274,6 +280,8 @@ function insert_keybindings(repl = Base.active_repl)
         LineEdit.edit_move_down(buffer(s)) || LineEdit.enter_prefix_search(s, p, false)
         Prompt.rewrite_with_ANSI(s)
     end
+
+
 
     main_mode.keymap_dict = LineEdit.keymap([NEW_KEYBINDINGS, main_mode.keymap_dict])
 end
@@ -312,17 +320,17 @@ function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
     line_pos = buf_pos
 
     # Count the '\n' at the end of the line if the terminal emulator does (specific to DOS cmd prompt)
-    miscountnl = Compat.Sys.iswindows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
+    miscountnl = @static Sys.iswindows() ? (isa(Terminals.pipe_reader(terminal), Base.TTY) && !Base.ispty(Terminals.pipe_reader(terminal))) : false
     lindent = promptlength
     indent = promptlength # TODO this gets the cursor right but not the text
     # Now go through the buffer line by line
     seek(buf, 0)
     moreinput = true # add a blank line if there is a trailing newline on the last line
     while moreinput
-        l = readline(buf, chomp=false)
+        l = readline(buf, keep=true)
         moreinput = endswith(l, "\n")
-        # We need to deal with on-screen characters, so use strwidth to compute occupied columns
-        llength = strwidth(l)
+        # We need to deal with on-screen characters, so use textwidth to compute occupied columns
+        llength = textwidth(l)
         slength = sizeof(l)
         cur_row += 1
         cmove_col(termbuf, lindent + 1)
@@ -332,7 +340,7 @@ function refresh_multi_line(termbuf, terminal, buf, state, promptlength)
             # in this case, we haven't yet written the cursor position
             line_pos -= slength # '\n' gets an extra pos
             if line_pos < 0 || !moreinput
-                num_chars = (line_pos >= 0 ? llength : strwidth(l[1:(line_pos + slength)]))
+                num_chars = (line_pos >= 0 ? llength : textwidth(l[1:prevind(l, line_pos + slength + 1)]))
                 curs_row, curs_pos = divrem(lindent + num_chars - 1, cols)
                 curs_row += cur_row
                 curs_pos += 1

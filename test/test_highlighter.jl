@@ -1,6 +1,6 @@
 module TestSyntaxHighlighter
 
-using Base.Test
+using Test
 
 using OhMyREPL
 import  OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS

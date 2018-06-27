@@ -18,6 +18,6 @@ global OUTPUT_PROMPT = ""
 
 function output_prompt!(s::String, col = :red)
     global OUTPUT_PROMPT
-    OUTPUT_PROMPT = string("\e[1m", get(Base.text_colors, Symbol(col), "red"), s, "\e[0m", " ")
+    OUTPUT_PROMPT = string("\e[1m", get(Base.text_colors, Symbol(col), Base.text_colors[:red]), s, "\e[0m", " ")
     return
 end
