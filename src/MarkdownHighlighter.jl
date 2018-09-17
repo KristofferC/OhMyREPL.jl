@@ -56,7 +56,7 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
             end
         end
     else
-        Markdown.with_output_format(:cyan, io) do io
+        Base.with_output_color(:cyan, io) do io
             for line in Markdown.lines(md.code)
                 print(io, " "^Markdown.margin)
                 println(io, line)
