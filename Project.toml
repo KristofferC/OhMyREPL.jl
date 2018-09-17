@@ -15,6 +15,9 @@ Crayons = "1.0"
 Tokenize = "0.5"
 VT100 = "0.3"
 
-[target.test.deps]
+[extra]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 VT100 = "7774df62-37c0-5c21-b34d-f6d7f98f54bc"
+
+[targets]
+test = ["Test", "VT100"]
