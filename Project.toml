@@ -11,7 +11,7 @@ REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 Tokenize = "0796e94c-ce3b-5d07-9a54-7f471281c624"
 
 [compat]
-Crayons = "0.5"
+Crayons = "1.0"
 Tokenize = "0.5"
 VT100 = "0.3"
 
