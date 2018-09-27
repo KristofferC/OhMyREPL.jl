@@ -1,6 +1,11 @@
 The OhMyREPL.jl package is licensed under the MIT "Expat" License:
 
-> Copyright (c) 2016: Kristoffer Carlsson.
+
+> Copyright (c) 2016-2018: Kristoffer Carlsson, and other contributors: https://github.com/KristofferC/OhMyREPL.jl/contributors
+>
+> Some parts based on: 
+>  - The Julia Logging standard library: Copyright (c) 2009-2018: Jeff Bezanson, Stefan Karpinski, Viral B. Shah, and other contributors: https://github.com/JuliaLang/julia/contributors
+>  - ProgressMeter.jl: Copyright (c) 2013 Timothy E. Holy
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal

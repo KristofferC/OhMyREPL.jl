@@ -19,6 +19,12 @@ include("prompt.jl")
 
 import .BracketInserter.enable_autocomplete_brackets
 
+
+include("OhMyREPL.jl")
+using OhMyREPL
+
+
+
 function colorscheme!(name::String)
     Passes.SyntaxHighlighter.activate!(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS,
                                        name)
