@@ -21,6 +21,7 @@ include("prompt.jl")
 import .BracketInserter.enable_autocomplete_brackets
 
 include("overprint.jl")
+include("progress.jl")
 include("logger_core.jl")
 
 
