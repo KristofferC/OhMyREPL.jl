@@ -1,3 +1,10 @@
+using Base.CoreLogging: LogLevel, AbstractLogger,
+    BelowMinLevel, Debug, Info, Warn, Error, AboveMaxLevel
+
+import Base.CoreLogging: handle_message, shouldlog, min_enabled_level, catch_exceptions
+
+using Logging: default_metafmt, termlength
+
 
 """
     OhMyLogger(stream=stderr, min_level=Info; meta_formatter=default_metafmt,
@@ -53,43 +60,6 @@ function showvalue(io, e::Tuple{Exception,Any})
     showerror(io, ex, bt; backtrace = bt!=nothing)
 end
 showvalue(io, ex::Exception) = showerror(io, ex)
-
-function default_logcolor(level)
-    level < Info  ? Base.debug_color() :
-    level < Warn  ? Base.info_color()  :
-    level < Error ? Base.warn_color()  :
-                    Base.error_color()
-end
-
-function default_metafmt(level, _module, group, id, file, line)
-    color = default_logcolor(level)
-    prefix = (level == Warn ? "Warning" : string(level))*':'
-    mod = _module === nothing ? "" : "$(_module) "
-    suffix = (Info <= level < Warn) ? "" : "@ $mod$(basename(file)):$line"
-    color,prefix,suffix
-end
-
-# Length of a string as it will appear in the terminal (after ANSI color codes
-# are removed)
-function termlength(str)
-    N = 0
-    in_esc = false
-    for c in str
-        if in_esc
-            if c == 'm'
-                in_esc = false
-            end
-        else
-            if c == '\e'
-                in_esc = true
-            else
-                N += 1
-            end
-        end
-    end
-    return N
-end
-
 
 
 
