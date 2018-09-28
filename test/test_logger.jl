@@ -1,4 +1,4 @@
-using OhMyLog
+using OhMyREPL
 using Test
 
 @testset "overwriting" begin
