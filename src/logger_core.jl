@@ -146,7 +146,7 @@ end
 function handle_message(logger::OhMyLogger, level, message, _module, group, id,
                         filepath, line; maxlog=nothing, overwrite_lastlog=nothing,
                         kwargs...)
-    id = Symbol(filepath, "#", line,'#', message)  # HACK around https://github.com/JuliaLang/julia/issues/29227
+    id = Symbol(filepath, "#", line)  # HACK around https://github.com/JuliaLang/julia/issues/29227
     prev_id = logger.last_message_id[]
     if overwrite_lastlog == nothing
         # default to only overwrite if same source
