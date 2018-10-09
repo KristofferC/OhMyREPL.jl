@@ -4,20 +4,20 @@ using Test
 @testset "overwriting" begin
     @testset "force overwrite" begin
         @info "A"^8 overwrite_lastlog=true
-        sleep(0.5)
+        sleep(0.2)
         @info "B"^8 overwrite_lastlog=true
-        sleep(0.5)
+        sleep(0.2)
         @info "C"^8 overwrite_lastlog=true
-        sleep(0.5)
+        sleep(0.2)
         @info "D"^8 overwrite_lastlog=true
-        sleep(0.5)
+        sleep(0.2)
         @info "E"^8 overwrite_lastlog=true
-        sleep(0.5)
+        sleep(0.2)
 
         @info "F"^3 n=2 overwrite_lastlog=true 
-        sleep(0.5)
+        sleep(0.2)
         @info "G"^3 n=3 m=3  overwrite_lastlog=true 
-         sleep(0.5)
+         sleep(0.2)
         @info "H"^3  overwrite_lastlog=true 
 
 
@@ -26,12 +26,12 @@ using Test
     @testset "repeat overwrite" begin
         for ii in 1:10
             @info "Should Overwrite1" ii
-            sleep(0.5)
+            sleep(0.2)
         end
         
         for ii in 1:10
             @info "Should Overwrite2 (but not first)" ii doubleii=2ii
-            sleep(0.5)
+            sleep(0.2)
         end
     end
 
@@ -39,7 +39,7 @@ using Test
     @testset "don't repeat overwrite" begin
         for ii in 1:10
             @info "Should not overwrite" ii overwrite_lastlog=false
-            sleep(0.5)
+            sleep(0.2)
         end
     end
 end
@@ -66,7 +66,7 @@ end
     @testset "loop" begin
         for ii in 1:100
             @info "loop" ii progress=ii/100 half="$(ii/2)%"
-            sleep(0.1)
+            sleep(0.02)
         end
     end
 
