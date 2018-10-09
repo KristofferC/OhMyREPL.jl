@@ -5,6 +5,7 @@ To prevent the console overflowing with log messages being output by a message b
 OhMyREPL will automatically overwrite the previous message if it comes from the same source.
 
 Shown below is only the last message from a loop, as the others have been overwritten:
+
 ![Overwritten logs](logging_overwrite.PNG)
 
 This behaviour can be overriden by passing the `overwrite_lastlog` to the logging command (`@info`/`@warn`/etc.)
