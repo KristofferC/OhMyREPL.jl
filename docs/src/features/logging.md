@@ -1,4 +1,3 @@
-T
 # Console Logging
 
 ## Log Message Overwriting
