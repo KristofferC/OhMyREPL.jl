@@ -13,7 +13,8 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
     outputs = String[]
     sourcecodes = String[]
     do_syntax = false
-    if lang == "jldoctest" || lang == "julia-repl"
+    # e.g. md.language = "jldoctest; filter = r\"[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}\""
+    if occursin(r"jldoctest;?", "jldoctest") || lang == "julia-repl"
         do_syntax = true
         code_blocks = split("\n" * code, "\njulia> ")
         for codeblock in code_blocks[2:end] #
