@@ -5,6 +5,7 @@ bracket matching and other nifty features.
 """
 module OhMyREPL
 
+using Base.CoreLogging: global_logger
 using Tokenize
 using Crayons
 
@@ -18,6 +19,11 @@ include("BracketInserter.jl")
 include("prompt.jl")
 
 import .BracketInserter.enable_autocomplete_brackets
+
+include("overprint.jl")
+include("progress.jl")
+include("logger_core.jl")
+
 
 function colorscheme!(name::String)
     Passes.SyntaxHighlighter.activate!(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS,
@@ -76,13 +82,27 @@ showpasses(io::IO = stdout) = Base.show(io, PASS_HANDLER)
 const HIGHLIGHT_MARKDOWN = Ref(true)
 enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
 
+
+
+
 function __init__()
     options = Base.JLOptions()
-    # command-line
+    # command-line -- do not activate OhMyREPL functionality
     if (options.isinteractive != 1) && options.commands != C_NULL
         return
     end
 
+
+    # Set up the logger
+    global_logger(OhMyLogger(stderr))
+    atexit() do
+        logger = global_logger()
+        if logger isa OhMyLogger
+            global_logger(OhMyLogger(Core.stderr, min_enabled_level(logger)))
+        end
+    end
+
+    # Setup REPL functionality
     if isdefined(Base, :active_repl)
         Prompt.insert_keybindings()
     else
