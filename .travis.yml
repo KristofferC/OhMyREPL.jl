@@ -13,4 +13,4 @@ notifications:
 script:
   - julia -e 'import Pkg; Pkg.build(); Pkg.test(; coverage=true)'
 after_success:
-  - julia -e 'Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'
+  - julia -e 'using Pkg; ps=PackageSpec(name="Documenter", version="0.19"); Pkg.add(ps); Pkg.pin(ps); include(joinpath("docs", "make.jl"))'
