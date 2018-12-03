@@ -149,8 +149,14 @@ function handle_message(logger::OhMyLogger, level, message, _module, group, id,
     id = Symbol(filepath, "#", line)  # HACK around https://github.com/JuliaLang/julia/issues/29227
     prev_id = logger.last_message_id[]
     if overwrite_lastlog == nothing
+        # disable automatic overwriting until #141 is resolved.
+        overwrite_lastlog = false
+        
+        # Should be doing:
         # default to only overwrite if same source
-        overwrite_lastlog = id == prev_id
+        # overwrite_lastlog = id == prev_id
+        
+        
     end
 
     if maxlog != nothing && maxlog isa Integer
