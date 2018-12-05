@@ -171,3 +171,20 @@ function _create_distinguished()
     number!(cs, Crayon(foreground = 173))
     return cs
 end
+
+function _create_dracula()
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = (255,184,108)))
+    comment!(cs, Crayon(foreground = (98, 114, 164)))
+    string!(cs, Crayon(foreground = (241, 250, 140)))
+    call!(cs, Crayon(foreground = (189, 147, 249)))
+    op!(cs, Crayon(foreground = (255, 121, 198)))
+    keyword!(cs, Crayon(foreground = (255, 121, 198)))
+    text!(cs, Crayon(foreground = (248, 248, 242)))
+    macro!(cs, Crayon(foreground = (80, 250, 123)))
+    function_def!(cs, Crayon(foreground = (189, 147, 249)))
+    error!(cs, Crayon(foreground = (255, 85, 85)))
+    argdef!(cs, Crayon(foreground = (139, 233, 253)))
+    number!(cs, Crayon(foreground = (255, 85, 85)))
+    return cs
+end
