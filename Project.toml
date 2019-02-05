@@ -4,7 +4,6 @@ version = "0.3"
 
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
-Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
