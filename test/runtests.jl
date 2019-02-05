@@ -1,6 +1,8 @@
 withenv("FORCE_COLOR" => true) do
     if Sys.islinux()
         include("flicker.jl")
+    else
+        @warn "flicker test not run"
     end
     include("test_custompass.jl")
     include("test_bracketmatch.jl")

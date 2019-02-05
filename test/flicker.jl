@@ -1,7 +1,6 @@
 using OhMyREPL
 import REPL
-
-include(Pkg.dir("VT100","test","TerminalRegressionTests.jl"))
+import TerminalRegressionTests
 
 TerminalRegressionTests.automated_test(
     joinpath(@__DIR__,"flicker/simple.multiout"),
