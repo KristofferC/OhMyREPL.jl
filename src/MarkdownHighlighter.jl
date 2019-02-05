@@ -18,11 +18,14 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
         code_blocks = split("\n" * code, "\njulia> ")
         for codeblock in code_blocks[2:end] #
             expr, pos = Meta.parse(codeblock, 1, raise = false);
-            sourcecode, output = if pos > length(codeblock)
-                codeblock, ""
-            else
-                ind = Base.nextind(codeblock, 0, pos)
-                codeblock[1:ind-1], codeblock[ind:end]
+            sourcecode, output = begin
+                if pos > length(codeblock)
+                    codeblock, ""
+                else
+                    ind = nextind(codeblock, 0, pos)
+                    pind = prevind(codeblock, ind)
+                    codeblock[1:pind], codeblock[ind:end]
+                end
             end
             push!(sourcecodes, string(sourcecode))
             push!(outputs, string(output))
