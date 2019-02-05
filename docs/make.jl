@@ -1,7 +1,6 @@
 using Documenter, OhMyREPL
 
 makedocs(
-    format = :html,
     sitename = "OhMyREPL",
     pages = Any[
         "Home" => "index.md",
@@ -22,8 +21,4 @@ makedocs(
 
 deploydocs(
     repo = "github.com/KristofferC/OhMyREPL.jl.git",
-    target = "build",
-    julia = "0.6",
-    deps = nothing,
-    make = nothing,
 )
