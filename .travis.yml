@@ -4,9 +4,15 @@ language: julia
 os:
   - linux
   - osx
+  
 julia:
-  - 0.7
+  - 1.0
+  - 1.1
   - nightly
+  
+branches:
+  only:
+  - master
 
 notifications:
   email: false
@@ -18,5 +24,12 @@ script:
                                  PackageSpec(name = "VT100", rev = "master")]);
                         Pkg.test()'
 
-after_success:
-  - julia -e 'using Pkg; ps=PackageSpec(name="Documenter", version="0.19"); Pkg.add(ps); Pkg.pin(ps); include(joinpath("docs", "make.jl"))'
+jobs:
+  include:
+    - stage: "Documentation"
+      julia: 1.1
+      os: linux
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.instantiate()'
+        - julia --project=docs/ docs/make.jl
+      after_success: skip
