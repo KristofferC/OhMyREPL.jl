@@ -171,3 +171,20 @@ function _create_distinguished()
     number!(cs, Crayon(foreground = 173))
     return cs
 end
+
+function _create_onedark()
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = (224,108,117)))
+    comment!(cs, Crayon(foreground = (92,99,112)))
+    string!(cs, Crayon(foreground = (152,195,121)))
+    call!(cs, Crayon(foreground = (97,175,239)))
+    op!(cs, Crayon(foreground = (198,120,221)))
+    keyword!(cs, Crayon(foreground = (224,108,117)))
+    text!(cs, Crayon(foreground = :default))
+    macro!(cs, Crayon(foreground = (198,120,221)))
+    function_def!(cs, Crayon(foreground = (171, 178, 191)))
+    error!(cs, Crayon(foreground = (190,80,70)))
+    argdef!(cs, Crayon(foreground = (229,192,123)))
+    number!(cs, Crayon(foreground = (209,154,102)))
+    return cs
+end
