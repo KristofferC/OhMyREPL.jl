@@ -13,7 +13,7 @@ Tokenize = "0796e94c-ce3b-5d07-9a54-7f471281c624"
 VT100 = "7774df62-37c0-5c21-b34d-f6d7f98f54bc"
 
 [compat]
-Crayons = "1.0"
+Crayons = "wat"
 Tokenize = "0.5"
 
 [extras]
