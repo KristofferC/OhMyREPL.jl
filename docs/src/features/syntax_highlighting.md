@@ -15,6 +15,7 @@ The current default colorschemes that comes with `OhMyREPL` are
 * "BoxyMonokai256" - 256 colors Monokai from [here](https://github.com/oivva/st-boxy)
 * "TomorrowNightBright" - 256 colors Tomorrow Night Bright
 * "TomorrowNightBright24bit" - 24 bit colored Tomorrow Night Bright
+* "OneDark" - 24 bit colored OneDark
 
  By default, "Monokai16" will be used on Windows and "Monokai256" otherwise. To test the supported colors in your terminal you can use `Crayons.test_system_colors()`, `Crayons.test_256_colors()`, `Crayons.test_24bit_colors()` to test 16, 256 and 24 bit colors respectively.
 
