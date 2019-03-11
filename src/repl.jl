@@ -36,15 +36,14 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
             mode = s
         end
 
-        outbuf = IOBuffer()
+        io = IOBuffer()
+        outbuf = IOContext(io, stdout)
         termbuf = Terminals.TerminalBuffer(outbuf)
         # Hide the cursor
         LineEdit.write(outbuf, "\e[?25l")
         LineEdit.clear_input_area(termbuf, mode)
         # Extract the cursor index in character count
         cursoridx = length(String(buffer(s).data[1:p]))
-
-
 
         l = textwidth(get_prompt(s))
         if !isa(s, LineEdit.SearchState)
@@ -65,7 +64,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         # Maybe it is possible to save the cursor and just restore it but that is probably Terminal dependent...
         mode.ias = refresh_multi_line(termbuf, terminal(s), buffer(s), mode.ias, l)
         LineEdit.write(outbuf, "\e[?25h")  # Show the cursor
-        write(terminal(s), take!(outbuf))
+        write(terminal(s), take!(io))
         flush(terminal(s))
 end
 
