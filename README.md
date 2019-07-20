@@ -18,7 +18,11 @@ If you like this package please give it a star. I like stars.
 Pkg.add("OhMyREPL")
 ```
 
-and then just load with `using OhMyREPL` (preferably by putting it in the `.julia/config/startup.jl` file)
+and then just load with `using OhMyREPL`.
+
+To automatically use OhMyREPL by default when you load Julia:
+
+Add `using OhMyREPL` to the startup file with the address of `.julia/config/startup.jl` . Create this file if it is not already there.
 
 ### Features
 
