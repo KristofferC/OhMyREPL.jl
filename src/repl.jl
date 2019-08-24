@@ -150,7 +150,7 @@ function create_keybindings()
 
 
     # Fixup bracket paste a bit
-     D["\e[200~"] = (s, data, c) ->begin
+    D["\e[200~"] = (s, data, c) ->begin
         input = LineEdit.bracketed_paste(s) # read directly from s until reaching the end-bracketed-paste marker
         sbuffer = LineEdit.buffer(s)
         curspos = position(sbuffer)
@@ -176,6 +176,9 @@ function create_keybindings()
         firstline = true
         isprompt_paste = false
         prompt = get_prompt(s)
+        default_prompt = "julia> "
+        jl_prompt_len = textwidth(prompt)
+        jl_default_len = textwidth(default_prompt)
         while oldpos <= lastindex(input) # loop until all lines have been executed
             # Check if the next statement starts with "julia> ", in that case
             # skip it. But first skip whitespace
@@ -183,11 +186,10 @@ function create_keybindings()
                 oldpos = nextind(input, oldpos)
                 oldpos >= sizeof(input) && return
             end
-            # Skip over prompt prefix if statement starts with it
-            jl_prompt_len = textwidth(prompt)
-            jl_default_len = textwidth("julia> ")
-            match_default = oldpos + jl_default_len <= sizeof(input) && input[oldpos:oldpos+jl_default_len-1] == "julia> "
-            match_prompt =  oldpos + jl_prompt_len  <= sizeof(input) && input[oldpos:oldpos+jl_prompt_len-1] == prompt
+            # Check if input line starts with "julia> ", remove it if we are in prompt paste mode
+            sstr = SubString(input, oldpos)
+            match_default = startswith(sstr, default_prompt)
+            match_prompt = startswith(sstr, prompt)
             if (firstline || isprompt_paste) && (match_default || match_prompt)
                 isprompt_paste = true
                 match_prompt ? (oldpos += jl_prompt_len) : (oldpos += jl_default_len)
@@ -200,7 +202,7 @@ function create_keybindings()
                 continue
             end
             ast, pos = Meta.parse(input, oldpos, raise=false, depwarn=false)
-            if (isa(ast, Expr) && (ast.head == :error || ast.head == :continue || ast.head == :incomplete)) ||
+            if (isa(ast, Expr) && (ast.head == :error || ast.head == :incomplete)) ||
                     (pos > ncodeunits(input) && !endswith(input, '\n'))
                 # remaining text is incomplete (an error, or parser ran to the end but didn't stop with a newline):
                 # Insert all the remaining text as one line (might be empty)
@@ -211,7 +213,7 @@ function create_keybindings()
                     tail = lstrip(tail)
                 end
                 if isprompt_paste # remove indentation spaces corresponding to the prompt
-                    tail = replace(tail, r"^ {7}"m => "") # 7: jl_prompt_len
+                    tail = replace(tail, r"^"m * ' '^jl_prompt_len => "")
                 end
                 LineEdit.replace_line(s, tail, true)
                 rewrite_with_ANSI(s)
@@ -221,7 +223,7 @@ function create_keybindings()
             line = strip(input[oldpos:prevind(input, pos)])
             if !isempty(line)
                 if isprompt_paste # remove indentation spaces corresponding to the prompt
-                    line = replace(line, r"^ {7}"m => "") # 7: jl_prompt_len
+                    line = replace(line, r"^"m * ' '^jl_prompt_len => "")
                 end
                 # put the line on the screen and history
                 LineEdit.replace_line(s, line)
