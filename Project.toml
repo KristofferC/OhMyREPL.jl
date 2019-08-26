@@ -13,7 +13,7 @@ Tokenize = "0796e94c-ce3b-5d07-9a54-7f471281c624"
 VT100 = "7774df62-37c0-5c21-b34d-f6d7f98f54bc"
 
 [compat]
-Crayons = "1, 2"
+Crayons = "1, 2, 3, 4"
 Tokenize = "0.5"
 julia = "1.0"
 
