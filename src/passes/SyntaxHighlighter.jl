@@ -110,7 +110,8 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
             crayons[i-1] = cscheme.argdef
             crayons[i] = cscheme.argdef
         # :foo
-        elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.COLON
+        elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.COLON && 
+               kind(pprev_t) ∉ (Tokens.INTEGER, Tokens.FLOAT, Tokens.IDENTIFIER, Tokens.RPAREN)
             crayons[i-1] = cscheme.symbol
             crayons[i] = cscheme.symbol
         # function
