@@ -1,6 +1,6 @@
 name = "OhMyREPL"
 uuid = "5fb14364-9ced-5910-84b2-373655c76a03"
-version = "0.5.2"
+version = "0.5.3"
 
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
@@ -8,9 +8,7 @@ Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
-TerminalRegressionTests = "98bfdc55-cc95-5876-a49a-74609291cbe0"
 Tokenize = "0796e94c-ce3b-5d07-9a54-7f471281c624"
-VT100 = "7774df62-37c0-5c21-b34d-f6d7f98f54bc"
 
 [compat]
 Crayons = "1, 2, 3, 4"
@@ -18,7 +16,9 @@ Tokenize = "0.5"
 julia = "1.0"
 
 [extras]
+TerminalRegressionTests = "98bfdc55-cc95-5876-a49a-74609291cbe0"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+VT100 = "7774df62-37c0-5c21-b34d-f6d7f98f54bc"
 
 [targets]
-test = ["Test"]
+test = ["Test", "TerminalRegressionTests", "VT100"]
