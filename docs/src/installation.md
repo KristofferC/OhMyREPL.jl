@@ -20,6 +20,6 @@ atreplinit() do repl
 end
 ```
 
-in your `.julia/config/startup.jl` file.
+in your `.julia/config/startup.jl` file. Create this file (and directory) if it is not already there.
 
 You can also compile `OhMyREPL` into the Julia system image. This will mean that there is no need to edit your `.juliarc` file and the Julia REPL will start a bit quicker since it does not have to parse and compile the package when it is loaded. The way to do this is by using https://github.com/JuliaLang/PackageCompiler.jl.
