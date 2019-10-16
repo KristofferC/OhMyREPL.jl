@@ -104,7 +104,7 @@ function insert_into_keymap!(D::Dict)
             if AUTOMATIC_BRACKET_MATCH[] && !eof(b) && peek(b) == v
                 edit_move_right(buffer(s))
             elseif AUTOMATIC_BRACKET_MATCH[] &&
-                    ((position(b) > 0 && leftpeek(b) in all_brackets_ws && (eof(b) || peek(b) in right_brackets_ws)) ||
+                    ((position(b) > 0 && leftpeek(b) in left_brackets_ws && (eof(b) || peek(b) in right_brackets_ws)) ||
                      ((!eof(b) && peek(b) in right_brackets_ws) || b.size == 0) && (position(b) == 0 || leftpeek(b) in left_brackets_ws))
                 edit_insert(buffer(s), v)
                 edit_insert(buffer(s), v)
