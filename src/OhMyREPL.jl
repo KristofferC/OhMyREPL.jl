@@ -7,6 +7,7 @@ module OhMyREPL
 
 using Tokenize
 using Crayons
+import REPL
 
 export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, test_colorscheme
 
@@ -84,10 +85,15 @@ function __init__()
     end
 
     if isdefined(Base, :active_repl)
+        if !isdefined(Base.active_repl, :interface)
+            Base.active_repl.interface = REPL.setup_interface(Base.active_repl)
+        end
         Prompt.insert_keybindings()
     else
         atreplinit() do repl
-            repl.interface = REPL.setup_interface(repl)
+            if !isdefined(repl, :interface)
+                repl.interface = REPL.setup_interface(repl)
+            end
             Prompt.insert_keybindings()
             update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
