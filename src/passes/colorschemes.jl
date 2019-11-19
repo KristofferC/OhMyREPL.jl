@@ -188,3 +188,20 @@ function _create_onedark()
     number!(cs, Crayon(foreground = (209,154,102)))
     return cs
 end
+
+function _create_base16_material_darker()
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = 0xf07178))
+    comment!(cs, Crayon(foreground = 0x4a4a4a))
+    string!(cs, Crayon(foreground = 0xc3e88d))
+    call!(cs, Crayon(foreground = 0x82aaff))
+    op!(cs, Crayon(foreground = 0x89ddff))
+    keyword!(cs, Crayon(foreground = 0xc792ea))
+    text!(cs, Crayon(foreground = :default))
+    macro!(cs, Crayon(foreground = 0x82aaff))
+    function_def!(cs, Crayon(foreground = 0x82aaff))
+    error!(cs, Crayon(foreground = :default))
+    argdef!(cs, Crayon(foreground = 0xffcb6b))
+    number!(cs, Crayon(foreground = 0xf78c6c))
+    return cs
+end
