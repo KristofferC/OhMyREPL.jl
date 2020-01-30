@@ -123,7 +123,7 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
                 crayons[i] = cscheme.keyword
             end
         # "foo"
-        elseif kind(t) == Tokens.STRING || kind(t) == Tokens.TRIPLE_STRING || kind(t) == Tokens.CHAR || kind(t) == Tokens.CMD
+    elseif kind(t) == Tokens.STRING || kind(t) == Tokens.TRIPLE_STRING || kind(t) == Tokens.CHAR || kind(t) == Tokens.CMD || kind(t) == Tokens.TRIPLE_CMD
             crayons[i] = cscheme.string
         # * -
         elseif Tokens.isoperator(kind(t)) || exactkind(t) == Tokens.TRUE || exactkind(t) == Tokens.FALSE
