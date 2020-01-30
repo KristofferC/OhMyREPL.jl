@@ -111,7 +111,7 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
             crayons[i-1] = cscheme.argdef
             crayons[i] = cscheme.argdef
         # :foo
-        elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.COLON && 
+        elseif kind(t) == Tokens.IDENTIFIER && exactkind(prev_t) == Tokens.COLON &&
                kind(pprev_t) ∉ (Tokens.INTEGER, Tokens.FLOAT, Tokens.IDENTIFIER, Tokens.RPAREN)
             crayons[i-1] = cscheme.symbol
             crayons[i] = cscheme.symbol
@@ -123,7 +123,7 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
                 crayons[i] = cscheme.keyword
             end
         # "foo"
-        elseif kind(t) == Tokens.STRING || kind(t) == Tokens.TRIPLE_STRING || kind(t) == Tokens.CHAR
+        elseif kind(t) == Tokens.STRING || kind(t) == Tokens.TRIPLE_STRING || kind(t) == Tokens.CHAR || kind(t) == Tokens.CMD
             crayons[i] = cscheme.string
         # * -
         elseif Tokens.isoperator(kind(t)) || exactkind(t) == Tokens.TRUE || exactkind(t) == Tokens.FALSE
