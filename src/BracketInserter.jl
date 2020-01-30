@@ -97,7 +97,7 @@ function insert_into_keymap!(D::Dict)
     end
 
     # Similar to above but with quotation marks that need to be handled a bit differently
-    for v in ['\"', '\'']
+    for v in ['\"', '\'', '\`']
         D[v] = (s, o...) -> begin
             b = buffer(s)
             # Next char is the quote symbol so just move right
@@ -118,8 +118,8 @@ function insert_into_keymap!(D::Dict)
 
     # On backspace, also remove a corresponding right bracket
     # to the right if we remove a left bracket
-    left_brackets2 = ['(', '{', '[', '\"', '\'']
-    right_brackets2 = [')', '}', ']', '\"', '\'']
+    left_brackets2 = ['(', '{', '[', '\"', '\'', '\`']
+    right_brackets2 = [')', '}', ']', '\"', '\'', '\`']
     D['\b'] = (s, data, c) -> begin
         repl = Base.active_repl
         mirepl = isdefined(repl,:mi) ? repl.mi : repl
