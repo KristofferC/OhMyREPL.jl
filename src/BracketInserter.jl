@@ -97,20 +97,24 @@ function insert_into_keymap!(D::Dict)
     end
 
     # Similar to above but with quotation marks that need to be handled a bit differently
-    for v in ['\"', '\'']
+    for v in ['\"', '\'', '\`']
         D[v] = (s, o...) -> begin
             b = buffer(s)
-            # Next char is the quote symbol so just move right
-            if AUTOMATIC_BRACKET_MATCH[] && !eof(b) && peek(b) == v
-                edit_move_right(buffer(s))
-            elseif AUTOMATIC_BRACKET_MATCH[] &&
-                    ((position(b) > 0 && leftpeek(b) in left_brackets_ws && (eof(b) || peek(b) in right_brackets_ws)) ||
-                     ((!eof(b) && peek(b) in right_brackets_ws) || b.size == 0) && (position(b) == 0 || leftpeek(b) in left_brackets_ws))
-                edit_insert(buffer(s), v)
-                edit_insert(buffer(s), v)
-                edit_move_left(buffer(s))
+
+            if AUTOMATIC_BRACKET_MATCH[]
+                # Next char is the quote symbol so just move right
+                if !eof(b) && peek(b) == v
+                    edit_move_right(b)
+                # we already have an open quote immediately before (triple quote)
+                elseif position(b) > 0 && leftpeek(b) == v
+                    edit_insert(b, v)
+                else
+                    edit_insert(b, v)
+                    edit_insert(b, v)
+                    edit_move_left(b)
+                end
             else
-                edit_insert(buffer(s), v)
+                edit_insert(b, v)
             end
             rewrite_with_ANSI(s)
         end
@@ -118,8 +122,8 @@ function insert_into_keymap!(D::Dict)
 
     # On backspace, also remove a corresponding right bracket
     # to the right if we remove a left bracket
-    left_brackets2 = ['(', '{', '[', '\"', '\'']
-    right_brackets2 = [')', '}', ']', '\"', '\'']
+    left_brackets2 = ['(', '{', '[', '\"', '\'', '\`']
+    right_brackets2 = [')', '}', ']', '\"', '\'', '\`']
     D['\b'] = (s, data, c) -> begin
         repl = Base.active_repl
         mirepl = isdefined(repl,:mi) ? repl.mi : repl
@@ -149,5 +153,4 @@ function insert_into_keymap!(D::Dict)
 end
 
 insert_into_keymap!(OhMyREPL.Prompt.NEW_KEYBINDINGS)
-
 end # module
