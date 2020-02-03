@@ -103,8 +103,6 @@ function create_keybindings()
     D["\et"] = (s, data, c)->(LineEdit.edit_transpose_words(buffer(s)); rewrite_with_ANSI(s))
     D["\ed"] = (s, data, c)->(LineEdit.edit_delete_next_word(buffer(s)); rewrite_with_ANSI(s))
     D["\e\b"] = (s, data, c)->(LineEdit.edit_delete_prev_word(buffer(s)); rewrite_with_ANSI(s))
-    D["^N"]  = (s,data,c)->(LineEdit.history_next(s, mode(s).hist); rewrite_with_ANSI(s))
-    D["^P"]  = (s,data,c)->(LineEdit.history_prev(s, mode(s).hist); rewrite_with_ANSI(s))
     D["^D"] = (s, data, c)->begin
         if buffer(s).size > 0
             LineEdit.edit_delete(buffer(s)); rewrite_with_ANSI(s)
