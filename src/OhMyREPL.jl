@@ -35,7 +35,7 @@ function funcdef(x::Float64, y::Int64)
     y = 100_000
     x = :foo
     s = "I am a happy string"
-    c = `sudo rm -rf /`
+    c = `mycmd`
     @time 1+1
     #= Comments look like this =#
     z = funccall(x, y)
