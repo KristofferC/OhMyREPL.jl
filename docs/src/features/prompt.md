@@ -3,8 +3,8 @@
 The functions
 
 ```julia
-OhMyREPL.input_prompt!(str::String, color::Symbol)
-OhMyREPL.output_prompt!(str::String, color::Symbol)
+OhMyREPL.input_prompt!(str::Union{String, Function}, color::Symbol)
+OhMyREPL.output_prompt!(str::Union{String, Function}, color::Symbol)
 ```
 
 can be used to change the way that the input and output prompts are displayed.
@@ -17,6 +17,9 @@ OhMyREPL.output_prompt!(">", :red)
 ```
 
 ![](new_prompts.png)
+
+If the first argument instead is a function, it will be run every time the prompt wants
+to update which allows for more dynamic behavior.
 
 The different possible colors can be found by typing `Base.text_colors` in the Julia REPL's help mode.
 
