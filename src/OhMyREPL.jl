@@ -85,15 +85,16 @@ function repl_has_pkg(repl_interface)
 end
 
 function wait_repl(repl_interface)
-    @async for i = 1:10 # retry for up to 10 times
-        if  repl_has_pkg(repl_interface) #pkg loaded
+    retry_n = 10 # retry for up to 10 times
+    @async for i = 1:retry_n
+        if  repl_has_pkg(repl_interface) # pkg loaded
             # @info "pkg.] loaded"
             Prompt.insert_keybindings()
             break
         end
         # @info "waiting for pkg..."
         sleep(.1)
-        i == 10 && Prompt.insert_keybindings() # last try, insert anyways
+        i == retry_n && Prompt.insert_keybindings() # last try, insert anyways
     end
 end
 
