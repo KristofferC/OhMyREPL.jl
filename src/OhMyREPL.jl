@@ -85,15 +85,15 @@ function repl_has_pkg(repl_interface)
 end
 
 function wait_repl(repl_interface)
-    count = 10 # retry for upto 10 times
-    @async while count > 0
+    @async for i = 1:10 # retry for up to 10 times
         if  repl_has_pkg(repl_interface) #pkg loaded
+            # @info "pkg.] loaded"
             Prompt.insert_keybindings()
             break
         end
         # @info "waiting for pkg..."
         sleep(.1)
-        count -= 1
+        i == 10 && Prompt.insert_keybindings() # last try, insert anyways
     end
 end
 
@@ -108,15 +108,13 @@ function __init__()
         if !isdefined(Base.active_repl, :interface)
             Base.active_repl.interface = REPL.setup_interface(Base.active_repl)
         end
-        repl_has_pkg(Base.active_repl.interface) || wait_repl(Base.active_repl.interface)
-        Prompt.insert_keybindings()
+        wait_repl(Base.active_repl.interface)
     else
         atreplinit() do repl
             if !isdefined(repl, :interface)
                 repl.interface = REPL.setup_interface(repl)
             end
-            repl_has_pkg(repl.interface) || wait_repl(repl.interface)
-            Prompt.insert_keybindings()
+            wait_repl(repl.interface)
             update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
             p = repl.interface.modes[5]
