@@ -78,6 +78,25 @@ showpasses(io::IO = stdout) = Base.show(io, PASS_HANDLER)
 const HIGHLIGHT_MARKDOWN = Ref(true)
 enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
 
+# Isssue 166: wait for pkg to load
+function repl_has_pkg(repl_interface)
+    main_mode = repl_interface.modes[1]
+    haskey(main_mode.keymap_dict, ']')
+end
+
+function wait_repl(repl_interface)
+    count = 10 # retry for up to 10 times
+    @async while count > 0
+        if  repl_has_pkg(repl_interface) #pkg loaded
+            __init__()
+            break
+        end
+        # @info "waiting for pkg..."
+        sleep(.1)
+        count -= 1
+    end
+end
+
 function __init__()
     options = Base.JLOptions()
     # command-line
@@ -89,12 +108,14 @@ function __init__()
         if !isdefined(Base.active_repl, :interface)
             Base.active_repl.interface = REPL.setup_interface(Base.active_repl)
         end
+        repl_has_pkg(Base.active_repl.interface) || wait_repl(Base.active_repl.interface)
         Prompt.insert_keybindings()
     else
         atreplinit() do repl
             if !isdefined(repl, :interface)
                 repl.interface = REPL.setup_interface(repl)
             end
+            repl_has_pkg(repl.interface) || wait_repl(repl.interface)
             Prompt.insert_keybindings()
             update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
