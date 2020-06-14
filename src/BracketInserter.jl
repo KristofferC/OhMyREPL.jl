@@ -36,9 +36,9 @@ end
 # when we should not close the bracket
 function no_closing_bracket(left_peek, v)
     # left_peek == v: we already have an open quote immediately before (triple quote)
-    # regex is for transposing calls: issue #200
-    # regex: immediately after letter/_: \w or closing array bracket \]
-    left_peek == v || (v == '\'' && occursin(r"\w|\]", string(left_peek)))
+    # tr_expr is for transposing calls: issue #200
+    tr_expr = isletter(left_peek) || isnumeric(left_peek) || left_peek == '_' || left_peek == ']'
+    left_peek == v || (v == '\'' && tr_expr)
 end
 
 const AUTOMATIC_BRACKET_MATCH = Ref(!Sys.iswindows())
