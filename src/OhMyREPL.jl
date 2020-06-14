@@ -85,10 +85,10 @@ function repl_has_pkg(repl_interface)
 end
 
 function wait_repl(repl_interface)
-    count = 10 # retry for up to 10 times
+    count = 10 # retry for upto 10 times
     @async while count > 0
         if  repl_has_pkg(repl_interface) #pkg loaded
-            __init__()
+            Prompt.insert_keybindings()
             break
         end
         # @info "waiting for pkg..."
