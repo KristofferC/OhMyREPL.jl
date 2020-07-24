@@ -47,7 +47,12 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
 
         l = textwidth(get_prompt(s))
         if !isa(s, LineEdit.SearchState)
-            LineEdit.write_prompt(termbuf, mode)
+            # xref: https://github.com/JuliaLang/julia/pull/36689
+            @static if VERSION ≥ v"1.6.0-DEV.531"
+                LineEdit.write_prompt(termbuf, mode, LineEdit.hascolor(terminal(s)))
+            else
+                LineEdit.write_prompt(termbuf, mode)
+            end
             LineEdit.write(termbuf, "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
         end
 
