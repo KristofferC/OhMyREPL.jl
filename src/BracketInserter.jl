@@ -33,6 +33,14 @@ function peek(b::IOBuffer)
     return c
 end
 
+# when we should not close the bracket
+function no_closing_bracket(left_peek, v)
+    # left_peek == v: we already have an open quote immediately before (triple quote)
+    # tr_expr is for transposing calls: issue #200
+    tr_expr = isletter(left_peek) || isnumeric(left_peek) || left_peek == '_' || left_peek == ']'
+    left_peek == v || (v == '\'' && tr_expr)
+end
+
 const AUTOMATIC_BRACKET_MATCH = Ref(!Sys.iswindows())
 enable_autocomplete_brackets(v::Bool) = AUTOMATIC_BRACKET_MATCH[] = v
 
@@ -105,8 +113,7 @@ function insert_into_keymap!(D::Dict)
                 # Next char is the quote symbol so just move right
                 if !eof(b) && peek(b) == v
                     edit_move_right(b)
-                # we already have an open quote immediately before (triple quote)
-                elseif position(b) > 0 && leftpeek(b) == v
+                elseif position(b) > 0 && no_closing_bracket(leftpeek(b), v)
                     edit_insert(b, v)
                 else
                     edit_insert(b, v)
