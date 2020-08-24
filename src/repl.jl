@@ -48,7 +48,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         l = textwidth(get_prompt(s))
         if !isa(s, LineEdit.SearchState)
             # xref: https://github.com/JuliaLang/julia/pull/36689
-            @static if VERSION ≥ v"1.6.0-DEV.531"
+            @static if VERSION ≥ v"1.6.0-DEV.517"
                 LineEdit.write_prompt(termbuf, mode, LineEdit.hascolor(terminal(s)))
             else
                 LineEdit.write_prompt(termbuf, mode)
