@@ -112,8 +112,7 @@ function create_keybindings()
         if buffer(s).size > 0
             LineEdit.edit_delete(buffer(s)); rewrite_with_ANSI(s)
         else
-            println(terminal(s))
-            return :abort
+            LineEdit.edit_abort(s)
         end
     end
 
