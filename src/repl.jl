@@ -18,6 +18,7 @@ import REPL.Terminals: raw!, width, height, cmove, getX, TerminalBuffer,
 
 using OhMyREPL
 import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
+import JLFzf
 
 @nospecialize # use only declared type signatures
 
@@ -267,6 +268,12 @@ function create_keybindings()
         rewrite_with_ANSI(s)
     end
 
+    #replace search with Fzf fuzzy search
+    D["^R"] = function (s, data, c)
+        line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "--read0", "--tiebreak=index");
+        JLFzf.insert_history_to_repl(s, line)
+        rewrite_with_ANSI(s)
+    end
     return D
 end
 NEW_KEYBINDINGS = create_keybindings()
