@@ -148,7 +148,7 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
             crayons[i-1] = cscheme._macro
             crayons[i] = cscheme._macro
         # 2] = 32.32
-        elseif (kind(t) == Tokens.INTEGER || kind(t) == Tokens.FLOAT) || (kind(t) == Tokens.IDENTIFIER && untokenize(t) == "NaN")
+        elseif kind(t) ∈ (Tokens.INTEGER, Tokens.BIN_INT, Tokens.OCT_INT, Tokens.HEX_INT, Tokens.FLOAT) || (kind(t) == Tokens.IDENTIFIER && untokenize(t) == "NaN")
             crayons[i] = cscheme.number
         elseif kind(t) == Tokens.WHITESPACE
             crayons[i] = Crayon()
