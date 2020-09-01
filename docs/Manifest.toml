@@ -4,9 +4,9 @@
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[Crayons]]
-git-tree-sha1 = "cb7a62895da739fe5bb43f1a26d4292baf4b3dc0"
+git-tree-sha1 = "3f71217b538d7aaee0b69ab47d9b7724ca8afa0d"
 uuid = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
-version = "4.0.1"
+version = "4.0.4"
 
 [[Dates]]
 deps = ["Printf"]
@@ -18,15 +18,15 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[DocStringExtensions]]
 deps = ["LibGit2", "Markdown", "Pkg", "Test"]
-git-tree-sha1 = "88bb0edb352b16608036faadcc071adda068582a"
+git-tree-sha1 = "50ddf44c53698f5e784bbebb3f4b21c5807401b1"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
-version = "0.8.1"
+version = "0.8.3"
 
 [[Documenter]]
 deps = ["Base64", "Dates", "DocStringExtensions", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "d497bcc45bb98a1fbe19445a774cfafeabc6c6df"
+git-tree-sha1 = "fb1ff838470573adc15c71ba79f8d31328f035da"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.24.5"
+version = "0.25.2"
 
 [[InteractiveUtils]]
 deps = ["Markdown"]
@@ -57,15 +57,15 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[OhMyREPL]]
 deps = ["Crayons", "Markdown", "Pkg", "Printf", "REPL", "Tokenize"]
-path = ".."
+git-tree-sha1 = "7184cf792033092d6c0bcd5a5059deae89205e04"
 uuid = "5fb14364-9ced-5910-84b2-373655c76a03"
-version = "0.5.3"
+version = "0.5.6"
 
 [[Parsers]]
 deps = ["Dates", "Test"]
-git-tree-sha1 = "d112c19ccca00924d5d3a38b11ae2b4b268dda39"
+git-tree-sha1 = "8077624b3c450b15c087944363606a6ba12f925e"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "0.3.11"
+version = "1.0.10"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
@@ -97,9 +97,9 @@ deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[Tokenize]]
-git-tree-sha1 = "c3aab236f122445406cf7a6de8af0b794da5a950"
+git-tree-sha1 = "73c00ad506d88a7e8e4f90f48a70943101728227"
 uuid = "0796e94c-ce3b-5d07-9a54-7f471281c624"
-version = "0.5.7"
+version = "0.5.8"
 
 [[UUIDs]]
 deps = ["Random", "SHA"]
