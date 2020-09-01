@@ -9,7 +9,7 @@ end
 
 function input_prompt!(s::Union{String, Function}, col = :green)
     global INPUT_PROMPT_PREFIX = get(Base.text_colors, Symbol(col), "\e[2m")
-    global INPUT_PROMPT = isa(s, String) ? s * " " : () -> string(s(), " ")
+    global INPUT_PROMPT = s
     isdefined(Base, :active_repl) && isdefined(Base.active_repl, :interface) && update_interface(Base.active_repl.interface)
     return
 end
