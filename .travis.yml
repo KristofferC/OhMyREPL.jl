@@ -9,10 +9,6 @@ julia:
   - 1.0
   - 1
   - nightly
-  
-jobs:
-  allow_failures:
-    - julia: nightly
 
 branches:
   only:
@@ -22,6 +18,8 @@ notifications:
   email: false
 
 jobs:
+  allow_failures:
+    - julia: nightly
   include:
     - stage: "Documentation"
       julia: 1
