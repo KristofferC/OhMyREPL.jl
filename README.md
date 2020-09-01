@@ -27,6 +27,7 @@ and then just load with `using OhMyREPL` (preferably by putting it in the `.juli
 * Automatic bracket insertion - Will insert matching closing bracket and quotation symbols when suitable.
 * Prompt changing - Can change the text and color of the `julia>` prompt as well as add a prompt for output.
 * Rainbow brackets - Colorizes matching brackets in the same color.
+* Fuzzy (fzf) history search - Search REPL history in any mode fuzzily with beloved [fzf](https://github.com/junegunn/fzf).
 
 ### Documentation
 
