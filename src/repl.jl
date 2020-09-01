@@ -18,7 +18,6 @@ import REPL.Terminals: raw!, width, height, cmove, getX, TerminalBuffer,
 
 using OhMyREPL
 import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
-import JLFzf
 
 @nospecialize # use only declared type signatures
 
@@ -89,7 +88,7 @@ function create_keybindings()
     # Meta B
     D["\eb"]  = (s, data, c) -> (LineEdit.edit_move_word_left(s) ; rewrite_with_ANSI(s))
     # Meta F
-     D["\ef"]  = (s, data, c) -> (LineEdit.edit_move_word_right(s); rewrite_with_ANSI(s))
+    D["\ef"]  = (s, data, c) -> (LineEdit.edit_move_word_right(s); rewrite_with_ANSI(s))
     # Meta Enter
     D["\e\r"] = (s, data, c) -> (LineEdit.edit_insert(buffer(s), '\n'); rewrite_with_ANSI(s))
     D["^A"]   = (s, data, c) -> (LineEdit.move_line_start(s); rewrite_with_ANSI(s))
@@ -270,9 +269,15 @@ function create_keybindings()
 
     #replace search with Fzf fuzzy search
     D["^R"] = function (s, data, c)
-        line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "--read0", "--tiebreak=index");
-        JLFzf.insert_history_to_repl(s, line)
-        rewrite_with_ANSI(s)
+        if VERSION >= v"1.3" && OhMyREPL.ENABLE_FZF[]
+            JLFzf = OhMyREPL.JLFzf
+            line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "--read0", "--tiebreak=index");
+            JLFzf.insert_history_to_repl(s, line)
+            rewrite_with_ANSI(s)
+        else
+            p = Base.active_repl.interface.modes[4]
+            LineEdit.enter_search(s, p, true)
+        end
     end
     return D
 end
@@ -293,8 +298,6 @@ function insert_keybindings(repl = Base.active_repl)
         LineEdit.edit_move_down(buffer(s)) || LineEdit.enter_prefix_search(s, p, false)
         Prompt.rewrite_with_ANSI(s)
     end
-
-
 
     main_mode.keymap_dict = LineEdit.keymap([NEW_KEYBINDINGS, main_mode.keymap_dict])
 end

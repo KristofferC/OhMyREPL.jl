@@ -18,6 +18,7 @@ Pages = [
     "features/bracket_complete.md",
     "features/rainbow_brackets.md",
     "features/markdown_highlight.md",
+    "features/fzf.md",
     "internals/passes.md"
 ]
 Depth = 1

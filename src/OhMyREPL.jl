@@ -7,9 +7,13 @@ module OhMyREPL
 
 using Tokenize
 using Crayons
+if VERSION > v"1.3"
+import JLFzf
+end
+
 import REPL
 
-export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, test_colorscheme
+export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, enable_fzf, test_colorscheme
 
 include("repl_pass.jl")
 include("repl.jl")
@@ -77,6 +81,9 @@ showpasses(io::IO = stdout) = Base.show(io, PASS_HANDLER)
 
 const HIGHLIGHT_MARKDOWN = Ref(true)
 enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
+
+const ENABLE_FZF = Ref(!Sys.iswindows())
+enable_fzf(v::Bool) = ENABLE_FZF[] = v
 
 function __init__()
     options = Base.JLOptions()
