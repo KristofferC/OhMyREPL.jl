@@ -153,7 +153,7 @@ function insert_into_keymap!(D::Dict)
                     return
                 end
             end
-            edit_backspace(buffer(s))
+            edit_backspace(s, true)
         end
         rewrite_with_ANSI(s)
     end

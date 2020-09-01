@@ -77,7 +77,7 @@ end
 function create_keybindings()
 
     D = Dict{Any, Any}()
-    D['\b']   = (s, data, c) -> if LineEdit.edit_backspace(buffer(s))
+    D['\b']   = (s, data, c) -> if LineEdit.edit_backspace(s, true)
         rewrite_with_ANSI(s)
     else
         beep(terminal(s))
@@ -90,7 +90,7 @@ function create_keybindings()
     # Meta F
      D["\ef"]  = (s, data, c) -> (LineEdit.edit_move_word_right(s); rewrite_with_ANSI(s))
     # Meta Enter
-    D["\e\r"] = (s, data, c) -> (LineEdit.edit_insert(buffer(s), '\n'); rewrite_with_ANSI(s))
+    D["\e\r"] = (s, data, c) -> (LineEdit.edit_insert_newline(s); rewrite_with_ANSI(s))
     D["^A"]   = (s, data, c) -> (LineEdit.move_line_start(s); rewrite_with_ANSI(s))
     D["^E"]   = (s, data, c) -> (LineEdit.move_line_end(s); rewrite_with_ANSI(s))
     D["\e[H"] = (s, data, c) -> (LineEdit.move_input_start(s); rewrite_with_ANSI(s))
@@ -133,7 +133,7 @@ function create_keybindings()
             end
             return :done
         else
-            edit_insert(buffer(s), '\n')
+            LineEdit.edit_insert_newline(s)
             rewrite_with_ANSI(s)
         end
     end
@@ -245,24 +245,7 @@ function create_keybindings()
 
     # Tab
     D['\t'] = (s, data, c) -> begin
-        buf = buffer(s)
-        # Yes, we are ignoring the possiblity
-        # the we could be in the middle of a multi-byte
-        # sequence, here but that's ok, since any
-        # whitespace we're interested in is only one byte
-        i = position(buf)
-        if i != 0
-            c = buf.data[i]
-            if c == UInt8('\n') || c == UInt8('\t') ||
-               # hack to allow path completion in cmds
-               # after a space, e.g., `cd <tab>`, while still
-               # allowing multiple indent levels
-               (c == UInt8(' ') && i > 3 && buf.data[i-1] == UInt8(' '))
-                edit_insert(s, " "^4)
-                return
-            end
-        end
-        LineEdit.complete_line(s)
+        LineEdit.edit_tab(s, true)
         rewrite_with_ANSI(s)
     end
 
@@ -285,8 +268,6 @@ function insert_keybindings(repl = Base.active_repl)
         LineEdit.edit_move_down(buffer(s)) || LineEdit.enter_prefix_search(s, p, false)
         Prompt.rewrite_with_ANSI(s)
     end
-
-
 
     main_mode.keymap_dict = LineEdit.keymap([NEW_KEYBINDINGS, main_mode.keymap_dict])
 end
