@@ -32,6 +32,12 @@ version = "0.25.2"
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
+[[JLFzf]]
+deps = ["Pipe", "REPL", "Random", "fzf_jll"]
+git-tree-sha1 = "cf18655fe5cb3ab4c6d129207c750337b3f2ad14"
+uuid = "1019f520-868f-41f5-a6de-eb00f4b6a39c"
+version = "0.1.1"
+
 [[JSON]]
 deps = ["Dates", "Mmap", "Parsers", "Unicode"]
 git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
@@ -56,8 +62,8 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[OhMyREPL]]
-deps = ["Crayons", "Markdown", "Pkg", "Printf", "REPL", "Tokenize"]
-git-tree-sha1 = "7184cf792033092d6c0bcd5a5059deae89205e04"
+deps = ["Crayons", "JLFzf", "Markdown", "Pkg", "Printf", "REPL", "Tokenize"]
+path = ".."
 uuid = "5fb14364-9ced-5910-84b2-373655c76a03"
 version = "0.5.6"
 
@@ -66,6 +72,11 @@ deps = ["Dates", "Test"]
 git-tree-sha1 = "8077624b3c450b15c087944363606a6ba12f925e"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "1.0.10"
+
+[[Pipe]]
+git-tree-sha1 = "6842804e7867b115ca9de748a0cf6b364523c16d"
+uuid = "b98c9c47-44ae-5843-9183-064241ee97a0"
+version = "1.3.0"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
@@ -107,3 +118,9 @@ uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+
+[[fzf_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "d1aec59bb46c05f3881aaedf0deac2df37b05374"
+uuid = "214eeab7-80f7-51ab-84ad-2988db7cef09"
+version = "0.21.1+0"
