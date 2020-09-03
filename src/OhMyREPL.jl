@@ -85,6 +85,22 @@ enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
 const ENABLE_FZF = Ref(!Sys.iswindows())
 enable_fzf(v::Bool) = ENABLE_FZF[] = v
 
+# Isssue 166: wait for pkg to load
+function wait_pkgrepl()
+    retry_n = 10 # retry for up to 10 times
+    pkgid = Base.PkgId(Base.UUID("44cfe95a-1eb2-52ea-b672-e2afdf69b78f"), "Pkg")
+    @async for i = 1:retry_n
+        if  haskey(Base.loaded_modules, pkgid) # pkg loaded
+            # @info "pkg loaded"
+            Prompt.insert_keybindings()
+            break
+        end
+        # @info "waiting for pkg..."
+        sleep(.1)
+        i == retry_n && Prompt.insert_keybindings() # last try, insert anyways
+    end
+end
+
 function __init__()
     options = Base.JLOptions()
     # command-line
@@ -96,13 +112,13 @@ function __init__()
         if !isdefined(Base.active_repl, :interface)
             Base.active_repl.interface = REPL.setup_interface(Base.active_repl)
         end
-        Prompt.insert_keybindings()
+        wait_pkgrepl()
     else
         atreplinit() do repl
             if !isdefined(repl, :interface)
                 repl.interface = REPL.setup_interface(repl)
             end
-            Prompt.insert_keybindings()
+            wait_pkgrepl()
             update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
             p = repl.interface.modes[5]
