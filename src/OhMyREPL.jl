@@ -82,7 +82,7 @@ showpasses(io::IO = stdout) = Base.show(io, PASS_HANDLER)
 const HIGHLIGHT_MARKDOWN = Ref(true)
 enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
 
-const ENABLE_FZF = Ref(!Sys.iswindows())
+const ENABLE_FZF = Ref(true)
 enable_fzf(v::Bool) = ENABLE_FZF[] = v
 
 function __init__()
