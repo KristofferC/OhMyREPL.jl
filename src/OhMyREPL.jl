@@ -79,16 +79,15 @@ const HIGHLIGHT_MARKDOWN = Ref(true)
 enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
 
 # Isssue 166: wait for pkg to load
-function repl_has_pkg(repl_interface)
-    main_mode = repl_interface.modes[1]
-    haskey(main_mode.keymap_dict, ']')
+function repl_has_pkg()
+    haskey(Base.loaded_modules, Base.PkgId(Base.UUID("44cfe95a-1eb2-52ea-b672-e2afdf69b78f"), "Pkg"))
 end
 
-function wait_repl(repl_interface)
+function wait_repl()
     retry_n = 10 # retry for up to 10 times
     @async for i = 1:retry_n
-        if  repl_has_pkg(repl_interface) # pkg loaded
-            # @info "pkg.] loaded"
+        if  repl_has_pkg() # pkg loaded
+            # @info "pkg loaded"
             Prompt.insert_keybindings()
             break
         end
@@ -109,13 +108,13 @@ function __init__()
         if !isdefined(Base.active_repl, :interface)
             Base.active_repl.interface = REPL.setup_interface(Base.active_repl)
         end
-        wait_repl(Base.active_repl.interface)
+        wait_repl()
     else
         atreplinit() do repl
             if !isdefined(repl, :interface)
                 repl.interface = REPL.setup_interface(repl)
             end
-            wait_repl(repl.interface)
+            wait_repl()
             update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
             p = repl.interface.modes[5]
