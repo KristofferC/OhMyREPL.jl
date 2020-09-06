@@ -2,7 +2,7 @@
 
 ![](fzf.png)
 
-By default (on Julia 1.3+ and non-Windows installations), OhMyREPL will use
+By default (on Julia 1.3+), OhMyREPL will use
 [fzf](https://github.com/junegunn/fzf) to search in the REPL history (initiated
 by pressing Ctrl-R). This is a [fuzzy
 searcher](https://en.wikipedia.org/wiki/Approximate_string_matching) which means
