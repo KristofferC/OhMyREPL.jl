@@ -281,7 +281,7 @@ function insert_keybindings(repl = Base.active_repl)
         Prompt.rewrite_with_ANSI(s)
     end
 
-    main_mode.keymap_dict = LineEdit.keymap([NEW_KEYBINDINGS, main_mode.keymap_dict])
+    main_mode.keymap_dict = LineEdit.keymap(Dict{Any, Any}[NEW_KEYBINDINGS, main_mode.keymap_dict])
 end
 
 function _commit_line(s, data, c)
