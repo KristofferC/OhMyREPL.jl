@@ -1,6 +1,6 @@
 name = "OhMyREPL"
 uuid = "5fb14364-9ced-5910-84b2-373655c76a03"
-version = "0.5.8"
+version = "0.5.9"
 
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
