@@ -205,3 +205,20 @@ function _create_base16_material_darker()
     number!(cs, Crayon(foreground = 0xf78c6c))
     return cs
 end
+
+function _create_gruvbox_dark() #palette https://github.com/morhetz/gruvbox#dark-mode-1
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = 0x83a598)) #blue
+    comment!(cs, Crayon(foreground = 0x928374))
+    string!(cs, Crayon(foreground = 0xb8bb26)) #green
+    call!(cs, Crayon(foreground = 0xebdbb2)) #foreground
+    op!(cs, Crayon(foreground = 0xebdbb2)) #foreground
+    keyword!(cs, Crayon(foreground = 0xfb4934)) #red
+    text!(cs, Crayon(foreground = 0xebdbb2)) #foreground
+    macro!(cs, Crayon(foreground = 0x8ec07c)) #aqua
+    function_def!(cs, Crayon(foreground = 0xebdbb2)) #foreground
+    error!(cs, Crayon(foreground = :default))
+    argdef!(cs, Crayon(foreground = 0xd79921)) #yellow
+    number!(cs, Crayon(foreground = 0xd3869b)) #purple
+    return cs
+end
