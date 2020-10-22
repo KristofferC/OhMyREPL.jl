@@ -17,6 +17,7 @@ The current default colorschemes that comes with `OhMyREPL` are
 * "TomorrowNightBright24bit" - 24 bit colored Tomorrow Night Bright
 * "OneDark" - 24 bit colored OneDark
 * "Base16MaterialDarker" - 24-bit [Base16](https://github.com/chriskempson/base16) Material Darker color scheme by [Nate Peters](https://github.com/ntpeters/base16-materialtheme-scheme)
+* "GruvboxDark" - Dark-mode variation of the [Gruvbox](https://github.com/morhetz/gruvbox#dark-mode) color scheme by Pavel Pertsev.
 
  By default, "Monokai16" will be used on Windows and "Monokai256" otherwise. To test the supported colors in your terminal you can use `Crayons.test_system_colors()`, `Crayons.test_256_colors()`, `Crayons.test_24bit_colors()` to test 16, 256 and 24 bit colors respectively.
 
