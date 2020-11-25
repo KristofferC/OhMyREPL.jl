@@ -107,7 +107,7 @@ function __init__()
             main_mode = repl.interface.modes[1]
             p = repl.interface.modes[5]
             # These are inserted here because we only want to insert them for the Julia mode
-            d = Dict(
+            d = Dict{Any,Any}(
             # Up Arrow
             "\e[A" => (s,o...)-> begin
                 REPL.LineEdit.edit_move_up(s) || LineEdit.enter_prefix_search(s, p, true)
@@ -119,7 +119,7 @@ function __init__()
                  Prompt.rewrite_with_ANSI(s)
             end
             )
-            main_mode.keymap_dict = LineEdit.keymap([d, main_mode.keymap_dict])
+            main_mode.keymap_dict = LineEdit.keymap(Dict{Any,Any}[d, main_mode.keymap_dict])
         end
     end
 
