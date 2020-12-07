@@ -7,3 +7,12 @@ Will insert a matching closing bracket to an opening bracket automatically if th
 ## Settings
 
 Can be disabled or enabled with `enable_autocomplete_brackets(::Bool)`.
+
+## Example
+
+If you want to enable `OhMyREPL` on startup of every Julia session, but have brackets turned off, add this to your `~/.julia/config/startup.jl` file:
+
+```julia
+using OhMyREPL
+enable_autocomplete_brackets(false)
+```
