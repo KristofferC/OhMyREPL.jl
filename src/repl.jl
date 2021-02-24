@@ -82,7 +82,8 @@ function create_keybindings()
     else
         beep(terminal(s))
     end
-    D["*"]    = (s, data, c) ->  (LineEdit.edit_insert(buffer(s), c); rewrite_with_ANSI(s))
+    D["*"]    = (s, data, c) -> (LineEdit.edit_insert(buffer(s), c); rewrite_with_ANSI(s))
+    D["^V"]   = (s, data, c) -> (LineEdit.edit_insert(buffer(s), REPL.InteractiveUtils.clipboard()); rewrite_with_ANSI(s))
     D["^B"]   = (s, data, c) -> (LineEdit.edit_move_left(buffer(s)) ;rewrite_with_ANSI(s))
     D["^F"]   = (s, data, c) -> (LineEdit.edit_move_right(buffer(s)) ;rewrite_with_ANSI(s))
     # Meta B
