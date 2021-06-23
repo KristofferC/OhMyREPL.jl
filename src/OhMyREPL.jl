@@ -129,7 +129,6 @@ function __init__()
         include(joinpath(@__DIR__, "refresh_lines.jl"))
         include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
         include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
-        include(joinpath(@__DIR__, "output_show_overwrite.jl"))
     end
 end
 
