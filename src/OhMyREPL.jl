@@ -7,6 +7,8 @@ module OhMyREPL
 
 using Tokenize
 using Crayons
+using GarishPrint
+
 if VERSION > v"1.3"
 import JLFzf
 end
