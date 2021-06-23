@@ -253,7 +253,7 @@ function create_keybindings()
     D["^R"] = function (s, data, c)
         if VERSION >= v"1.3" && OhMyREPL.ENABLE_FZF[]
             JLFzf = OhMyREPL.JLFzf
-            line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "--read0", "--tiebreak=index");
+            line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "--read0", "--tiebreak=index", "--height=80%");
             JLFzf.insert_history_to_repl(s, line)
             rewrite_with_ANSI(s)
         else
@@ -281,7 +281,7 @@ function insert_keybindings(repl = Base.active_repl)
         Prompt.rewrite_with_ANSI(s)
     end
 
-    main_mode.keymap_dict = LineEdit.keymap([NEW_KEYBINDINGS, main_mode.keymap_dict])
+    main_mode.keymap_dict = LineEdit.keymap(Dict{Any, Any}[NEW_KEYBINDINGS, main_mode.keymap_dict])
 end
 
 function _commit_line(s, data, c)
