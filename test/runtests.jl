@@ -1,5 +1,6 @@
 withenv("FORCE_COLOR" => true) do
-    if Sys.isunix() && VERSION >= v"1.1.0"
+    # TODO: re-enable
+    if false # Sys.isunix() && VERSION >= v"1.1.0"
         include("flicker.jl")
     else
         @warn "flicker test not run"
