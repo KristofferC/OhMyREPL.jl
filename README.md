@@ -1,7 +1,10 @@
 # OhMyREPL
 
-[![Build Status](https://github.com/KristofferC/OhMyREPL.jl/workflows/CI/badge.svg)](https://github.com/KristofferC/OhMyREPL.jl/actions?query=workflows/CI)
 
+[![][docs-stable-img]][docs-stable-url] [![build](https://github.com/KristofferC/OhMyREPL.jl/workflows/CI/badge.svg)](https://github.com/KristofferC/OhMyREPL.jl/actions?query=workflow%3ACI) 
+
+[docs-stable-img]: https://img.shields.io/badge/docs-blue.svg
+[docs-stable-url]: https://kristofferc.github.io/OhMyREPL.jl/latest
 
 *This is my REPL. There are many like it, but this one is mine.*
 
