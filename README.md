@@ -1,10 +1,11 @@
 # OhMyREPL
 
+[![Build Status](https://github.com/KristofferC/OhMyREPL.jl/workflows/CI/badge.svg)](https://github.com/KristofferC/OhMyREPL.jl/actions?query=workflows/CI)
+
+
 *This is my REPL. There are many like it, but this one is mine.*
 
 ![repl](https://i.imgur.com/wtR0ASD.png)
-
-[![Build Status](https://travis-ci.org/KristofferC/OhMyREPL.jl.svg?branch=master)](https://travis-ci.org/KristofferC/OhMyREPL.jl) [![Build status](https://ci.appveyor.com/api/projects/status/4qlpyvwaggd1vrx7?svg=true)](https://ci.appveyor.com/project/KristofferC/ohmyrepl-jl) [![][docs-latest-img]][docs-latest-url]
 
 
 A package that hooks into the Julia REPL and gives it syntax highlighting, bracket highlighting, rainbow brackets and other goodies.
