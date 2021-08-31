@@ -15,35 +15,34 @@ function _create_juliadefault()
     return cs
 end
 
-
 # Try to represent the Monokai colorscheme.
 function _create_monokai()
     cs = ColorScheme()
-    symbol!(cs, Crayon(foreground = :magenta))
+    symbol!(cs, Crayon(foreground = :cyan))
     comment!(cs, Crayon(foreground = :dark_gray))
-    string!(cs, Crayon(foreground = :yellow))
-    call!(cs, Crayon(foreground = :cyan))
+    string!(cs, Crayon(foreground = :light_yellow))
+    call!(cs, Crayon(foreground = :light_cyan))
     op!(cs, Crayon(foreground = :light_red))
     keyword!(cs, Crayon(foreground = :light_red))
     text!(cs, Crayon(foreground = :default))
-    macro!(cs, Crayon(foreground = :cyan))
-    function_def!(cs, Crayon(foreground = :green))
+    macro!(cs, Crayon(foreground = :light_cyan))
+    function_def!(cs, Crayon(foreground = :light_green))
     error!(cs, Crayon(foreground = :default))
-    argdef!(cs, Crayon(foreground = :cyan))
-    number!(cs, Crayon(foreground = :magenta))
+    argdef!(cs, Crayon(foreground = :light_cyan))
+    number!(cs, Crayon(foreground = :cyan))
     return cs
 end
 
 function _create_monokai_256()
     cs = ColorScheme()
     symbol!(cs, Crayon(foreground = 141)) # purpleish
-    comment!(cs, Crayon(foreground = 60)) # greyish
-    string!(cs, Crayon(foreground = 208)) # beigish
+    comment!(cs, Crayon(foreground = 240)) # greyish
+    string!(cs, Crayon(foreground = 185)) # beigish
     call!(cs, Crayon(foreground = 81)) # cyanish
     op!(cs, Crayon(foreground = 197)) # redish
     keyword!(cs, Crayon(foreground = 197)) # redish
     text!(cs, Crayon(foreground = :default))
-    macro!(cs, Crayon(foreground = 208)) # cyanish
+    macro!(cs, Crayon(foreground = 81)) # cyanish
     function_def!(cs, Crayon(foreground = 148))
     error!(cs, Crayon(foreground = :default))
     argdef!(cs, Crayon(foreground = 81))  # cyanish
@@ -55,19 +54,18 @@ function _create_monokai_24()
     cs = ColorScheme()
     symbol!(cs, Crayon(foreground = (174,129,255)))
     comment!(cs, Crayon(foreground = (89, 89, 89)))
-    string!(cs, Crayon(foreground = (253,151,31)))
+    string!(cs, Crayon(foreground = (230,219,116)))
     call!(cs, Crayon(foreground = (102,217,239)))
     op!(cs, Crayon(foreground = (249, 38, 114)))
     keyword!(cs, Crayon(foreground = (249, 38, 114)))
     text!(cs, Crayon(foreground = :default))
-    macro!(cs, Crayon(foreground = (253,151,31)))
+    macro!(cs, Crayon(foreground = (102,217,239)))
     function_def!(cs, Crayon(foreground = (166,226,42)))
     error!(cs, Crayon(foreground = :default))
     argdef!(cs, Crayon(foreground = (102,217,239)))
     number!(cs, Crayon(foreground = (174,129,255)))
     return cs
 end
-
 
 function _create_boxymonokai_256()
     cs = ColorScheme()
