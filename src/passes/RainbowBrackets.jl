@@ -50,7 +50,7 @@ const RAINBOW_TOKENS_256 =
                           Crayon(foreground = 196, bold = true))
 
 const RAINBOWBRACKETS_SETTINGS = RainbowBracketsSettings(RAINBOW_TOKENS_256, RAINBOW_TOKENS_16,
-    Supports256colors ? RAINBOW_TOKENS_256 : RAINBOW_TOKENS_16)
+        SUPPORTS_256_COLORS ? RAINBOW_TOKENS_256 : RAINBOW_TOKENS_16)
 
 
 function (rainbow::RainbowBracketsSettings)(ansitokens::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)

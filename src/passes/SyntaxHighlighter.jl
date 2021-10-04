@@ -94,7 +94,7 @@ add!(SYNTAX_HIGHLIGHTER_SETTINGS, "GruvboxDark", _create_gruvbox_dark())
 # Added by default
 # add!(SYNTAX_HIGHLIGHTER_SETTINGS, "JuliaDefault", _create_juliadefault())
 
-if Supports256colors
+if SUPPORTS_256_COLORS
     activate!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai256")
 else
     activate!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai16")
