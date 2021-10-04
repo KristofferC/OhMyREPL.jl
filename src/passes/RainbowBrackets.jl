@@ -5,7 +5,7 @@ using Tokenize
 using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
 
-import OhMyREPL: add_pass!, PASS_HANDLER, Supports256colors
+import OhMyREPL: add_pass!, PASS_HANDLER, SUPPORTS_256_COLORS
 
 mutable struct RainBowTokens
     parenthesis_tokens::Vector{Crayon}

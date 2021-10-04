@@ -6,7 +6,7 @@ import Tokenize.Tokens: Token, kind, exactkind, iskeyword, untokenize
 
 using Crayons
 
-import OhMyREPL: add_pass!, PASS_HANDLER, Supports256colors
+import OhMyREPL: add_pass!, PASS_HANDLER, SUPPORTS_256_COLORS 
 
 mutable struct ColorScheme
     symbol::Crayon
