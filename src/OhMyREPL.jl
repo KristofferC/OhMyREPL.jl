@@ -15,6 +15,8 @@ import REPL
 
 export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, enable_fzf, test_colorscheme
 
+const Supports256colors = !(Sys.iswindows() && VERSION < v"1.5.3")
+
 include("repl_pass.jl")
 include("repl.jl")
 include("passes/Passes.jl")
