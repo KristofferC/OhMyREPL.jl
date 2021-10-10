@@ -5,29 +5,31 @@ function REPL.display(d::REPL.REPLDisplay, mime::MIME"text/plain", x)
     write(io, OUTPUT_PROMPT_PREFIX)
     write(io, output_prompt, "\e[0m")
     Base.have_color && write(io, REPL.answer_color(d.repl))
-    limited_io = IOContext(io, :limit => true)
+    scheme = OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS.active
+    color_prefs = GarishPrint.ColorScheme(
+        fieldname = scheme.text,
+        type      = scheme.argdef,
 
-    if fallback_to_default_show(io, x)
-        pprint(limited_io, x)
-    else
-        show(limited_io, mime, x)
-    end
+        keyword   = scheme.keyword,
+        call      = scheme.call,
+
+        text      = scheme.text,
+        number    = scheme.number,
+        string    = scheme.string,
+        symbol    = scheme.symbol,
+        op        = scheme.op,
+        literal   = scheme.number,
+        constant  = scheme.text,
+        
+        comment   = scheme.comment,
+        undef     = scheme.comment,
+        lineno    = scheme.comment,
+    )
+    limited_io = GarishPrint.GarishIO(io;
+        limit = true,
+        color = true,
+        color_prefs = color_prefs,
+    )
+    pprint(limited_io, mime, x)
     println(io)
-end
-
-function fallback_to_default_show(io::IO, x)
-    # NOTE: Base.show(::IO, ::MIME"text/plain", ::Any) forwards to
-    # Base.show(::IO, ::Any)
-
-    # check if we are gonna call Base.show(::IO, ::MIME"text/plain", ::Any)
-    mt = methods(Base.show, (typeof(io), MIME"text/plain", typeof(x)))
-    length(mt.ms) == 1 && any(mt.ms) do method
-        method.sig == Tuple{typeof(Base.show), IO, MIME"text/plain", Any}
-    end || return false
-
-    # check if we are gonna call Base.show(::IO, ::Any)
-    mt = methods(Base.show, (typeof(io), typeof(x)))
-    length(mt.ms) == 1 && return any(mt.ms) do method
-        method.sig == Tuple{typeof(Base.show), IO, Any}
-    end
 end

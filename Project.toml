@@ -14,6 +14,7 @@ Tokenize = "0796e94c-ce3b-5d07-9a54-7f471281c624"
 
 [compat]
 Crayons = "1, 2, 3, 4"
+GarishPrint = "0.4"
 JLFzf = "^0.1.1"
 Tokenize = "0.5"
 julia = "1.0"
