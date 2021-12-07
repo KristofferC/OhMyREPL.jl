@@ -7,6 +7,7 @@ module OhMyREPL
 
 using Tokenize
 using Crayons
+using Requires
 if VERSION > v"1.3"
 import JLFzf
 end
@@ -86,6 +87,7 @@ const ENABLE_FZF = Ref(true)
 enable_fzf(v::Bool) = ENABLE_FZF[] = v
 
 function __init__()
+    @require CodeTracking="da1fd8a2-8d9e-5ec2-8556-3022fb5608a2" include("CodeTracking.jl")
     options = Base.JLOptions()
     # command-line
     if (options.isinteractive != 1) && options.commands != C_NULL
