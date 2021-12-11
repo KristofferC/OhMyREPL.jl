@@ -24,6 +24,6 @@ using Test, OhMyREPL, CodeTracking
 
     s = read(rd, String)
     redirect_stdout(original_stdout)
-    @test contains(s, "\e[")
-    @test contains(s, "AbstractRange")
+    @test occursin("\e[", s)
+    @test occursin("AbstractRange",s)
 end
