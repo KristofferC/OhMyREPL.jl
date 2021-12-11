@@ -23,6 +23,7 @@ julia = "1.0"
 TerminalRegressionTests = "98bfdc55-cc95-5876-a49a-74609291cbe0"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 VT100 = "7774df62-37c0-5c21-b34d-f6d7f98f54bc"
+CodeTracking="da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
 
 [targets]
-test = ["Test", "TerminalRegressionTests", "VT100"]
+test = ["Test", "TerminalRegressionTests", "VT100", "CodeTracking"]
