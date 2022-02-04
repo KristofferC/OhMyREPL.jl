@@ -18,7 +18,7 @@ global OUTPUT_PROMPT = ""
 global OUTPUT_PROMPT_PREFIX = ""
 
 function output_prompt!(s::Union{String, Function}, col = :red)
-    global OUTPUT_PROMPT_PREFIX = string("\e[1m", get(Base.text_colors, Symbol(col), Base.text_colors[:red]))
+    global OUTPUT_PROMPT_PREFIX = string("\e[1m", get(Base.text_colors, col isa Int64 ? col : Symbol(col), Base.text_colors[:red]))
     global OUTPUT_PROMPT = s
     return
 end
