@@ -305,7 +305,7 @@ function get_prompt(s)
     else
         error("Bug: $(typeof(s)) not accounted for")
     end
-    isa(prompt, String) ? (return prompt) : (return prompt())
+    isa(prompt, String) ? (return prompt) : (return Base.invokelatest(prompt))
 end
 
 # Pasted from LineEdit.jl but the writes to the Terminal have been removed.
