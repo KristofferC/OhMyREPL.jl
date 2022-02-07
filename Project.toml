@@ -4,6 +4,7 @@ version = "0.5.12"
 
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
+GarishPrint = "b0ab02a7-8576-43f7-aa76-eaa7c3897c54"
 JLFzf = "1019f520-868f-41f5-a6de-eb00f4b6a39c"
 Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
@@ -13,8 +14,9 @@ Tokenize = "0796e94c-ce3b-5d07-9a54-7f471281c624"
 
 [compat]
 Crayons = "1, 2, 3, 4"
-Tokenize = "0.5"
+GarishPrint = "0.4"
 JLFzf = "^0.1.1"
+Tokenize = "0.5"
 julia = "1.0"
 
 [extras]
