@@ -253,8 +253,10 @@ function create_keybindings()
     D["^R"] = function (s, data, c)
         if VERSION >= v"1.3" && OhMyREPL.ENABLE_FZF[]
             JLFzf = OhMyREPL.JLFzf
-            line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "--read0", "--tiebreak=index", "--height=80%");
-            JLFzf.insert_history_to_repl(s, line)
+            withenv("FZF_DEFAULT_OPTS" => nothing) do
+                line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "--read0", "--tiebreak=index", "--height=80%");
+                JLFzf.insert_history_to_repl(s, line)
+            end
             rewrite_with_ANSI(s)
         else
             p = Base.active_repl.interface.modes[4]
