@@ -35,7 +35,7 @@ and then just load with `using OhMyREPL` (preferably by putting it in the `.juli
 
 ### Documentation
 
-Please see [the documentation](https://KristofferC.github.io/OhMyREPL.jl/latest) for more extensive description of the features and their settings like how to change coloschemes, how to create your own colorschemes etc.
+Please see [the documentation](https://KristofferC.github.io/OhMyREPL.jl/latest) for more extensive description of the features and their settings like how to change colorschemes, how to create your own colorschemes etc.
 
 [docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
 [docs-latest-url]: https://kristofferc.github.io/OhMyREPL.jl/latest/
