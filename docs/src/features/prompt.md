@@ -28,3 +28,7 @@ The different possible colors can be found by typing `Base.text_colors` in the J
     to show which version of Julia you are currently running.
 
     ![](version_prompt.png)
+
+You can also easily get prompts that mimics those of IPython using `ipython_prompts`:
+
+![](ipython_prompts.png)

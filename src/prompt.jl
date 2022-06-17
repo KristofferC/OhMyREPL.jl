@@ -22,3 +22,16 @@ function output_prompt!(s::Union{String, Function}, col = :red)
     global OUTPUT_PROMPT = s
     return
 end
+
+using Crayons.Box
+
+function ipython_prompts!()
+
+    hp = Base.active_repl.interface.modes[1].hist
+    in_f() =  string("In [", max(length(hp.history)-hp.start_idx, 1), "]: ")
+    out_f() = string("Out[", max(length(hp.history)-hp.start_idx, 1)-1, "]: ")
+
+    output_prompt!(out_f)
+    input_prompt!(in_f)
+    return
+end

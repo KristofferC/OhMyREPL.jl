@@ -13,7 +13,8 @@ end
 
 import REPL
 
-export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, enable_fzf, test_colorscheme
+export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, enable_fzf, test_colorscheme,
+       ipython_prompts!
 
 include("repl_pass.jl")
 include("repl.jl")
