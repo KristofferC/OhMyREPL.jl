@@ -5,7 +5,8 @@ bracket matching and other nifty features.
 """
 module OhMyREPL
 
-using Tokenize
+import JuliaSyntax
+using JuliaSyntax.Tokenize
 using Crayons
 if VERSION > v"1.3"
 import JLFzf

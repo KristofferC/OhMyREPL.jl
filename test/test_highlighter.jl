@@ -5,7 +5,8 @@ using Test
 using OhMyREPL
 import  OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
 
-using Tokenize
+import JuliaSyntax.Tokenize
+using .Tokenize
 
 OhMyREPL.colorscheme!("Monokai16")
 
