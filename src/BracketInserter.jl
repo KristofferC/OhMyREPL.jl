@@ -135,7 +135,9 @@ function insert_into_keymap!(D::Dict)
         repl = Base.active_repl
         mirepl = isdefined(repl, :mi) ? repl.mi : repl
         main_mode = mirepl.interface.modes[1]
-        if isempty(s) || position(buffer(s)) == 0
+        if is_region_active(s)
+            edit_kill_region(s)
+        elseif isempty(s) || position(buffer(s)) == 0
             buf = copy(buffer(s))
             transition(s, main_mode) do
                 state(s, main_mode).input_buffer = buf
@@ -153,7 +155,7 @@ function insert_into_keymap!(D::Dict)
                     return
                 end
             end
-            is_region_active(s) ? edit_kill_region(s) : edit_backspace(s, true)
+            edit_backspace(s, true)
         end
         rewrite_with_ANSI(s)
     end
