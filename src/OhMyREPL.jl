@@ -130,4 +130,6 @@ function __init__()
     end
 end
 
+include("precompile.jl")
+
 end # module
