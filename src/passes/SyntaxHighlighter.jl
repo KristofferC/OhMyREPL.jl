@@ -91,6 +91,9 @@ add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Distinguished", _create_distinguished())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "OneDark", _create_onedark())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Base16MaterialDarker", _create_base16_material_darker())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "GruvboxDark", _create_gruvbox_dark())
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "GitHubLight", _create_github_light())
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "GitHubDark", _create_github_dark())
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "GitHubDarkDimmed", _create_github_dark_dimmed())
 # Added by default
 # add!(SYNTAX_HIGHLIGHTER_SETTINGS, "JuliaDefault", _create_juliadefault())
 

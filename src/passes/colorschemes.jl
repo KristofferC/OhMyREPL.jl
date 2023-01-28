@@ -220,3 +220,80 @@ function _create_gruvbox_dark() #palette https://github.com/morhetz/gruvbox#dark
     number!(cs, Crayon(foreground = 0xd3869b)) #purple
     return cs
 end
+
+function _create_github_light()
+    # https://primer.style/primitives/colors#themes
+    # Note: this matches "GitHub Light Default", not the legacy "GitHub Light"
+    blue = 0x0450ae
+    dark_blue = 0x0a2f69
+    gray = 0x6f7781
+    red = 0xce222e
+    purple = 0x8250df
+    black = 0x24292f
+
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = blue))
+    comment!(cs, Crayon(foreground = gray))
+    string!(cs, Crayon(foreground = dark_blue))
+    call!(cs, Crayon(foreground = blue))
+    op!(cs, Crayon(foreground = red))
+    keyword!(cs, Crayon(foreground = red))
+    text!(cs, Crayon(foreground = black))
+    macro!(cs, Crayon(foreground = blue))
+    function_def!(cs, Crayon(foreground = purple))
+    error!(cs, Crayon(foreground = :default))
+    argdef!(cs, Crayon(foreground = blue))
+    number!(cs, Crayon(foreground = blue))
+    return cs
+end
+
+function _create_github_dark()
+    # https://primer.style/primitives/colors#themes
+    # Note: this matches "GitHub Dark Default", not the legacy "GitHub Dark"
+    blue = 0x79c0ff
+    light_blue = 0xa4d7ff
+    gray = 0x8c949e
+    light_gray = 0xc9d1d9
+    red = 0xfe7b72
+    purple = 0xd2a8ff
+
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = blue))
+    comment!(cs, Crayon(foreground = gray))
+    string!(cs, Crayon(foreground = light_blue))
+    call!(cs, Crayon(foreground = blue))
+    op!(cs, Crayon(foreground = red))
+    keyword!(cs, Crayon(foreground = red))
+    text!(cs, Crayon(foreground = light_gray))
+    macro!(cs, Crayon(foreground = blue))
+    function_def!(cs, Crayon(foreground = purple))
+    error!(cs, Crayon(foreground = :default))
+    argdef!(cs, Crayon(foreground = blue))
+    number!(cs, Crayon(foreground = blue))
+    return cs
+end
+
+function _create_github_dark_dimmed()
+    # https://primer.style/primitives/colors#themes
+    blue = 0x6cb6ff
+    light_blue = 0x96d0ff
+    gray = 0x768390
+    light_gray = 0xadbac7
+    red = 0xf47067
+    purple = 0xdcbdfb
+
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = blue))
+    comment!(cs, Crayon(foreground = gray))
+    string!(cs, Crayon(foreground = light_blue))
+    call!(cs, Crayon(foreground = blue))
+    op!(cs, Crayon(foreground = red))
+    keyword!(cs, Crayon(foreground = red))
+    text!(cs, Crayon(foreground = light_gray))
+    macro!(cs, Crayon(foreground = blue))
+    function_def!(cs, Crayon(foreground = purple))
+    error!(cs, Crayon(foreground = :default))
+    argdef!(cs, Crayon(foreground = blue))
+    number!(cs, Crayon(foreground = blue))
+    return cs
+end
