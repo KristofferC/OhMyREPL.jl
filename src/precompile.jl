@@ -8,7 +8,10 @@
 # Lines containing "fzf_jll" and "JLLWrappers" where manually commented out
 # (they made precompiling OhMyREPL error).
 #
-# ..and the following import was added:
+# Lines with `.var"#` were also commented out: they error on a different
+# system than the one these statements were recorded on.
+#
+# Finally, the following import was added:
 
 import REPL.Markdown
 
@@ -29,10 +32,10 @@ precompile(Tuple{typeof(Base.getindex), Type{Base.Dict{Any, Any}}, Base.Dict{Any
 precompile(Tuple{typeof(REPL.LineEdit.refresh_multi_line), REPL.Terminals.TerminalBuffer, REPL.LineEdit.ModeState})
 
 # Typing first character ("1")
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#2#29", String}, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#2#29", String}, Any, Any})
 precompile(Tuple{Type{Crayons.Crayon}, Crayons.ANSIColor, Crayons.ANSIColor, Crayons.ANSIStyle, Crayons.ANSIStyle, Crayons.ANSIStyle, Crayons.ANSIStyle, Crayons.ANSIStyle, Crayons.ANSIStyle, Crayons.ANSIStyle, Crayons.ANSIStyle, Crayons.ANSIStyle})
 precompile(Tuple{typeof(Base.convert), Type{Crayons.Crayon}, Crayons.Crayon})
-precompile(Tuple{OhMyREPL.Prompt.var"#2#29", Any, Any, Any})
+# precompile(Tuple{OhMyREPL.Prompt.var"#2#29", Any, Any, Any})
 precompile(Tuple{typeof(Base.write), Base.IOContext{Base.GenericIOBuffer{Array{UInt8, 1}}}, String})
 precompile(Tuple{typeof(Base.Unicode.textwidth), String})
 precompile(Tuple{typeof(Base.unsafe_write), Base.IOContext{Base.GenericIOBuffer{Array{UInt8, 1}}}, Ptr{UInt8}, UInt64})
@@ -47,13 +50,13 @@ precompile(Tuple{typeof(OhMyREPL.untokenize_with_ANSI), Base.IOContext{Base.Gene
 precompile(Tuple{typeof(Base.position), Base.GenericIOBuffer{Array{UInt8, 1}}})
 precompile(Tuple{typeof(Base.pipe_reader), REPL.Terminals.TTYTerminal})
 precompile(Tuple{typeof(Base.seek), Base.GenericIOBuffer{Array{UInt8, 1}}, Int64})
-precompile(Tuple{Base.var"#readline##kw", NamedTuple{(:keep,), Tuple{Bool}}, typeof(Base.readline), Base.GenericIOBuffer{Array{UInt8, 1}}})
+# precompile(Tuple{Base.var"#readline##kw", NamedTuple{(:keep,), Tuple{Bool}}, typeof(Base.readline), Base.GenericIOBuffer{Array{UInt8, 1}}})
 precompile(Tuple{typeof(Base.divrem), Int64, Int64})
 precompile(Tuple{typeof(Base.flush), REPL.Terminals.TTYTerminal})
 
 # <enter>
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#22#49", String}, Any, Any})
-precompile(Tuple{OhMyREPL.Prompt.var"#22#49", Any, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#22#49", String}, Any, Any})
+# precompile(Tuple{OhMyREPL.Prompt.var"#22#49", Any, Any, Any})
 precompile(Tuple{typeof(REPL.LineEdit.mode), REPL.LineEdit.MIState})
 precompile(Tuple{typeof(REPL.LineEdit.state), REPL.LineEdit.MIState, REPL.LineEdit.TextInterface})
 precompile(Tuple{typeof(Base.Multimedia.display), Any})
@@ -64,12 +67,12 @@ precompile(Tuple{Type{Base.IOContext{IO_t} where IO_t<:IO}, Base.TTY, Pair{Symbo
 precompile(Tuple{typeof(Base.println), Base.TTY})
 
 # Pasting in `OhMyREPL.colorscheme!("OneLight")`
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.BracketInserter.var"#1#8"{Array{Char, 1}, Char, Char}, String}, Any, Any})
-precompile(Tuple{OhMyREPL.BracketInserter.var"#1#8"{Array{Char, 1}, Char, Char}, REPL.LineEdit.MIState, REPL.LineEditREPL, Vararg{Any}})
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.BracketInserter.var"#5#12"{Char}, String}, Any, Any})
-precompile(Tuple{OhMyREPL.BracketInserter.var"#5#12"{Char}, REPL.LineEdit.MIState, REPL.LineEditREPL, Vararg{Any}})
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.BracketInserter.var"#2#9"{Char}, String}, Any, Any})
-precompile(Tuple{OhMyREPL.BracketInserter.var"#2#9"{Char}, REPL.LineEdit.MIState, REPL.LineEditREPL, Vararg{Any}})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.BracketInserter.var"#1#8"{Array{Char, 1}, Char, Char}, String}, Any, Any})
+# precompile(Tuple{OhMyREPL.BracketInserter.var"#1#8"{Array{Char, 1}, Char, Char}, REPL.LineEdit.MIState, REPL.LineEditREPL, Vararg{Any}})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.BracketInserter.var"#5#12"{Char}, String}, Any, Any})
+# precompile(Tuple{OhMyREPL.BracketInserter.var"#5#12"{Char}, REPL.LineEdit.MIState, REPL.LineEditREPL, Vararg{Any}})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.BracketInserter.var"#2#9"{Char}, String}, Any, Any})
+# precompile(Tuple{OhMyREPL.BracketInserter.var"#2#9"{Char}, REPL.LineEdit.MIState, REPL.LineEditREPL, Vararg{Any}})
 
 # <enter>  (which prints `KeyError: key "OneLight" not found`)
 precompile(Tuple{typeof(OhMyREPL.colorscheme!), String})
@@ -80,13 +83,13 @@ precompile(Tuple{Type{NamedTuple{(:exception, :backtrace), T} where T<:Tuple}, T
 precompile(Tuple{typeof(Base.getproperty), NamedTuple{(:exception, :backtrace), Tuple{Base.KeyError, Array{Base.StackTraces.StackFrame, 1}}}, Symbol})
 precompile(Tuple{typeof(Base.indexed_iterate), NamedTuple{(:exception, :backtrace), Tuple{Base.KeyError, Array{Base.StackTraces.StackFrame, 1}}}, Int64})
 precompile(Tuple{typeof(Base.indexed_iterate), NamedTuple{(:exception, :backtrace), Tuple{Base.KeyError, Array{Base.StackTraces.StackFrame, 1}}}, Int64, Int64})
-precompile(Tuple{Base.var"#showerror##kw", NamedTuple{(:backtrace,), Tuple{Bool}}, typeof(Base.showerror), Base.IOContext{Base.TTY}, Base.KeyError, Array{Base.StackTraces.StackFrame, 1}})
+# precompile(Tuple{Base.var"#showerror##kw", NamedTuple{(:backtrace,), Tuple{Bool}}, typeof(Base.showerror), Base.IOContext{Base.TTY}, Base.KeyError, Array{Base.StackTraces.StackFrame, 1}})
 precompile(Tuple{typeof(Base.show), Base.IOContext{Base.TTY}, String})
 precompile(Tuple{typeof(Base.Filesystem.joinpath), Tuple{String, String, String, String, String, String, String, String}})
 
 # typing "OhMyREPL.<tab>"
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#25#52", String}, Any, Any})
-precompile(Tuple{OhMyREPL.Prompt.var"#25#52", Any, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#25#52", String}, Any, Any})
+# precompile(Tuple{OhMyREPL.Prompt.var"#25#52", Any, Any, Any})
 precompile(Tuple{typeof(REPL.REPLCompletions.get_value), Symbol, Module})
 precompile(Tuple{typeof(Base.indexed_iterate), Tuple{Module, Bool}, Int64})
 precompile(Tuple{typeof(Base.indexed_iterate), Tuple{Module, Bool}, Int64, Int64})
@@ -104,21 +107,21 @@ precompile(Tuple{typeof(Base.show), Base.IOContext{Base.TTY}, Base.Multimedia.MI
 precompile(Tuple{typeof(Base.print), Base.IOContext{Base.TTY}, UInt8})
 
 # <up>
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#55#57"{REPL.LineEdit.PrefixHistoryPrompt}, String}, Any, Any})
-precompile(Tuple{OhMyREPL.Prompt.var"#55#57"{REPL.LineEdit.PrefixHistoryPrompt}, Any, Any, Vararg{Any}})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#55#57"{REPL.LineEdit.PrefixHistoryPrompt}, String}, Any, Any})
+# precompile(Tuple{OhMyREPL.Prompt.var"#55#57"{REPL.LineEdit.PrefixHistoryPrompt}, Any, Any, Vararg{Any}})
 precompile(Tuple{typeof(Base.print), Base.IOContext{Base.GenericIOBuffer{Array{UInt8, 1}}}, UInt8})
 
 # <home>
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#10#37", String}, Any, Any})
-precompile(Tuple{OhMyREPL.Prompt.var"#10#37", Any, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#10#37", String}, Any, Any})
+# precompile(Tuple{OhMyREPL.Prompt.var"#10#37", Any, Any, Any})
 
 # type "?"
 # <end>
-precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.LineEdit.var"#147#201", String}, Any, Any})
-precompile(Tuple{REPL.LineEdit.var"#147#201", REPL.LineEdit.MIState, Any, Vararg{Any}})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.LineEdit.var"#147#201", String}, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#147#201", REPL.LineEdit.MIState, Any, Vararg{Any}})
 
 # <enter>
-precompile(Tuple{REPL.var"#repl##kw", NamedTuple{(:brief,), Tuple{Bool}}, typeof(REPL.repl), Base.TTY, Expr})
+# precompile(Tuple{REPL.var"#repl##kw", NamedTuple{(:brief,), Tuple{Bool}}, typeof(REPL.repl), Base.TTY, Expr})
 precompile(Tuple{typeof(REPL.lookup_doc), Expr})
 precompile(Tuple{typeof(Base.hash), Expr, UInt64})
 precompile(Tuple{typeof(Base.hash), Any, UInt64})
@@ -128,8 +131,8 @@ precompile(Tuple{typeof(Base.Docs.aliasof), Function, Any})
 precompile(Tuple{typeof(REPL.summarize), Base.GenericIOBuffer{Array{UInt8, 1}}, Function, Base.Docs.Binding})
 precompile(Tuple{typeof(Base.print), Base.GenericIOBuffer{Array{UInt8, 1}}, Base.MethodList})
 precompile(Tuple{typeof(Base.string_with_env), Base.ImmutableDict{Symbol, Any}, Type})
-precompile(Tuple{Base.var"#sprint##kw", NamedTuple{(:context,), Tuple{Base.ImmutableDict{Symbol, Any}}}, typeof(Base.sprint), Function, Type, Vararg{Any}})
-precompile(Tuple{Base.var"##sprint#452", Base.ImmutableDict{Symbol, Any}, Int64, typeof(Base.sprint), Function, Type, Vararg{Any}})
+# precompile(Tuple{Base.var"#sprint##kw", NamedTuple{(:context,), Tuple{Base.ImmutableDict{Symbol, Any}}}, typeof(Base.sprint), Function, Type, Vararg{Any}})
+# precompile(Tuple{Base.var"##sprint#452", Base.ImmutableDict{Symbol, Any}, Int64, typeof(Base.sprint), Function, Type, Vararg{Any}})
 precompile(Tuple{typeof(Base.show_signature_function), Base.IOContext{Base.GenericIOBuffer{Array{UInt8, 1}}}, Any, Bool, String, Bool})
 precompile(Tuple{typeof(Base.Multimedia.display), REPL.REPLDisplay{REPL.LineEditREPL}, Base.Multimedia.MIME{Symbol("text/plain")}, Markdown.MD})
 precompile(Tuple{Type{NamedTuple{(:raise,), T} where T<:Tuple}, Tuple{Bool}})
@@ -138,7 +141,7 @@ precompile(Tuple{Type{NamedTuple{(:foreground, :bold), T} where T<:Tuple}, Tuple
 precompile(Tuple{typeof(Base.haskey), NamedTuple{(:foreground, :bold), Tuple{Symbol, Bool}}, Symbol})
 precompile(Tuple{Type{Crayons.ANSIStyle}, Bool})
 precompile(Tuple{Type{NamedTuple{(:reset,), T} where T<:Tuple}, Tuple{Bool}})
-precompile(Tuple{Core.var"#Type##kw", NamedTuple{(:reset,), Tuple{Bool}}, Type{Crayons.Crayon}})
+# precompile(Tuple{Core.var"#Type##kw", NamedTuple{(:reset,), Tuple{Bool}}, Type{Crayons.Crayon}})
 precompile(Tuple{typeof(Markdown.term), Base.IOContext{Base.TTY}, Markdown.Code, Int64})
 precompile(Tuple{typeof(Base.print), Base.GenericIOBuffer{Array{UInt8, 1}}, UInt8})
 
@@ -148,12 +151,12 @@ precompile(Tuple{typeof(OhMyREPL.BracketInserter.enable_autocomplete_brackets), 
 precompile(Tuple{typeof(Base.Multimedia.display), REPL.REPLDisplay{REPL.LineEditREPL}, Base.Multimedia.MIME{Symbol("text/plain")}, Bool})
 
 # Type "1", then <backspace>
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.BracketInserter.var"#6#13"{Array{Char, 1}, Array{Char, 1}}, String}, Any, Any})
-precompile(Tuple{OhMyREPL.BracketInserter.var"#6#13"{Array{Char, 1}, Array{Char, 1}}, REPL.LineEdit.MIState, REPL.LineEditREPL, String})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.BracketInserter.var"#6#13"{Array{Char, 1}, Array{Char, 1}}, String}, Any, Any})
+# precompile(Tuple{OhMyREPL.BracketInserter.var"#6#13"{Array{Char, 1}, Array{Char, 1}}, REPL.LineEdit.MIState, REPL.LineEditREPL, String})
 
 # Type "[", then <end><backspace><backspace>
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#11#38", String}, Any, Any})
-precompile(Tuple{OhMyREPL.Prompt.var"#11#38", Any, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#11#38", String}, Any, Any})
+# precompile(Tuple{OhMyREPL.Prompt.var"#11#38", Any, Any, Any})
 
 # Type "OhMy<tab>"
 precompile(Tuple{typeof(Base.incomplete_tag), Symbol})
@@ -172,8 +175,8 @@ precompile(Tuple{typeof(Base.length), Core.SimpleVector})
 precompile(Tuple{typeof(Base.show), Base.IOContext{Base.TTY}, Array{Crayons.Crayon, 1}})
 
 # "?Int<enter>"
-precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.var"#67#70"{REPL.LineEdit.Prompt}, String}, Any, Any})
-precompile(Tuple{REPL.var"#67#70"{REPL.LineEdit.Prompt}, REPL.LineEdit.MIState, Any, Vararg{Any}})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.var"#67#70"{REPL.LineEdit.Prompt}, String}, Any, Any})
+# precompile(Tuple{REPL.var"#67#70"{REPL.LineEdit.Prompt}, REPL.LineEdit.MIState, Any, Vararg{Any}})
 precompile(Tuple{typeof(Base._typed_vcat), Type{Symbol}, Tuple{Array{Symbol, 1}, Array{Symbol, 1}, Array{Symbol, 1}, Array{Symbol, 1}, Array{Symbol, 1}, Array{Symbol, 1}}})
 precompile(Tuple{typeof(Base.Docs.aliasof), DataType, Any})
 precompile(Tuple{typeof(Base.Docs.formatdoc), Base.GenericIOBuffer{Array{UInt8, 1}}, Base.Docs.DocStr, Int64})
@@ -183,24 +186,24 @@ precompile(Tuple{typeof(Base.vcat), Markdown.MD})
 precompile(Tuple{typeof(Base.Multimedia.display), REPL.REPLDisplay{REPL.LineEditREPL}, Base.Multimedia.MIME{Symbol("text/plain")}, Array{Int64, 1}})
 
 # Type <up> a few times
-precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.LineEdit.var"#242#250", String}, Any, Any})
-precompile(Tuple{REPL.LineEdit.var"#242#250", REPL.LineEdit.MIState, REPL.LineEdit.ModeState, Any})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.LineEdit.var"#242#250", String}, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#242#250", REPL.LineEdit.MIState, REPL.LineEdit.ModeState, Any})
 
 # <home>
-precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.LineEdit.var"#146#200", String}, Any, Any})
-precompile(Tuple{REPL.LineEdit.var"#146#200", REPL.LineEdit.MIState, Any, Vararg{Any}})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.LineEdit.var"#146#200", String}, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#146#200", REPL.LineEdit.MIState, Any, Vararg{Any}})
 
 # <backspace>
-precompile(Tuple{REPL.var"#68#71"{REPL.LineEdit.MIState, Base.GenericIOBuffer{Array{UInt8, 1}}, REPL.LineEdit.Prompt}})
+# precompile(Tuple{REPL.var"#68#71"{REPL.LineEdit.MIState, Base.GenericIOBuffer{Array{UInt8, 1}}, REPL.LineEdit.Prompt}})
 
 # <ctrl>-<k> (empty line)
-precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.LineEdit.var"#139#193", String}, Any, Any})
-precompile(Tuple{REPL.LineEdit.var"#139#193", REPL.LineEdit.MIState, Any, Vararg{Any}})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.LineEdit.var"#139#193", String}, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#139#193", REPL.LineEdit.MIState, Any, Vararg{Any}})
 
 # <ctrl>-<r> (fuzzy history search)
-precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.LineEdit.var"#139#193", String}, Any, Any})
-precompile(Tuple{REPL.LineEdit.var"#139#193", REPL.LineEdit.MIState, Any, Vararg{Any}})
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#26#53", String}, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{REPL.LineEdit.var"#139#193", String}, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#139#193", REPL.LineEdit.MIState, Any, Vararg{Any}})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#26#53", String}, Any, Any})
 precompile(Tuple{typeof(Base.:(<)), UInt32, UInt32})
 precompile(Tuple{typeof(Base.:(>)), UInt32, UInt32})
 precompile(Tuple{typeof(Base.:(!=)), UInt32, UInt32})
@@ -208,8 +211,8 @@ precompile(Tuple{Type{Base.Broadcast.Broadcasted{Base.Broadcast.DefaultArrayStyl
 precompile(Tuple{typeof(Base.ntuple), Base.Returns{Base.OneTo{Int64}}, Base.Val{1}})
 precompile(Tuple{Type{MethodError}, Any, Any, UInt64})
 precompile(Tuple{Type{MethodError}, Any, Any})
-precompile(Tuple{OhMyREPL.Prompt.var"#26#53", Any, Any, Any})
-precompile(Tuple{typeof(Base.withenv), OhMyREPL.Prompt.var"#27#54"{REPL.LineEdit.MIState, Module}, Pair{String, Nothing}})
+# precompile(Tuple{OhMyREPL.Prompt.var"#26#53", Any, Any, Any})
+# precompile(Tuple{typeof(Base.withenv), OhMyREPL.Prompt.var"#27#54"{REPL.LineEdit.MIState, Module}, Pair{String, Nothing}})
 precompile(Tuple{typeof(JLFzf.read_repl_hist)})
 precompile(Tuple{typeof(JLFzf.inter_fzf), Array{Base.SubString{String}, 1}, String, Vararg{String}})
 precompile(Tuple{typeof(JLFzf.inter_fzf), String, String, Vararg{String}})
@@ -222,17 +225,17 @@ precompile(Tuple{typeof(Base.iterate), Base.Dict{String, String}, Int64})
 # precompile(Tuple{typeof(Base.withenv), JLLWrappers.var"#2#3"{JLFzf.var"#1#2"{String, Tuple{String, String, String, String}}, String}, Pair{String, String}})
 # precompile(Tuple{JLLWrappers.var"#2#3"{JLFzf.var"#1#2"{String, Tuple{String, String, String, String}}, String}})
 precompile(Tuple{typeof(Base.haskey), NamedTuple{(:ignorestatus,), Tuple{Bool}}, Symbol})
-precompile(Tuple{JLFzf.var"#1#2"{String, Tuple{String, String, String, String}}, String})
+# precompile(Tuple{JLFzf.var"#1#2"{String, Tuple{String, String, String, String}}, String})
 precompile(Tuple{typeof(Base.arg_gen), Tuple{String, String, String, String}})
 precompile(Tuple{typeof(Base.read), Base.PipeEndpoint})
-precompile(Tuple{Base.var"#729#730"{Base.GenericIOBuffer{Array{UInt8, 1}}, Bool, Base.PipeEndpoint, Base.PipeEndpoint, Base.GenericIOBuffer{Array{UInt8, 1}}}})
+# precompile(Tuple{Base.var"#729#730"{Base.GenericIOBuffer{Array{UInt8, 1}}, Bool, Base.PipeEndpoint, Base.PipeEndpoint, Base.GenericIOBuffer{Array{UInt8, 1}}}})
 
 # <up> a few times, then <enter>
 precompile(Tuple{typeof(JLFzf.insert_history_to_repl), REPL.LineEdit.MIState, Base.SubString{String}})
 
 # <ctrl>-<d> (to quit julia)
-precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#21#48", String}, Any, Any})
-precompile(Tuple{OhMyREPL.Prompt.var"#21#48", Any, Any, Any})
+# precompile(Tuple{REPL.LineEdit.var"#25#26"{OhMyREPL.Prompt.var"#21#48", String}, Any, Any})
+# precompile(Tuple{OhMyREPL.Prompt.var"#21#48", Any, Any, Any})
 precompile(Tuple{typeof(Base.indexed_iterate), Tuple{Nothing, Int64}, Int64})
 precompile(Tuple{typeof(Base.indexed_iterate), Tuple{Nothing, Int64}, Int64, Int64})
-precompile(Tuple{REPL.var"#48#53"{REPL.REPLBackendRef}})
+# precompile(Tuple{REPL.var"#48#53"{REPL.REPLBackendRef}})
