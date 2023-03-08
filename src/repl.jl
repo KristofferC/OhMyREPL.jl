@@ -267,7 +267,6 @@ function create_keybindings()
 end
 NEW_KEYBINDINGS = create_keybindings()
 
-import Pkg
 function insert_keybindings(repl = Base.active_repl)
     mirepl = isdefined(repl,:mi) ? repl.mi : repl
     main_mode = mirepl.interface.modes[1]

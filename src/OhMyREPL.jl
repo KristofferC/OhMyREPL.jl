@@ -87,6 +87,17 @@ enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
 const ENABLE_FZF = Ref(true)
 enable_fzf(v::Bool) = ENABLE_FZF[] = v
 
+using Pkg
+function reinsert_after_pkg()
+    repl = Base.active_repl
+    mirepl = isdefined(repl,:mi) ? repl.mi : repl
+    main_mode = mirepl.interface.modes[1]
+    m = first(methods(main_mode.keymap_dict[']']))
+    if m.module == Pkg.REPLMode
+        Prompt.insert_keybindings()
+    end
+end
+
 function __init__()
     options = Base.JLOptions()
     # command-line
@@ -99,12 +110,20 @@ function __init__()
             Base.active_repl.interface = REPL.setup_interface(Base.active_repl)
         end
         Prompt.insert_keybindings()
+        @async begin
+            sleep(0.25)
+            reinsert_after_pkg()
+        end
     else
         atreplinit() do repl
             if !isdefined(repl, :interface)
                 repl.interface = REPL.setup_interface(repl)
             end
             Prompt.insert_keybindings()
+            @async begin
+                sleep(0.25)
+                reinsert_after_pkg()
+            end
             update_interface(repl.interface)
             main_mode = repl.interface.modes[1]
             p = repl.interface.modes[5]
