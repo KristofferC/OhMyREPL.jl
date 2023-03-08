@@ -11,8 +11,8 @@ end
 
 import REPL
 import REPL.LineEdit
-import REPL.LineEdit: edit_insert, edit_move_left, edit_move_right, buffer, char_move_left,
-                      edit_backspace, terminal, transition, state
+import REPL.LineEdit: edit_insert, edit_move_left, edit_move_right, edit_backspace, edit_kill_region,
+                      is_region_active, buffer, char_move_left,  terminal, transition, state
 
 import REPL.Terminals.beep
 import OhMyREPL.Prompt.rewrite_with_ANSI
@@ -133,9 +133,11 @@ function insert_into_keymap!(D::Dict)
     right_brackets2 = [')', '}', ']', '\"', '\'', '\`']
     D['\b'] = (s, data, c) -> begin
         repl = Base.active_repl
-        mirepl = isdefined(repl,:mi) ? repl.mi : repl
+        mirepl = isdefined(repl, :mi) ? repl.mi : repl
         main_mode = mirepl.interface.modes[1]
-        if isempty(s) || position(buffer(s)) == 0
+        if is_region_active(s)
+            edit_kill_region(s)
+        elseif isempty(s) || position(buffer(s)) == 0
             buf = copy(buffer(s))
             transition(s, main_mode) do
                 state(s, main_mode).input_buffer = buf
@@ -143,9 +145,9 @@ function insert_into_keymap!(D::Dict)
         else
             b = buffer(s)
             str = String(take!(copy(b)))
-            if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) != nothing
+            if AUTOMATIC_BRACKET_MATCH[] && !eof(buffer(s)) && position(buffer(s)) !== nothing
                 i = findfirst(isequal(str[prevind(str, position(b) + 1)]), left_brackets2)
-                if i != nothing && peek(b) == right_brackets2[i]
+                if i !== nothing && peek(b) == right_brackets2[i]
                     edit_move_right(buffer(s))
                     edit_backspace(buffer(s))
                     edit_backspace(buffer(s))
