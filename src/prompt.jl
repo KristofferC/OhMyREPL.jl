@@ -15,14 +15,14 @@ function update_interface(interface)
 end
 
 function input_prompt!(s::Union{String, Function}, col = :green)
-    global INPUT_PROMPT_PREFIX = get(Base.text_colors, Symbol(col), "\e[2m")
+    global INPUT_PROMPT_PREFIX = get(Base.text_colors, col isa Int64 ? col : Symbol(col), "\e[2m")
     global INPUT_PROMPT = s
     isdefined(Base, :active_repl) && isdefined(Base.active_repl, :interface) && update_interface(Base.active_repl.interface)
     return
 end
 
 function output_prompt!(s::Union{String, Function}, col = :red)
-    global OUTPUT_PROMPT_PREFIX = string("\e[1m", get(Base.text_colors, Symbol(col), Base.text_colors[:red]))
+    global OUTPUT_PROMPT_PREFIX = string("\e[1m", get(Base.text_colors, col isa Int64 ? col : Symbol(col), Base.text_colors[:red]))
     global OUTPUT_PROMPT = s
     if isdefined(REPL, :IPython)
         isdefined(Base, :active_repl) && isdefined(Base.active_repl, :interface) && update_interface(Base.active_repl.interface)
