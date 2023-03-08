@@ -5,7 +5,7 @@ using Tokenize
 using Tokenize.Tokens
 import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
 
-import OhMyREPL: add_pass!, PASS_HANDLER
+import OhMyREPL: add_pass!, PASS_HANDLER, SUPPORTS_256_COLORS
 
 mutable struct RainBowTokens
     parenthesis_tokens::Vector{Crayon}
@@ -49,7 +49,8 @@ const RAINBOW_TOKENS_256 =
                          [Crayon(foreground = 223), Crayon(foreground = 130), Crayon(foreground = 202)],
                           Crayon(foreground = 196, bold = true))
 
-const RAINBOWBRACKETS_SETTINGS = RainbowBracketsSettings(RAINBOW_TOKENS_256, RAINBOW_TOKENS_16, Sys.iswindows() ? RAINBOW_TOKENS_16 : RAINBOW_TOKENS_256)
+const RAINBOWBRACKETS_SETTINGS = RainbowBracketsSettings(RAINBOW_TOKENS_256, RAINBOW_TOKENS_16,
+        SUPPORTS_256_COLORS ? RAINBOW_TOKENS_256 : RAINBOW_TOKENS_16)
 
 
 function (rainbow::RainbowBracketsSettings)(ansitokens::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)

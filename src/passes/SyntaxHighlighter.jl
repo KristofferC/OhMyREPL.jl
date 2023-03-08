@@ -6,7 +6,7 @@ import Tokenize.Tokens: Token, kind, exactkind, iskeyword, untokenize
 
 using Crayons
 
-import OhMyREPL: add_pass!, PASS_HANDLER
+import OhMyREPL: add_pass!, PASS_HANDLER, SUPPORTS_256_COLORS 
 
 mutable struct ColorScheme
     symbol::Crayon
@@ -97,7 +97,7 @@ add!(SYNTAX_HIGHLIGHTER_SETTINGS, "GitHubDarkDimmed", _create_github_dark_dimmed
 # Added by default
 # add!(SYNTAX_HIGHLIGHTER_SETTINGS, "JuliaDefault", _create_juliadefault())
 
-if !Sys.iswindows()
+if SUPPORTS_256_COLORS
     activate!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai256")
 else
     activate!(SYNTAX_HIGHLIGHTER_SETTINGS, "Monokai16")
