@@ -1,5 +1,6 @@
 import REPL
 
+if !isdefined(REPL, :IPython)
 function REPL.display(d::REPL.REPLDisplay, mime::MIME"text/plain", x)
     x = Ref{Any}(x)
     REPL.with_repl_linfo(d.repl) do io
@@ -21,4 +22,5 @@ function REPL.display(d::REPL.REPLDisplay, mime::MIME"text/plain", x)
         println(io)
     end
     return nothing
+end
 end
