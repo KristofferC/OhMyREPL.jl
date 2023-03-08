@@ -130,4 +130,49 @@ function __init__()
     end
 end
 
+if !(ccall(:jl_generating_output, Cint, ()) == 1)
+    using TerminalRegressionTests
+else
+
+let
+tracecompile_file = tempname()
+
+content = """
+const OhMyREPL = Base.require(Base.PkgId(Base.UUID("5fb14364-9ced-5910-84b2-373655c76a03"), "OhMyREPL"))
+using OhMyREPL.REPL
+OhMyREPL.TerminalRegressionTests.create_automated_test(
+    tempname(),
+    [c for c in "function foo(a = b())\nend\n\x4"],
+    aggressive_yield=true) do emuterm
+    repl = REPL.LineEditREPL(emuterm, false)
+    repl.specialdisplay = REPL.REPLDisplay(repl)
+    repl.interface = REPL.setup_interface(repl)
+    OhMyREPL.Prompt.insert_keybindings(repl)
+    REPL.run_repl(repl)
+end
+"""
+
+p = run(pipeline(ignorestatus(`$(Base.julia_cmd()) --project=$(Base.active_project()) --trace-compile=$tracecompile_file --compiled-modules=no -e $content`); stderr=devnull))
+if p.exitcode != 0
+    # There seems to be some finalizer problem from VT100...
+    # @warn "OhMyREPL internal precompilation failed"
+end
+
+num_prec = 0
+for line in eachline(tracecompile_file)
+    try
+        eval(Meta.parse(line))
+        num_prec += 1
+    catch e
+        # @warn line
+    end
+end
+
+rm(tracecompile_file; force=true)
+
+# @show num_prec ~251
+end
+
+end # end precompile block
+
 end # module
