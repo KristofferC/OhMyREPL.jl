@@ -94,6 +94,7 @@ add!(SYNTAX_HIGHLIGHTER_SETTINGS, "GruvboxDark", _create_gruvbox_dark())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "GitHubLight", _create_github_light())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "GitHubDark", _create_github_dark())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "GitHubDarkDimmed", _create_github_dark_dimmed())
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Dracula", _create_dracula())
 # Added by default
 # add!(SYNTAX_HIGHLIGHTER_SETTINGS, "JuliaDefault", _create_juliadefault())
 
