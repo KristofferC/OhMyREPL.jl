@@ -187,6 +187,23 @@ function _create_onedark()
     return cs
 end
 
+function _create_onelight()
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = 0xe45649))
+    comment!(cs, Crayon(foreground = 0x9ca0a4))
+    string!(cs, Crayon(foreground = 0x50a14f))
+    call!(cs, Crayon(foreground = 0x4078f2))
+    op!(cs, Crayon(foreground = 0x0184bc))
+    keyword!(cs, Crayon(foreground = 0xe45649))
+    text!(cs, Crayon(foreground = 0x383a42))
+    macro!(cs, Crayon(foreground = 0xa626a4))
+    function_def!(cs, Crayon(foreground = 0xa626a4))
+    error!(cs, Crayon(foreground = 0xe45649))
+    argdef!(cs, Crayon(foreground = 0x986801))
+    number!(cs, Crayon(foreground = 0xda8548))
+    return cs
+end
+
 function _create_base16_material_darker()
     cs = ColorScheme()
     symbol!(cs, Crayon(foreground = 0xf07178))
