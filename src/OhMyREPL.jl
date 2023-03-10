@@ -157,11 +157,21 @@ OhMyREPL.TerminalRegressionTests.create_automated_test(
 end
 """
 
-p = run(pipeline(ignorestatus(`$(Base.julia_cmd()) --project=$(Base.active_project()) --trace-compile=$tracecompile_file --compiled-modules=no -e $content`); stderr=devnull))
-if p.exitcode != 0
-    # There seems to be some finalizer problem from VT100...
-    # @warn "OhMyREPL internal precompilation failed"
+function run_with_timeout(command, timeout::Integer = 25)
+    cmd = run(command; wait=false)
+     for _ in 1:timeout
+         if !process_running(cmd) return success(cmd) end
+         sleep(1)
+     end
+     @warn "OhMyREPL precompilation not finished in time, killing"
+     kill(cmd)
+     return false
 end
+
+
+run_with_timeout(
+    pipeline(ignorestatus(`$(Base.julia_cmd()) --project=$(Base.active_project()) --trace-compile=$tracecompile_file --compiled-modules=no -e $content`); stderr=devnull)
+)
 
 num_prec = 0
 for line in eachline(tracecompile_file)
