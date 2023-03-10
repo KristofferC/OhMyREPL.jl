@@ -1,16 +1,24 @@
-global INPUT_PROMPT = "julia> "
-global INPUT_PROMPT_PREFIX = Base.text_colors[:green]
+INPUT_PROMPT = nothing
+INPUT_PROMPT_PREFIX = nothing
 
-global OUTPUT_PROMPT = ""
-global OUTPUT_PROMPT_PREFIX = ""
+OUTPUT_PROMPT = nothing
+OUTPUT_PROMPT_PREFIX = nothing
 
 function update_interface(interface)
     main_mode = interface.modes[1]
-    main_mode.prompt_prefix = INPUT_PROMPT_PREFIX
-    main_mode.prompt = INPUT_PROMPT
+    if INPUT_PROMPT_PREFIX !== nothing
+        main_mode.prompt_prefix = INPUT_PROMPT_PREFIX
+    end
+    if INPUT_PROMPT !== nothing
+        main_mode.prompt = INPUT_PROMPT
+    end
     if isdefined(REPL, :IPython)
-        main_mode.output_prefix_prefix = OUTPUT_PROMPT_PREFIX
-        main_mode.output_prefix = OUTPUT_PROMPT
+        if OUTPUT_PROMPT_PREFIX !== nothing
+            main_mode.output_prefix_prefix = OUTPUT_PROMPT_PREFIX
+        end
+        if OUTPUT_PROMPT !== nothing
+            main_mode.output_prefix = OUTPUT_PROMPT
+        end
     end
 end
 
