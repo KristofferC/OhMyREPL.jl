@@ -10,9 +10,11 @@ function REPL.display(d::REPL.REPLDisplay, mime::MIME"text/plain", x)
             mod = Main
         end
         io = IOContext(io, :limit => true, :module => mod)
-        output_prompt = OUTPUT_PROMPT isa String ? OUTPUT_PROMPT : OUTPUT_PROMPT()
-        write(io, OUTPUT_PROMPT_PREFIX)
-        write(io, output_prompt, "\e[0m")
+        if OUTPUT_PROMPT !== nothing
+            output_prompt = OUTPUT_PROMPT isa String ? OUTPUT_PROMPT : OUTPUT_PROMPT()
+            write(io, OUTPUT_PROMPT_PREFIX)
+            write(io, output_prompt, "\e[0m")
+        end
         get(io, :color, false) && write(io, REPL.answer_color(d.repl))
         if isdefined(d.repl, :options) && isdefined(d.repl.options, :iocontext)
             # this can override the :limit property set initially
