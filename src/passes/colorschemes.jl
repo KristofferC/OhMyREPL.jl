@@ -153,6 +153,23 @@ function _create_tomorrow_256()
     return cs
 end
 
+function _create_tomorrow_day()
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = 0x8959a8))
+    comment!(cs, Crayon(foreground = 0x8e908c))
+    string!(cs, Crayon(foreground = 0x718c00))
+    call!(cs, Crayon(foreground = 0x4271ae))
+    op!(cs, Crayon(foreground = 0x4271ae))
+    keyword!(cs, Crayon(foreground = 0x8959a8))
+    text!(cs, Crayon(foreground = 0x4d4d4c))
+    macro!(cs, Crayon(foreground = 0xf5871f))
+    function_def!(cs, Crayon(foreground = 0xf5871f))
+    error!(cs, Crayon(foreground = 0xc82829))
+    argdef!(cs, Crayon(foreground = 0xbb9200))
+    number!(cs, Crayon(foreground = 0xf5871f))
+    return cs
+end
+
 function _create_distinguished()
     cs = ColorScheme()
     symbol!(cs, Crayon(foreground = 66, bold=true))

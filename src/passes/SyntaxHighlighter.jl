@@ -87,6 +87,7 @@ add!(SYNTAX_HIGHLIGHTER_SETTINGS, "TomorrowNightBright", _create_tomorrow_night_
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "TomorrowNightBright24bit", _create_tomorrow_night_bright_24())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Tomorrow24bit", _create_tomorrow_24())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Tomorrow", _create_tomorrow_256())
+add!(SYNTAX_HIGHLIGHTER_SETTINGS, "TomorrowDay", _create_tomorrow_day())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "Distinguished", _create_distinguished())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "OneDark", _create_onedark())
 add!(SYNTAX_HIGHLIGHTER_SETTINGS, "OneLight", _create_onelight())
