@@ -153,6 +153,23 @@ function _create_tomorrow_256()
     return cs
 end
 
+function _create_tomorrow_day()
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = 0x8959a8))
+    comment!(cs, Crayon(foreground = 0x8e908c))
+    string!(cs, Crayon(foreground = 0x718c00))
+    call!(cs, Crayon(foreground = 0x4271ae))
+    op!(cs, Crayon(foreground = 0x4271ae))
+    keyword!(cs, Crayon(foreground = 0x8959a8))
+    text!(cs, Crayon(foreground = 0x4d4d4c))
+    macro!(cs, Crayon(foreground = 0xf5871f))
+    function_def!(cs, Crayon(foreground = 0xf5871f))
+    error!(cs, Crayon(foreground = 0xc82829))
+    argdef!(cs, Crayon(foreground = 0xbb9200))
+    number!(cs, Crayon(foreground = 0xf5871f))
+    return cs
+end
+
 function _create_distinguished()
     cs = ColorScheme()
     symbol!(cs, Crayon(foreground = 66, bold=true))
@@ -184,6 +201,23 @@ function _create_onedark()
     error!(cs, Crayon(foreground = (190,80,70)))
     argdef!(cs, Crayon(foreground = (229,192,123)))
     number!(cs, Crayon(foreground = (209,154,102)))
+    return cs
+end
+
+function _create_onelight()
+    cs = ColorScheme()
+    symbol!(cs, Crayon(foreground = 0xe45649))
+    comment!(cs, Crayon(foreground = 0x9ca0a4))
+    string!(cs, Crayon(foreground = 0x50a14f))
+    call!(cs, Crayon(foreground = 0x4078f2))
+    op!(cs, Crayon(foreground = 0x0184bc))
+    keyword!(cs, Crayon(foreground = 0xe45649))
+    text!(cs, Crayon(foreground = 0x383a42))
+    macro!(cs, Crayon(foreground = 0xa626a4))
+    function_def!(cs, Crayon(foreground = 0xa626a4))
+    error!(cs, Crayon(foreground = 0xe45649))
+    argdef!(cs, Crayon(foreground = 0x986801))
+    number!(cs, Crayon(foreground = 0xda8548))
     return cs
 end
 

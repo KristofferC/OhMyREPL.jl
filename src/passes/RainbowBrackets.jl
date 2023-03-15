@@ -7,6 +7,8 @@ import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
 
 import OhMyREPL: add_pass!, PASS_HANDLER, SUPPORTS_256_COLORS
 
+using ..SyntaxHighlighter
+
 mutable struct RainBowTokens
     parenthesis_tokens::Vector{Crayon}
     brackets_tokens::Vector{Crayon}
@@ -36,22 +38,30 @@ end
 activate_16colors() = RAINBOWBRACKETS_SETTINGS.active = RAINBOWBRACKETS_SETTINGS.tokens_16
 activate_256colors() = RAINBOWBRACKETS_SETTINGS.active = RAINBOWBRACKETS_SETTINGS.tokens_256
 
-
 const RAINBOW_TOKENS_16 =
  RainBowTokens([Crayon(foreground = :yellow), Crayon(foreground = :green)],
-                         [Crayon(foreground = :cyan), Crayon(foreground = :magenta)],
-                         [Crayon(foreground = :light_gray), Crayon(foreground = :default)],
-                          Crayon(foreground = :light_red))
+               [Crayon(foreground = :cyan), Crayon(foreground = :magenta)],
+               [Crayon(foreground = :light_gray), Crayon(foreground = :default)],
+               Crayon(foreground = :light_red))
 
 const RAINBOW_TOKENS_256 =
  RainBowTokens([Crayon(foreground = 178), Crayon(foreground = 161), Crayon(foreground =  034), Crayon(foreground = 200)],
-                         [Crayon(foreground = 045), Crayon(foreground = 099), Crayon(foreground = 033)],
-                         [Crayon(foreground = 223), Crayon(foreground = 130), Crayon(foreground = 202)],
-                          Crayon(foreground = 196, bold = true))
+               [Crayon(foreground = 045), Crayon(foreground = 099), Crayon(foreground = 033)],
+               [Crayon(foreground = 223), Crayon(foreground = 130), Crayon(foreground = 202)],
+               Crayon(foreground = 196, bold = true))
 
 const RAINBOWBRACKETS_SETTINGS = RainbowBracketsSettings(RAINBOW_TOKENS_256, RAINBOW_TOKENS_16,
         SUPPORTS_256_COLORS ? RAINBOW_TOKENS_256 : RAINBOW_TOKENS_16)
 
+function updatebracketcolors!(cs::SyntaxHighlighter.ColorScheme)
+    RAINBOWBRACKETS_SETTINGS.active.parenthesis_tokens =
+        [cs.argdef, cs.keyword, cs.string]
+    RAINBOWBRACKETS_SETTINGS.active.brackets_tokens =
+        [cs.call, cs.op]
+    RAINBOWBRACKETS_SETTINGS.active.curly_tokens =
+        [cs.argdef, cs.number]
+    RAINBOWBRACKETS_SETTINGS.active.error_token = cs.error
+end
 
 function (rainbow::RainbowBracketsSettings)(ansitokens::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
     p, s, b = 0, 0, 0

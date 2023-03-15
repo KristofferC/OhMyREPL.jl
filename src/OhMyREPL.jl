@@ -27,8 +27,10 @@ include("prompt.jl")
 import .BracketInserter.enable_autocomplete_brackets
 
 function colorscheme!(name::String)
-    Passes.SyntaxHighlighter.activate!(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS,
-                                       name)
+    Passes.SyntaxHighlighter.activate!(
+        Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS, name)
+    Passes.RainbowBrackets.updatebracketcolors!(
+        Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS.active)
 end
 
 function colorschemes()
