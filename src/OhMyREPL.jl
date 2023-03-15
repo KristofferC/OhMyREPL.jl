@@ -135,59 +135,8 @@ function __init__()
     end
 end
 
-if !(ccall(:jl_generating_output, Cint, ()) == 1)
-    using TerminalRegressionTests
-else
-
-let
-tracecompile_file = tempname()
-
-content = """
-const OhMyREPL = Base.require(Base.PkgId(Base.UUID("5fb14364-9ced-5910-84b2-373655c76a03"), "OhMyREPL"))
-using OhMyREPL.REPL
-OhMyREPL.TerminalRegressionTests.create_automated_test(
-    tempname(),
-    [c for c in "function foo(a = b())\nend\n\x4"],
-    aggressive_yield=true) do emuterm
-    repl = REPL.LineEditREPL(emuterm, false)
-    repl.specialdisplay = REPL.REPLDisplay(repl)
-    repl.interface = REPL.setup_interface(repl)
-    OhMyREPL.Prompt.insert_keybindings(repl)
-    REPL.run_repl(repl)
+if ccall(:jl_generating_output, Cint, ()) == 1
+    include("precompile.jl")
 end
-"""
-
-function run_with_timeout(command, timeout::Integer = 25)
-    cmd = run(command; wait=false)
-     for _ in 1:timeout
-         if !process_running(cmd) return success(cmd) end
-         sleep(1)
-     end
-     @warn "OhMyREPL precompilation not finished in time, killing"
-     kill(cmd)
-     return false
-end
-
-
-run_with_timeout(
-    pipeline(ignorestatus(`$(Base.julia_cmd()) --project=$(Base.active_project()) --trace-compile=$tracecompile_file --compiled-modules=no -e $content`); stderr=devnull)
-)
-
-num_prec = 0
-for line in eachline(tracecompile_file)
-    try
-        eval(Meta.parse(line))
-        num_prec += 1
-    catch e
-        # @warn line
-    end
-end
-
-rm(tracecompile_file; force=true)
-
-# @show num_prec ~251
-end
-
-end # end precompile block
 
 end # module
