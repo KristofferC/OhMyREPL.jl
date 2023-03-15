@@ -7,10 +7,10 @@ All the passes are registered in a global pass handler. To show all the passes u
 ```jl
 julia> OhMyREPL.showpasses()
 ----------------------------------
- #   Pass name             Enabled  
+ #   Pass name             Enabled
 ----------------------------------
- 1   BracketHighlighter    true     
- 2   SyntaxHighlighter     true     
+ 1   BracketHighlighter    true
+ 2   SyntaxHighlighter     true
 ----------------------------------
 ```
 
@@ -34,24 +34,24 @@ julia> using Tokenize
 julia> tokens = collect(Tokenize.tokenize(str))
 20-element Array{Tokenize.Tokens.Token,1}:
   1,1-1,8:          KEYWORD           "function"
-  1,9-1,9:          WHITESPACE        " "       
-  1,10-1,10:        IDENTIFIER        "f"       
-  1,11-1,11:        LPAREN            "("       
-  1,12-1,12:        IDENTIFIER        "x"       
-  1,13-1,14:        OP                "::"      
+  1,9-1,9:          WHITESPACE        " "
+  1,10-1,10:        IDENTIFIER        "f"
+  1,11-1,11:        LPAREN            "("
+  1,12-1,12:        IDENTIFIER        "x"
+  1,13-1,14:        OP                "::"
   1,15-1,21:        IDENTIFIER        "Float64"
-  1,22-1,22:        RPAREN            ")"       
-  1,23-1,23:        WHITESPACE        " "       
-  1,24-1,29:        KEYWORD           "return"  
-  1,30-1,30:        WHITESPACE        " "       
-  1,31-1,31:        OP                ":"       
-  1,32-1,32:        IDENTIFIER        "x"       
-  1,33-1,33:        WHITESPACE        " "       
-  1,34-1,34:        OP                "+"       
-  1,35-1,35:        WHITESPACE        " "       
-  1,36-1,38:        CHAR              "'a'"     
-  1,39-1,39:        WHITESPACE        " "       
-  1,40-1,42:        KEYWORD           "end"     
+  1,22-1,22:        RPAREN            ")"
+  1,23-1,23:        WHITESPACE        " "
+  1,24-1,29:        KEYWORD           "return"
+  1,30-1,30:        WHITESPACE        " "
+  1,31-1,31:        OP                ":"
+  1,32-1,32:        IDENTIFIER        "x"
+  1,33-1,33:        WHITESPACE        " "
+  1,34-1,34:        OP                "+"
+  1,35-1,35:        WHITESPACE        " "
+  1,36-1,38:        CHAR              "'a'"
+  1,39-1,39:        WHITESPACE        " "
+  1,40-1,42:        KEYWORD           "end"
   1,43-1,42:        ENDMARKER         ""
 ```
 
@@ -62,17 +62,17 @@ crayons = Vector{Crayon}(length(tokens));
 fill!(crayons, Crayon()) # Crayon is a bits type so this is OK
 ```
 
-These two vectors are then sent to the syntax highlighter pass together with an integer that represent what character offset the cursor currently is located. The syntax highlighter does not use this information but the bracket highlighter does.
+These two vectors and the source code are then sent to the syntax highlighter pass together with an integer that represent what character offset the cursor currently is located. The syntax highlighter does not use this information but the bracket highlighter does.
 
 ```
-OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0)
+OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0, str)
 ```
 
 Running this function has the effect of updating the `crayons` vector. If we print this vector we see that they have been updated:
 
 ![](ansitokens_after.png)
 
-To print the original string with the updated vector of `Crayon`s we use the `OhMyREPL.untokenize_with_ANSI([io::IO], crayons, tokens)` function as:
+To print the original string with the updated vector of `Crayon`s we use the `OhMyREPL.untokenize_with_ANSI([io::IO], crayons, tokens, str)` function as:
 
 ![](print_ansi.png)
 
@@ -80,7 +80,7 @@ Each registered and enabled pass does this updating and the contributions from e
 
 ## Creating a pass
 
-This section shows how to create a very pass that let the user define a `Crayon` for each typeassertion / declaration that happens to be a `Float64`.
+This section shows how to create a pass that let the user define a `Crayon` for each typeassertion / declaration that happens to be a `Float64`.
 
 !!! info
     Please refer to the [Tokenize.jl API](https://github.com/KristofferC/Tokenize.jl#api) section and the  [`Crayons.jl` documentation](https://github.com/KristofferC/Crayons.jl) while reading this section.
@@ -89,7 +89,8 @@ We start off with a few imports and creating a new struct which will hold the se
 
 ```jl
 using Crayons
-import Tokenize.Tokens: Token, untokenize, exactkind
+import JuliaSyntax
+import JuliaSyntax.Tokenize: Token, untokenize, kind
 using OhMyREPL
 
 mutable struct Float64Modifier
@@ -104,11 +105,11 @@ We then use call overloading to define a function for the type. The function wil
 
 ```jl
 # The pass function, the cursor position is not used but it needs to be given an argument
-function (float64modifier::Float64Modifier)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
+function (float64modifier::Float64Modifier)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int, str::AbstractString)
     # Loop over all tokens and crayons
     for i in 1:length(crayons)
-        if untokenize(tokens[i]) == "Float64"
-            if i > 1 && exactkind(tokens[i-1]) == Tokenize.Tokens.DECLARATION
+        if untokenize(tokens[i], str) == "Float64"
+            if i > 1 && kind(tokens[i-1]) == JuliaSyntax.K"::"
                 # Update the crayon
                 crayons[i] = float64modifier.crayon
             end
@@ -130,11 +131,11 @@ To register and start using the pass simply use `OhMyREPL.add_pass!(passname::St
 ```jl
 julia> OhMyREPL.add_pass!("Redify Float64", FLOAT64_MODIFIER)
 ----------------------------------
- #   Pass name             Enabled  
+ #   Pass name             Enabled
 ----------------------------------
- 1   Redify Float64        true     
- 2   BracketHighlighter    true     
- 3   SyntaxHighlighter     true     
+ 1   Redify Float64        true
+ 2   BracketHighlighter    true
+ 3   SyntaxHighlighter     true
 ----------------------------------
 ```
 
@@ -151,11 +152,11 @@ The prescedence of a pass can be modified with the `OhMyREPL.prescedence!(pass::
 ```jl
 julia> OhMyREPL.prescedence!("Redify Float64", 3)
 ----------------------------------
- #   Pass name             Enabled  
+ #   Pass name             Enabled
 ----------------------------------
- 1   BracketHighlighter    true     
- 2   SyntaxHighlighter     true     
- 3   Redify Float64        true     
+ 1   BracketHighlighter    true
+ 2   SyntaxHighlighter     true
+ 3   Redify Float64        true
 ----------------------------------
 ```
 
