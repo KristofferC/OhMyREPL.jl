@@ -135,8 +135,10 @@ function __init__()
     end
 end
 
+if !Sys.iswindows()
 if ccall(:jl_generating_output, Cint, ()) == 1
     include("precompile.jl")
+end
 end
 
 end # module
