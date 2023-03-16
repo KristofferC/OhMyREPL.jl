@@ -1,5 +1,5 @@
-import JuliaSyntax.Tokenize
-import .Tokenize: Token, kind, untokenize, Lexer
+import JuliaSyntax
+using JuliaSyntax: kind, @K_str, Token, tokenize, untokenize
 using Printf
 
 const RESET = Crayon(reset = true)
@@ -22,7 +22,7 @@ const PASS_HANDLER = PassHandler()
 function test_pass(io::IO, f, str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false)
     rpc = PassHandler()
     add_pass!(rpc, "TestPass", f)
-    tokens = collect(Lexer(str))
+    tokens = tokenize(str)
     apply_passes!(rpc, tokens, str, cursorpos, cursormovement)
     untokenize_with_ANSI(io, rpc.accum_crayons, tokens, str)
 end
@@ -32,7 +32,7 @@ test_pass(f, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::B
 
 function test_passes(io::IO, rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false)
     b = IOBuffer()
-    tokens = collect(Lexer(str))
+    tokens = tokenize(str)
     apply_passes!(rpc, tokens, str, cursorpos, cursormovement)
     untokenize_with_ANSI(io, rpc.accum_crayons, tokens, str)
 end

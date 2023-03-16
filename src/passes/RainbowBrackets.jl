@@ -1,10 +1,7 @@
 module RainbowBrackets
 
 using Crayons
-import JuliaSyntax.@K_str
-import JuliaSyntax.Tokenize
-using .Tokenize
-import .Tokenize: Token, kind, startpos, untokenize, Kind
+import JuliaSyntax: kind, Kind, @K_str, Token
 
 import OhMyREPL: add_pass!, PASS_HANDLER, SUPPORTS_256_COLORS
 

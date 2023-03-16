@@ -1,6 +1,5 @@
 
 using Crayons
-using JuliaSyntax.Tokenize
 import Markdown
 
 import .OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
