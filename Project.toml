@@ -13,7 +13,7 @@ REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 
 [compat]
 Crayons = "1, 2, 3, 4"
-JuliaSyntax = "0.3.0"
+JuliaSyntax = "0.3.3"
 JLFzf = "^0.1.1"
 julia = "1.6"
 

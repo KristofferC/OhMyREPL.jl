@@ -11,8 +11,7 @@ import REPL: respond, return_callback
 import REPL.LineEdit: buffer, cmove_col, cmove_up, InputAreaState, transition,
                       terminal, buffer, on_enter, move_input_end, add_history, state, mode, edit_insert
 
-import JuliaSyntax.Tokenize
-import .Tokenize.Lexer
+import JuliaSyntax: tokenize, untokenize
 
 import REPL.Terminals: raw!, width, height, cmove, getX, TerminalBuffer,
                   getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
@@ -60,7 +59,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
         # Insert colorized text from running the passes
         seekstart(buffer(s))
         str = read(buffer(s), String)
-        tokens = collect(Lexer(str))
+        tokens = tokenize(str)
         apply_passes!(PASS_HANDLER, tokens, str, cursoridx, cursormove)
         untokenize_with_ANSI(outbuf, PASS_HANDLER, tokens, str)
 

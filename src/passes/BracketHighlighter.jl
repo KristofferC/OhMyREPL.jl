@@ -1,7 +1,6 @@
 module BracketHighlighter
 
-using JuliaSyntax.Tokenize
-import .Tokenize: Token, kind, startpos, untokenize
+using JuliaSyntax: kind, Token, untokenize
 
 using Crayons
 

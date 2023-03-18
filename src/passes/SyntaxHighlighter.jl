@@ -1,10 +1,7 @@
 module SyntaxHighlighter
 
 import JuliaSyntax
-import .JuliaSyntax.Tokenize
-import JuliaSyntax.@K_str
-using .Tokenize
-import .Tokenize: Token, kind, kind, untokenize
+using JuliaSyntax: @K_str, kind, Token, untokenize
 
 using Crayons
 
@@ -121,8 +118,10 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
             crayons[i-1] = cscheme.argdef
             crayons[i] = cscheme.argdef
         =#
+        if JuliaSyntax.is_error(t)
+            crayons[i] = cscheme.error
         # :foo
-        if kind(t) == K"Identifier" && kind(prev_t) == K":" &&
+        elseif kind(t) == K"Identifier" && kind(prev_t) == K":" &&
                kind(pprev_t) ∉ (K"Integer", K"Float", K"Identifier", K")")
             crayons[i-1] = cscheme.symbol
             crayons[i] = cscheme.symbol
