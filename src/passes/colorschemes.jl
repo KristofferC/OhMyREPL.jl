@@ -27,7 +27,7 @@ function _create_monokai()
     text!(cs, Crayon(foreground = :default))
     macro!(cs, Crayon(foreground = :light_cyan))
     function_def!(cs, Crayon(foreground = :light_green))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = :light_cyan))
     number!(cs, Crayon(foreground = :cyan))
     return cs
@@ -44,7 +44,7 @@ function _create_monokai_256()
     text!(cs, Crayon(foreground = :default))
     macro!(cs, Crayon(foreground = 81)) # cyanish
     function_def!(cs, Crayon(foreground = 148))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = 81))  # cyanish
     number!(cs, Crayon(foreground = 141)) # purpleish
     return cs
@@ -61,7 +61,7 @@ function _create_monokai_24()
     text!(cs, Crayon(foreground = :default))
     macro!(cs, Crayon(foreground = (102,217,239)))
     function_def!(cs, Crayon(foreground = (166,226,42)))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = (102,217,239)))
     number!(cs, Crayon(foreground = (174,129,255)))
     return cs
@@ -78,7 +78,7 @@ function _create_boxymonokai_256()
     text!(cs, Crayon(foreground = :default))
     macro!(cs, Crayon(foreground = 81))
     function_def!(cs, Crayon(foreground = 81))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = 186))
     number!(cs, Crayon(foreground = 208))
     return cs
@@ -95,7 +95,7 @@ function _create_tomorrow_night_bright()
     text!(cs, Crayon(foreground = :default))
     macro!(cs, Crayon(foreground = 73))
     function_def!(cs, Crayon(foreground = 110))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = 255)) # nothing special added here
     number!(cs, Crayon(foreground = 208))
     return cs
@@ -112,7 +112,7 @@ function _create_tomorrow_night_bright_24()
     text!(cs, Crayon(foreground = :default))
     macro!(cs, Crayon(foreground = (112, 192, 177)))
     function_def!(cs, Crayon(foreground = (122, 166, 218)))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = 255)) # nothing special added here
     number!(cs, Crayon(foreground = (231, 140, 69)))
     return cs
@@ -130,7 +130,7 @@ function _create_tomorrow_24()
     text!(cs, Crayon(foreground = :default))
     macro!(cs, Crayon(foreground = (62, 153, 159)))
     function_def!(cs, Crayon(foreground = (66, 113, 174)))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = :default)) # nothing special added here
     number!(cs, Crayon(foreground = (245, 135, 31)))
     return cs
@@ -147,7 +147,7 @@ function _create_tomorrow_256()
     text!(cs, Crayon(foreground = :default))
     macro!(cs, Crayon(foreground = 67))
     function_def!(cs, Crayon(foreground = 61))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = :default)) # nothing special added here
     number!(cs, Crayon(foreground = 208))
     return cs
@@ -181,7 +181,7 @@ function _create_distinguished()
     text!(cs, Crayon(foreground = :default))
     macro!(cs, Crayon(foreground = 247))
     function_def!(cs, Crayon(foreground = :default))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = 67))
     number!(cs, Crayon(foreground = 173))
     return cs
@@ -232,7 +232,7 @@ function _create_base16_material_darker()
     text!(cs, Crayon(foreground = :default))
     macro!(cs, Crayon(foreground = 0x82aaff))
     function_def!(cs, Crayon(foreground = 0x82aaff))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = 0xffcb6b))
     number!(cs, Crayon(foreground = 0xf78c6c))
     return cs
@@ -249,7 +249,7 @@ function _create_gruvbox_dark() #palette https://github.com/morhetz/gruvbox#dark
     text!(cs, Crayon(foreground = 0xebdbb2)) #foreground
     macro!(cs, Crayon(foreground = 0x8ec07c)) #aqua
     function_def!(cs, Crayon(foreground = 0xebdbb2)) #foreground
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = 0xd79921)) #yellow
     number!(cs, Crayon(foreground = 0xd3869b)) #purple
     return cs
@@ -275,7 +275,7 @@ function _create_github_light()
     text!(cs, Crayon(foreground = black))
     macro!(cs, Crayon(foreground = blue))
     function_def!(cs, Crayon(foreground = purple))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = blue))
     number!(cs, Crayon(foreground = blue))
     return cs
@@ -301,7 +301,7 @@ function _create_github_dark()
     text!(cs, Crayon(foreground = light_gray))
     macro!(cs, Crayon(foreground = blue))
     function_def!(cs, Crayon(foreground = purple))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = blue))
     number!(cs, Crayon(foreground = blue))
     return cs
@@ -326,7 +326,7 @@ function _create_github_dark_dimmed()
     text!(cs, Crayon(foreground = light_gray))
     macro!(cs, Crayon(foreground = blue))
     function_def!(cs, Crayon(foreground = purple))
-    error!(cs, Crayon(foreground = :default))
+    error!(cs, Crayon(foreground = :default, background=:light_red))
     argdef!(cs, Crayon(foreground = blue))
     number!(cs, Crayon(foreground = blue))
     return cs
