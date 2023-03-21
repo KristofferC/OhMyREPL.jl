@@ -22,61 +22,65 @@ import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 @nospecialize # use only declared type signatures
 
 function rewrite_with_ANSI(s, cursormove::Bool = false)
-        if isa(s, LineEdit.SearchState)
-            return
-        end
-        # Clear input area
-        p = position(buffer(s))
-        if isa(s, LineEdit.PrefixSearchState)
-            s = s.mi
-        end
-        if isa(s, LineEdit.MIState)
-            mode = s.mode_state[s.current_mode]
+    if isa(s, LineEdit.SearchState)
+        return
+    end
+
+    # Clear input area
+    p = position(buffer(s))
+    if isa(s, LineEdit.PrefixSearchState)
+        s = s.mi
+    end
+    if isa(s, LineEdit.MIState)
+        mode = s.mode_state[s.current_mode]
+    else
+        mode = s
+    end
+
+    if mode isa REPL.LineEdit.PromptState && !(mode.p.complete isa REPL.REPLCompletionProvider)
+        return
+    end
+
+    io = IOBuffer()
+    outbuf = IOContext(io, stdout)
+    termbuf = Terminals.TerminalBuffer(outbuf)
+    # Hide the cursor
+    LineEdit.write(outbuf, "\e[?25l")
+    LineEdit.clear_input_area(termbuf, mode)
+    # Extract the cursor index in character count
+    cursoridx = length(String(buffer(s).data[1:p]))
+
+    l = textwidth(get_prompt(s))
+    if !isa(s, LineEdit.SearchState)
+        # xref: https://github.com/JuliaLang/julia/pull/36689
+        @static if VERSION ≥ v"1.6.0-DEV.517"
+            LineEdit.write_prompt(termbuf, mode, LineEdit.hascolor(terminal(s)))
         else
-            mode = s
+            LineEdit.write_prompt(termbuf, mode)
         end
+        LineEdit.write(termbuf, "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
+    end
 
-        io = IOBuffer()
-        outbuf = IOContext(io, stdout)
-        termbuf = Terminals.TerminalBuffer(outbuf)
-        # Hide the cursor
-        LineEdit.write(outbuf, "\e[?25l")
-        LineEdit.clear_input_area(termbuf, mode)
-        # Extract the cursor index in character count
-        cursoridx = length(String(buffer(s).data[1:p]))
+    # Insert colorized text from running the passes
+    seekstart(buffer(s))
+    str = read(buffer(s), String)
+    tokens = tokenize(str)
+    apply_passes!(PASS_HANDLER, tokens, str, cursoridx, cursormove)
+    untokenize_with_ANSI(outbuf, PASS_HANDLER, tokens, str)
 
-        l = textwidth(get_prompt(s))
-        if !isa(s, LineEdit.SearchState)
-            # xref: https://github.com/JuliaLang/julia/pull/36689
-            @static if VERSION ≥ v"1.6.0-DEV.517"
-                LineEdit.write_prompt(termbuf, mode, LineEdit.hascolor(terminal(s)))
-            else
-                LineEdit.write_prompt(termbuf, mode)
-            end
-            LineEdit.write(termbuf, "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
-        end
+    # Reset the buffer since the Lexer messed with it (maybe the Lexer should reset it on done)
+    seek(buffer(s), p)
 
-        # Insert colorized text from running the passes
-        seekstart(buffer(s))
-        str = read(buffer(s), String)
-        tokens = tokenize(str)
-        apply_passes!(PASS_HANDLER, tokens, str, cursoridx, cursormove)
-        untokenize_with_ANSI(outbuf, PASS_HANDLER, tokens, str)
-
-        # Reset the buffer since the Lexer messed with it (maybe the Lexer should reset it on done)
-        seek(buffer(s), p)
-
-        # Our cursor now seems to be out of place, we run the already existing refresh_multi_line code to put it where it belongs.
-        # Maybe it is possible to save the cursor and just restore it but that is probably Terminal dependent...
-        mode.ias = refresh_multi_line(termbuf, terminal(s), buffer(s), mode.ias, l)
-        LineEdit.write(outbuf, "\e[?25h")  # Show the cursor
-        write(terminal(s), take!(io))
-        flush(terminal(s))
+    # Our cursor now seems to be out of place, we run the already existing refresh_multi_line code to put it where it belongs.
+    # Maybe it is possible to save the cursor and just restore it but that is probably Terminal dependent...
+    mode.ias = refresh_multi_line(termbuf, terminal(s), buffer(s), mode.ias, l)
+    LineEdit.write(outbuf, "\e[?25h")  # Show the cursor
+    write(terminal(s), take!(io))
+    flush(terminal(s))
 end
 
 
 function create_keybindings()
-
     D = Dict{Any, Any}()
     D['\b']   = (s, data, c) -> if LineEdit.edit_backspace(s, true)
         rewrite_with_ANSI(s)
