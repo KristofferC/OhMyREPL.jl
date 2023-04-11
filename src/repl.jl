@@ -288,6 +288,15 @@ function insert_keybindings(repl = Base.active_repl)
     end
 
     main_mode.keymap_dict = LineEdit.keymap(Dict{Any, Any}[NEW_KEYBINDINGS, main_mode.keymap_dict])
+
+    # Inject ^R keybinding into other repl modes for fzf reverse search to work
+    for repl_mode in mirepl.interface.modes[2:end]
+        if repl_mode isa LineEdit.Prompt
+            keybindings = Dict{Any, Any}()
+            keybindings["^R"] = NEW_KEYBINDINGS["^R"]
+            repl_mode.keymap_dict = LineEdit.keymap(Dict{Any, Any}[keybindings, repl_mode.keymap_dict])
+        end
+    end
 end
 
 function _commit_line(s, data, c)
