@@ -90,43 +90,40 @@ const ENABLE_FZF = Ref(true)
 enable_fzf(v::Bool) = ENABLE_FZF[] = v
 
 using Pkg
-function reinsert_after_pkg()
-    repl = Base.active_repl
+function reinsert_after_pkg(repl, world_age)
     mirepl = isdefined(repl,:mi) ? repl.mi : repl
     main_mode = mirepl.interface.modes[1]
     m = first(methods(main_mode.keymap_dict[']']))
     if m.module == Pkg.REPLMode
-        Prompt.insert_keybindings()
+        Prompt.insert_keybindings(repl, world_age)
     end
+end
+
+function setup_repl(repl, world_age)
+    if !isdefined(repl, :interface)
+        repl.interface = REPL.setup_interface(repl)
+    end
+    Prompt.insert_keybindings(repl, world_age)
+    @async begin
+        sleep(0.25)
+        reinsert_after_pkg(repl, world_age)
+    end
+    update_interface(repl.interface)
 end
 
 function __init__()
     options = Base.JLOptions()
+    world_age = Base.get_world_counter()
     # command-line
     if (options.isinteractive != 1) && options.commands != C_NULL
         return
     end
 
     if isdefined(Base, :active_repl)
-        if !isdefined(Base.active_repl, :interface)
-            Base.active_repl.interface = REPL.setup_interface(Base.active_repl)
-        end
-        Prompt.insert_keybindings()
-        @async begin
-            sleep(0.25)
-            reinsert_after_pkg()
-        end
+        setup_repl(Base.active_repl, world_age)
     else
         atreplinit() do repl
-            if !isdefined(repl, :interface)
-                repl.interface = REPL.setup_interface(repl)
-            end
-            Prompt.insert_keybindings()
-            @async begin
-                sleep(0.25)
-                reinsert_after_pkg()
-            end
-            update_interface(repl.interface)
+            setup_repl(Base.active_repl, world_age)
         end
     end
 
