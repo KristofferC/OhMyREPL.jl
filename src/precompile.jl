@@ -5,3 +5,8 @@ precompile(Tuple{OhMyREPL.Passes.SyntaxHighlighter.SyntaxHighlighterSettings, Ar
 precompile(Tuple{OhMyREPL.Passes.BracketHighlighter.BracketHighlighterSettings, Array{Crayons.Crayon, 1}, Array{JuliaSyntax.Token, 1}, Int64, String})
 precompile(Tuple{OhMyREPL.Passes.RainbowBrackets.RainbowBracketsSettings, Array{Crayons.Crayon, 1}, Array{JuliaSyntax.Token, 1}, Int64, String})
 precompile(Tuple{typeof(OhMyREPL.untokenize_with_ANSI), Base.IOContext{Base.GenericIOBuffer{Array{UInt8, 1}}}, OhMyREPL.PassHandler, Array{JuliaSyntax.Token, 1}, String, Int64})
+precompile(_refresh_line, (REPL.LineEdit.ModeState,))
+precompile(_refresh_line, (REPL.LineEdit.MIState,))
+precompile(_refresh_line, (REPL.LineEdit.IOBuffer,))
+precompile(_REPL_display, (REPL.REPLDisplay, MIME"text/plain", String))
+precompile(_Markdown_term, (IO, Markdown.Code, Int))
