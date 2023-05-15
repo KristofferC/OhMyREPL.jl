@@ -66,7 +66,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
     str = read(buffer(s), String)
     tokens = tokenize(str)
     apply_passes!(PASS_HANDLER, tokens, str, cursoridx, cursormove)
-    untokenize_with_ANSI(outbuf, PASS_HANDLER, tokens, str)
+    untokenize_with_ANSI(outbuf, PASS_HANDLER, tokens, str, l)
 
     # Reset the buffer since the Lexer messed with it (maybe the Lexer should reset it on done)
     seek(buffer(s), p)
