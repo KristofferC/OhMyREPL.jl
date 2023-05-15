@@ -67,7 +67,12 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
     end
 end
 
-function markdown_prompt!(prompt::Union{String, Function} = "julia> "; crayon::Crayon = Crayon(foreground = :red, bold = true))
+"""
+    markdown_prompt!(prompt = "julia> "; crayon = Crayon(foreground=:red, bold=true))
+
+Set the prompt shown in `jldoctest` and `julia-repl` code blocks.
+"""
+function markdown_prompt!(prompt = "julia> "; crayon = Crayon(foreground = :red, bold = true))
     global MARKDOWN_PROMPT = sprint(print, crayon, prompt)
     return
 end
