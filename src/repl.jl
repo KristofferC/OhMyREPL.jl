@@ -17,7 +17,7 @@ import REPL.Terminals: raw!, width, height, cmove, getX, TerminalBuffer,
                   getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
 
 using OhMyREPL
-import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
+import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER, fix_world_age
 
 @nospecialize # use only declared type signatures
 
@@ -77,13 +77,6 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
     LineEdit.write(outbuf, "\e[?25h")  # Show the cursor
     write(terminal(s), take!(io))
     flush(terminal(s))
-end
-
-# Wrap the function `f` so that it's always invoked in the given `world_age`
-function fix_world_age(f, world_age)
-    function (args...; kws...)
-        Base.invoke_in_world(world_age, f, args...; kws...)
-    end
 end
 
 function create_keybindings(prefix_hist_prompt, world_age)

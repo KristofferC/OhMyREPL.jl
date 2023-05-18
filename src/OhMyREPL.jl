@@ -17,12 +17,26 @@ export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highligh
 
 const SUPPORTS_256_COLORS = !(Sys.iswindows() && VERSION < v"1.5.3")
 
+# Wrap the function `f` so that it's always invoked in the given `world_age`
+function fix_world_age(f, world_age)
+    if world_age == typemax(UInt)
+        function (args...; kws...)
+            Base.invokelatest(f, args...; kws...)
+        end
+    else
+        function (args...; kws...)
+            Base.invoke_in_world(world_age, f, args...; kws...)
+        end
+    end
+end
+
 include("repl_pass.jl")
 include("repl.jl")
 include("passes/Passes.jl")
 
 include("BracketInserter.jl")
 include("prompt.jl")
+include("hooks.jl")
 
 import .BracketInserter.enable_autocomplete_brackets
 
@@ -109,6 +123,8 @@ function setup_repl(repl, world_age)
         reinsert_after_pkg(repl, world_age)
     end
     update_interface(repl.interface)
+
+    global _refresh_line_hook = fix_world_age(_refresh_line, world_age)
 end
 
 function __init__()
@@ -128,9 +144,7 @@ function __init__()
     end
 
     if ccall(:jl_generating_output, Cint, ()) == 0
-        include(joinpath(@__DIR__, "refresh_lines.jl"))
-        include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
-        include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
+        activate_hooks()
     end
 end
 

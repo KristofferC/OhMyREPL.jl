@@ -110,4 +110,10 @@ end
 
 generate_precompile_statements()
 
+precompile(_refresh_line, (REPL.LineEdit.ModeState,))
+precompile(_refresh_line, (REPL.LineEdit.MIState,))
+precompile(_refresh_line, (REPL.LineEdit.IOBuffer,))
+precompile(_REPL_display, (REPL.REPLDisplay, MIME"text/plain", String))
+precompile(_Markdown_term, (IO, Markdown.Code, Int))
+
 end
