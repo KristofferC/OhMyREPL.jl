@@ -31,6 +31,7 @@ function colorscheme!(name::String)
         Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS, name)
     Passes.RainbowBrackets.updatebracketcolors!(
         Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS.active)
+    return Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS.active
 end
 
 function colorschemes()
