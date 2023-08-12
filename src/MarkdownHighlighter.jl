@@ -1,5 +1,4 @@
 using Crayons
-using Tokenize
 import Markdown
 
 import .OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
@@ -39,14 +38,14 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
         for (sourcecode, output) in zip(sourcecodes, outputs)
             tokens = collect(tokenize(sourcecode))
             crayons = fill(Crayon(), length(tokens))
-            SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0)
+            SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0, sourcecode)
             buff = IOBuffer()
             if lang == "jldoctest" || lang == "julia-repl"
                 print(buff, MARKDOWN_PROMPT, Crayon(reset = true))
             end
             for (token, crayon) in zip(tokens, crayons)
                 print(buff, crayon)
-                print(buff, untokenize(token))
+                print(buff, untokenize(token, sourcecode))
                 print(buff, Crayon(reset = true))
             end
             print(buff, output)

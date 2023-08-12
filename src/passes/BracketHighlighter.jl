@@ -1,10 +1,10 @@
 module BracketHighlighter
 
-using Tokenize
-using Tokenize.Tokens
-import Tokenize.Tokens: Token, kind, startpos, endpos, untokenize
+using JuliaSyntax: kind, Token, untokenize
 
 using Crayons
+
+import JuliaSyntax.@K_str
 
 import OhMyREPL: add_pass!, PASS_HANDLER
 
@@ -15,8 +15,8 @@ end
 const BRACKETMATCHER_SETTINGS =
  BracketHighlighterSettings(Crayon(bold = :true, underline = :true))
 
-function (matcher::BracketHighlighterSettings)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
-    left_bracket_match, right_bracket_match, matched = bracket_match(tokens, cursorpos)
+function (matcher::BracketHighlighterSettings)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int, str::AbstractString)
+    left_bracket_match, right_bracket_match, matched = bracket_match(tokens, cursorpos, str)
     !matched && return
     crayons[left_bracket_match] = matcher.crayon
     crayons[right_bracket_match] = matcher.crayon
@@ -31,14 +31,14 @@ add_pass!(PASS_HANDLER, "BracketHighlighter", BRACKETMATCHER_SETTINGS, true)
 # Takes a string and a cursor index.
 # Returns index of left matching bracket, right matching bracket
 # and if there was a match at all as a 3 tuple.
-const LEFT_DELIMS = [Tokens.LPAREN, Tokens.LSQUARE, Tokens.LBRACE]
-const RIGHT_DELIMS = [Tokens.RPAREN, Tokens.RSQUARE, Tokens.RBRACE]
-function bracket_match(tokens::Vector{Token}, cursoridx::Int)
+const LEFT_DELIMS = [K"(", K"[", K"{"]
+const RIGHT_DELIMS = [K")", K"]", K"}"]
+function bracket_match(tokens::Vector{Token}, cursoridx::Int, str)
     enclosing_token_idx = -1
     char_counter = 0
     # find which token we are currently inside
     for (i, token) in enumerate(tokens)
-        char_counter += length(untokenize(token))
+        char_counter += length(untokenize(token, str))
         if char_counter >= cursoridx
             enclosing_token_idx = i
             break
@@ -55,9 +55,9 @@ function bracket_match(tokens::Vector{Token}, cursoridx::Int)
     for idx in enclosing_token_idx:-1:0
         idx == 0 && return 0, 0, false
         token = tokens[idx]
-        (i = findfirst(isequal(kind(token)), RIGHT_DELIMS)) != nothing && (counts[i] -= 1)
+        (i = findfirst(isequal(kind(token)), RIGHT_DELIMS)) !== nothing && (counts[i] -= 1)
 
-        if (i = findfirst(isequal(kind(token)), LEFT_DELIMS)) != nothing
+        if (i = findfirst(isequal(kind(token)), LEFT_DELIMS)) !== nothing
             if counts[i] == 0
                 left_match = i
                 left_idx = idx

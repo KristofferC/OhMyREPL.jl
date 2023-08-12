@@ -1,16 +1,16 @@
 # Passes
 
-In `OhMyREPL` each plugin that changes the way text is printed to the REPL is implemented as a **pass**. A **pass** is defined as a function (or a call overloaded type) that takes a list of Julia tokens from [`Tokenize.jl`](https://github.com/KristofferC/Tokenize.jl), a list of `Crayon`s from [`Crayons.jl`](https://github.com/KristofferC/Crayons.jl), the position of the cursor and sets the `Crayon`s to however the pass wants the Julia tokens to be printed. Both the [Syntax highlighting](@ref) and the [Bracket highlighting](@ref) are implemented as passses.
+In `OhMyREPL` each plugin that changes the way text is printed to the REPL is implemented as a **pass**. A **pass** is defined as a function (or a call overloaded type) that takes a list of Julia tokens from [`JuliaSyntax.jl`](https://github.com/JuliaLang/JuliaSyntax.jl), a list of `Crayon`s from [`Crayons.jl`](https://github.com/KristofferC/Crayons.jl), the position of the cursor and sets the `Crayon`s to however the pass wants the Julia tokens to be printed. Both the [Syntax highlighting](@ref) and the [Bracket highlighting](@ref) are implemented as passses.
 
 All the passes are registered in a global pass handler. To show all the passes use `OhMyREPL.showpasses()`:
 
 ```jl
 julia> OhMyREPL.showpasses()
 ----------------------------------
- #   Pass name             Enabled  
+ #   Pass name             Enabled
 ----------------------------------
- 1   BracketHighlighter    true     
- 2   SyntaxHighlighter     true     
+ 1   BracketHighlighter    true
+ 2   SyntaxHighlighter     true
 ----------------------------------
 ```
 
@@ -26,33 +26,34 @@ This section shows how text from the REPL get transformed into syntax highlighte
 str = "function f(x::Float64) return :x + 'a' end"
 ```
 
-First the text is tokenized with [`Tokenize.jl`](https://github.com/KristofferC/Tokenize.jl):
+First the text is tokenized with [`JuliaSyntax.jl`](https://github.com/JuliaLang/JuliaSyntax.jl):
 
 ```jl
-julia> using Tokenize
+julia> using JuliaSyntax
 
-julia> tokens = collect(Tokenize.tokenize(str))
-20-element Array{Tokenize.Tokens.Token,1}:
-  1,1-1,8:          KEYWORD           "function"
-  1,9-1,9:          WHITESPACE        " "       
-  1,10-1,10:        IDENTIFIER        "f"       
-  1,11-1,11:        LPAREN            "("       
-  1,12-1,12:        IDENTIFIER        "x"       
-  1,13-1,14:        OP                "::"      
-  1,15-1,21:        IDENTIFIER        "Float64"
-  1,22-1,22:        RPAREN            ")"       
-  1,23-1,23:        WHITESPACE        " "       
-  1,24-1,29:        KEYWORD           "return"  
-  1,30-1,30:        WHITESPACE        " "       
-  1,31-1,31:        OP                ":"       
-  1,32-1,32:        IDENTIFIER        "x"       
-  1,33-1,33:        WHITESPACE        " "       
-  1,34-1,34:        OP                "+"       
-  1,35-1,35:        WHITESPACE        " "       
-  1,36-1,38:        CHAR              "'a'"     
-  1,39-1,39:        WHITESPACE        " "       
-  1,40-1,42:        KEYWORD           "end"     
-  1,43-1,42:        ENDMARKER         ""
+julia> tokens = JuliaSyntax.tokenize(str)
+21-element Vector{JuliaSyntax.Token}:
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"function", 0x0001), 0x00000001:0x00000008)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Whitespace", 0x0001), 0x00000009:0x00000009)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Identifier", 0x0000), 0x0000000a:0x0000000a)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"(", 0x0001), 0x0000000b:0x0000000b)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Identifier", 0x0000), 0x0000000c:0x0000000c)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"::", 0x0001), 0x0000000d:0x0000000e)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Identifier", 0x0000), 0x0000000f:0x00000015)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K")", 0x0001), 0x00000016:0x00000016)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Whitespace", 0x0001), 0x00000017:0x00000017)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"return", 0x0001), 0x00000018:0x0000001d)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Whitespace", 0x0001), 0x0000001e:0x0000001e)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K":", 0x0001), 0x0000001f:0x0000001f)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Identifier", 0x0000), 0x00000020:0x00000020)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Whitespace", 0x0001), 0x00000021:0x00000021)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"+", 0x0000), 0x00000022:0x00000022)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Whitespace", 0x0001), 0x00000023:0x00000023)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"'", 0x0001), 0x00000024:0x00000024)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Char", 0x0000), 0x00000025:0x00000025)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"'", 0x0001), 0x00000026:0x00000026)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"Whitespace", 0x0001), 0x00000027:0x00000027)
+ JuliaSyntax.Token(JuliaSyntax.SyntaxHead(K"end", 0x0001), 0x00000028:0x0000002a)
 ```
 
 A vector of `Crayon`s of the same length as the Julia tokens is then created and filled  with empty tokens.
@@ -62,17 +63,17 @@ crayons = Vector{Crayon}(length(tokens));
 fill!(crayons, Crayon()) # Crayon is a bits type so this is OK
 ```
 
-These two vectors are then sent to the syntax highlighter pass together with an integer that represent what character offset the cursor currently is located. The syntax highlighter does not use this information but the bracket highlighter does.
+These two vectors and the source code are then sent to the syntax highlighter pass together with an integer that represent what character offset the cursor currently is located. The syntax highlighter does not use this information but the bracket highlighter does.
 
 ```
-OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0)
+OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0, str)
 ```
 
 Running this function has the effect of updating the `crayons` vector. If we print this vector we see that they have been updated:
 
 ![](ansitokens_after.png)
 
-To print the original string with the updated vector of `Crayon`s we use the `OhMyREPL.untokenize_with_ANSI([io::IO], crayons, tokens)` function as:
+To print the original string with the updated vector of `Crayon`s we use the `OhMyREPL.untokenize_with_ANSI([io::IO], crayons, tokens, str)` function as:
 
 ![](print_ansi.png)
 
@@ -80,16 +81,17 @@ Each registered and enabled pass does this updating and the contributions from e
 
 ## Creating a pass
 
-This section shows how to create a very pass that let the user define a `Crayon` for each typeassertion / declaration that happens to be a `Float64`.
+This section shows how to create a pass that let the user define a `Crayon` for each typeassertion / declaration that happens to be a `Float64`.
 
 !!! info
-    Please refer to the [Tokenize.jl API](https://github.com/KristofferC/Tokenize.jl#api) section and the  [`Crayons.jl` documentation](https://github.com/KristofferC/Crayons.jl) while reading this section.
+    Please refer to the [JuliaSyntax.jl API](https://github.com/JuliaLang/JuliaSyntax.jl) and the  [`Crayons.jl` documentation](https://github.com/KristofferC/Crayons.jl) while reading this section.
 
 We start off with a few imports and creating a new struct which will hold the setting for the pass:
 
 ```jl
 using Crayons
-import Tokenize.Tokens: Token, untokenize, exactkind
+import JuliaSyntax
+import JuliaSyntax: Token, untokenize, kind
 using OhMyREPL
 
 mutable struct Float64Modifier
@@ -104,11 +106,11 @@ We then use call overloading to define a function for the type. The function wil
 
 ```jl
 # The pass function, the cursor position is not used but it needs to be given an argument
-function (float64modifier::Float64Modifier)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int)
+function (float64modifier::Float64Modifier)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int, str::AbstractString)
     # Loop over all tokens and crayons
     for i in 1:length(crayons)
-        if untokenize(tokens[i]) == "Float64"
-            if i > 1 && exactkind(tokens[i-1]) == Tokenize.Tokens.DECLARATION
+        if untokenize(tokens[i], str) == "Float64"
+            if i > 1 && kind(tokens[i-1]) == JuliaSyntax.K"::"
                 # Update the crayon
                 crayons[i] = float64modifier.crayon
             end
@@ -130,11 +132,11 @@ To register and start using the pass simply use `OhMyREPL.add_pass!(passname::St
 ```jl
 julia> OhMyREPL.add_pass!("Redify Float64", FLOAT64_MODIFIER)
 ----------------------------------
- #   Pass name             Enabled  
+ #   Pass name             Enabled
 ----------------------------------
- 1   Redify Float64        true     
- 2   BracketHighlighter    true     
- 3   SyntaxHighlighter     true     
+ 1   Redify Float64        true
+ 2   BracketHighlighter    true
+ 3   SyntaxHighlighter     true
 ----------------------------------
 ```
 
@@ -151,11 +153,11 @@ The prescedence of a pass can be modified with the `OhMyREPL.prescedence!(pass::
 ```jl
 julia> OhMyREPL.prescedence!("Redify Float64", 3)
 ----------------------------------
- #   Pass name             Enabled  
+ #   Pass name             Enabled
 ----------------------------------
- 1   BracketHighlighter    true     
- 2   SyntaxHighlighter     true     
- 3   Redify Float64        true     
+ 1   BracketHighlighter    true
+ 2   SyntaxHighlighter     true
+ 3   Redify Float64        true
 ----------------------------------
 ```
 

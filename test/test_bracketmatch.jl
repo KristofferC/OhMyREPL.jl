@@ -2,7 +2,6 @@ module TestBracketHighlighter
 
 using Test
 using OhMyREPL
-using Tokenize
 
 b = IOBuffer()
 str = "(function :foobar, foobar )# foobar"

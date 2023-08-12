@@ -1,21 +1,21 @@
 name = "OhMyREPL"
 uuid = "5fb14364-9ced-5910-84b2-373655c76a03"
-version = "0.5.12"
+version = "0.5.22"
 
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
 JLFzf = "1019f520-868f-41f5-a6de-eb00f4b6a39c"
+JuliaSyntax = "70703baa-626e-46a2-a12c-08ffd08c73b4"
 Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
-Tokenize = "0796e94c-ce3b-5d07-9a54-7f471281c624"
 
 [compat]
 Crayons = "1, 2, 3, 4"
-Tokenize = "0.5"
+JuliaSyntax = "0.3.3, 0.4"
 JLFzf = "^0.1.1"
-julia = "1.0"
+julia = "1.6"
 
 [extras]
 TerminalRegressionTests = "98bfdc55-cc95-5876-a49a-74609291cbe0"

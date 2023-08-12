@@ -5,7 +5,7 @@ bracket matching and other nifty features.
 """
 module OhMyREPL
 
-using Tokenize
+import JuliaSyntax
 using Crayons
 if VERSION > v"1.3"
 import JLFzf
@@ -14,6 +14,8 @@ end
 import REPL
 
 export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, enable_fzf, test_colorscheme
+
+const SUPPORTS_256_COLORS = !(Sys.iswindows() && VERSION < v"1.5.3")
 
 include("repl_pass.jl")
 include("repl.jl")
@@ -25,8 +27,10 @@ include("prompt.jl")
 import .BracketInserter.enable_autocomplete_brackets
 
 function colorscheme!(name::String)
-    Passes.SyntaxHighlighter.activate!(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS,
-                                       name)
+    Passes.SyntaxHighlighter.activate!(
+        Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS, name)
+    Passes.RainbowBrackets.updatebracketcolors!(
+        Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS.active)
 end
 
 function colorschemes()
@@ -85,6 +89,17 @@ enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
 const ENABLE_FZF = Ref(true)
 enable_fzf(v::Bool) = ENABLE_FZF[] = v
 
+using Pkg
+function reinsert_after_pkg()
+    repl = Base.active_repl
+    mirepl = isdefined(repl,:mi) ? repl.mi : repl
+    main_mode = mirepl.interface.modes[1]
+    m = first(methods(main_mode.keymap_dict[']']))
+    if m.module == Pkg.REPLMode
+        Prompt.insert_keybindings()
+    end
+end
+
 function __init__()
     options = Base.JLOptions()
     # command-line
@@ -97,29 +112,21 @@ function __init__()
             Base.active_repl.interface = REPL.setup_interface(Base.active_repl)
         end
         Prompt.insert_keybindings()
+        @async begin
+            sleep(0.25)
+            reinsert_after_pkg()
+        end
     else
         atreplinit() do repl
             if !isdefined(repl, :interface)
                 repl.interface = REPL.setup_interface(repl)
             end
             Prompt.insert_keybindings()
-            update_interface(repl.interface)
-            main_mode = repl.interface.modes[1]
-            p = repl.interface.modes[5]
-            # These are inserted here because we only want to insert them for the Julia mode
-            d = Dict{Any,Any}(
-            # Up Arrow
-            "\e[A" => (s,o...)-> begin
-                REPL.LineEdit.edit_move_up(s) || LineEdit.enter_prefix_search(s, p, true)
-                Prompt.rewrite_with_ANSI(s)
-            end,
-            # Down Arrow
-            "\e[B" => (s,o...)-> begin
-                 REPL.LineEdit.edit_move_down(s) || LineEdit.enter_prefix_search(s, p, false)
-                 Prompt.rewrite_with_ANSI(s)
+            @async begin
+                sleep(0.25)
+                reinsert_after_pkg()
             end
-            )
-            main_mode.keymap_dict = LineEdit.keymap(Dict{Any,Any}[d, main_mode.keymap_dict])
+            update_interface(repl.interface)
         end
     end
 
@@ -128,6 +135,12 @@ function __init__()
         include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
         include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
     end
+end
+
+if !Sys.iswindows()
+if ccall(:jl_generating_output, Cint, ()) == 1
+    include("precompile.jl")
+end
 end
 
 end # module

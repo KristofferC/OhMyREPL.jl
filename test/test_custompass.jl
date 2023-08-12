@@ -2,14 +2,14 @@ module CustomPassTest
 
 using Test
 using OhMyREPL
-using Tokenize
+using JuliaSyntax
+import JuliaSyntax: kind, untokenize, @K_str
 using Crayons
 
-function foobar_bluify(crayons, tokens, ::Int)
+function foobar_bluify(crayons, tokens, ::Int, str::AbstractString)
     for (i, (crayon, tok)) in enumerate(zip(crayons, tokens))
         println(tok)
-        if (Tokenize.Tokens.kind(tok) == Tokenize.Tokens.IDENTIFIER
-               && Tokenize.Tokens.untokenize(tok) == "foobar")
+        if (kind(tok) == K"Identifier" && untokenize(tok, str) == "foobar")
             crayons[i] = Crayon(foreground = :blue)
         end
     end

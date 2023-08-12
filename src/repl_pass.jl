@@ -1,5 +1,5 @@
-import Tokenize:Tokens, Lexers
-import Tokenize.Tokens: Token, kind, untokenize
+import JuliaSyntax
+using JuliaSyntax: kind, @K_str, Token, tokenize, untokenize
 using Printf
 
 const RESET = Crayon(reset = true)
@@ -22,9 +22,9 @@ const PASS_HANDLER = PassHandler()
 function test_pass(io::IO, f, str::Union{String, IO}, cursorpos::Int = 1, cursormovement::Bool = false)
     rpc = PassHandler()
     add_pass!(rpc, "TestPass", f)
-    tokens = collect(Lexers.Lexer(str))
-    apply_passes!(rpc, tokens, cursorpos, cursormovement)
-    untokenize_with_ANSI(io, rpc.accum_crayons, tokens)
+    tokens = tokenize(str)
+    apply_passes!(rpc, tokens, str, cursorpos, cursormovement)
+    untokenize_with_ANSI(io, rpc.accum_crayons, tokens, str)
 end
 
 test_pass(f, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
@@ -32,30 +32,30 @@ test_pass(f, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::B
 
 function test_passes(io::IO, rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false)
     b = IOBuffer()
-    tokens = collect(Lexers.Lexer(str))
-    apply_passes!(rpc, tokens, cursorpos, cursormovement)
-    untokenize_with_ANSI(io, rpc.accum_crayons, tokens)
+    tokens = tokenize(str)
+    apply_passes!(rpc, tokens, str, cursorpos, cursormovement)
+    untokenize_with_ANSI(io, rpc.accum_crayons, tokens, str)
 end
 
 test_passes(rpc::PassHandler, str::Union{String, IOBuffer}, cursorpos::Int = 1, cursormovement::Bool = false) =
     test_passes(stdout, rpc, str, cursorpos, cursormovement)
 
-function untokenize_with_ANSI(io::IO, crayons::Vector{Crayon}, tokens::Vector{Token}, indent = 7)
+function untokenize_with_ANSI(io::IO, crayons::Vector{Crayon}, tokens::Vector{Token}, str, indent = 7)
     @assert length(tokens) == length(crayons)
     print(io, RESET)
     z = 1
     for (token, crayon) in zip(tokens, crayons)
         print(io, crayon)
-        for c in untokenize(token)
+        for c in untokenize(token, str)
             print(io, c)
             c == '\n' && print(io, " "^indent)
         end
         print(io, RESET)
     end
 end
-untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}, indent = 7) = untokenize_with_ANSI(io, rpc.accum_crayons, tokens, indent)
-untokenize_with_ANSI(crayons::Vector{Crayon}, tokens::Vector{Token}, indent = 7) =
-    untokenize_with_ANSI(stdout, crayons, tokens, indent)
+untokenize_with_ANSI(io::IO, rpc::PassHandler, tokens::Vector{Token}, str::AbstractString, indent = 7) = untokenize_with_ANSI(io, rpc.accum_crayons, tokens, str, indent)
+untokenize_with_ANSI(crayons::Vector{Crayon}, tokens::Vector{Token}, str::AbstractString, indent = 7) =
+    untokenize_with_ANSI(stdout, crayons, tokens, str, indent)
 
 function merge!(t1::Vector{Crayon}, t2::Vector{Crayon})
     @assert length(t1) == length(t2)
@@ -65,7 +65,7 @@ function merge!(t1::Vector{Crayon}, t2::Vector{Crayon})
     return t1
 end
 
-function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, cursorpos::Int = 1, cursormovement::Bool = false)
+function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, str::AbstractString, cursorpos::Int = 1, cursormovement::Bool = false)
     resize!(rpc.crayons, length(tokens))
     resize!(rpc.accum_crayons, length(tokens))
     fill!(rpc.accum_crayons, Crayon())
@@ -77,7 +77,7 @@ function apply_passes!(rpc::PassHandler, tokens::Vector{Token}, cursorpos::Int =
                 continue
             end
             # This is an enabled pass that should be run, so run it!
-            pass.f!(rpc.crayons, tokens, cursorpos)
+            pass.f!(rpc.crayons, tokens, cursorpos, str)
             merge!(rpc.accum_crayons, rpc.crayons)
         end
     end

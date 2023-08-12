@@ -3,8 +3,8 @@
 The functions
 
 ```julia
-OhMyREPL.input_prompt!(str::Union{String, Function}, color::Symbol)
-OhMyREPL.output_prompt!(str::Union{String, Function}, color::Symbol)
+OhMyREPL.input_prompt!(str::Union{String, Function}, color::Union{Symbol, Int64})
+OhMyREPL.output_prompt!(str::Union{String, Function}, color::Union{Symbol, Int64})
 ```
 
 can be used to change the way that the input and output prompts are displayed.
@@ -12,8 +12,8 @@ can be used to change the way that the input and output prompts are displayed.
 As an example, after running:
 
 ```julia
-OhMyREPL.input_prompt!(">", :magenta)
-OhMyREPL.output_prompt!(">", :red)
+OhMyREPL.input_prompt!("> ", :magenta)
+OhMyREPL.output_prompt!("> ", :red)
 ```
 
 ![](new_prompts.png)
@@ -22,6 +22,17 @@ If the first argument instead is a function, it will be run every time the promp
 to update which allows for more dynamic behavior.
 
 The different possible colors can be found by typing `Base.text_colors` in the Julia REPL's help mode.
+Colors in `Base.text_colors` can be called by names (e.g. `:red`, `:green`) or by an integer from 0 to 255 inclusive. 
+
+As an example after, running:
+
+```julia
+OhMyREPL.input_prompt!("> ", 13)
+OhMyREPL.output_prompt!("> ", 14)
+```
+
+![](new_prompts_IntColors.png)
+
 
 !!! hint
     You can use something like `OhMyREPL.input_prompt!(string(VERSION) * ">", :green)`

@@ -5,8 +5,6 @@ using Test
 using OhMyREPL
 import  OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
 
-using Tokenize
-
 OhMyREPL.colorscheme!("Monokai16")
 
 b = IOBuffer()
