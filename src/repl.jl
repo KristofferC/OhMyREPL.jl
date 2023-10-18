@@ -78,7 +78,10 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
     write(terminal(s), take!(io))
     flush(terminal(s))
     @static if isdefined(LineEdit, :maybe_show_hint)
-        LineEdit.maybe_show_hint(state(s))
+        stat = state(s)
+        if stat isa LineEdit.PromptState
+            LineEdit.maybe_show_hint(stat)
+        end
     end
 end
 
