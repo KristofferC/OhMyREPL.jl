@@ -77,6 +77,12 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
     LineEdit.write(outbuf, "\e[?25h")  # Show the cursor
     write(terminal(s), take!(io))
     flush(terminal(s))
+    @static if isdefined(LineEdit, :maybe_show_hint)
+        stat = state(s)
+        if stat isa LineEdit.PromptState
+            LineEdit.maybe_show_hint(stat)
+        end
+    end
 end
 
 
@@ -87,7 +93,11 @@ function create_keybindings()
     else
         beep(terminal(s))
     end
-    D["*"]    = (s, data, c) ->  (LineEdit.edit_insert(buffer(s), c); rewrite_with_ANSI(s))
+    D["*"] = @static if isdefined(LineEdit, :check_for_hint)
+                (s, data, c) -> (LineEdit.edit_insert(buffer(s), c); LineEdit.check_for_hint(s); rewrite_with_ANSI(s))
+             else
+                (s, data, c) -> (LineEdit.edit_insert(buffer(s), c); rewrite_with_ANSI(s))
+             end
     D["^B"]   = (s, data, c) -> (LineEdit.edit_move_left(buffer(s)) ;rewrite_with_ANSI(s))
     D["^F"]   = (s, data, c) -> (LineEdit.edit_move_right(buffer(s)) ;rewrite_with_ANSI(s))
     # Meta B
