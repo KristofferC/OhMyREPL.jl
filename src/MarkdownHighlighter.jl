@@ -36,7 +36,7 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
     end
 
     if do_syntax && HIGHLIGHT_MARKDOWN[]
-        for (sourcecode, output) in zip(sourcecodes, outputs)
+        for (i, (sourcecode, output)) in enumerate(zip(sourcecodes, outputs))
             tokens = collect(tokenize(sourcecode))
             crayons = fill(Crayon(), length(tokens))
             SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0, sourcecode)
@@ -52,16 +52,20 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
             print(buff, output)
 
             str = String(take!(buff))
-            for line in Markdown.lines(str)
-                print(io, " "^Markdown.margin)
-                println(io, line)
+            lines = Markdown.lines(str)
+            for li in eachindex(lines)
+                print(io, " "^Markdown.margin, lines[li])
+                li < lastindex(lines) && println(io)
             end
+
+            i < lastindex(sourcecodes) && println(io)
         end
     else
         Base.with_output_color(:cyan, io) do io
-            for line in Markdown.lines(md.code)
-                print(io, " "^Markdown.margin)
-                println(io, line)
+            lines = Markdown.lines(md.code)
+            for i in eachindex(lines)
+                print(io, " "^Markdown.margin, lines[i])
+                i < lastindex(lines) && println(io)
             end
         end
     end
