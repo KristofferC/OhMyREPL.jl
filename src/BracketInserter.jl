@@ -46,6 +46,11 @@ enable_autocomplete_brackets(v::Bool) = AUTOMATIC_BRACKET_MATCH[] = v
 
 const pkgmode = Ref{Any}()
 import Pkg
+@static if isdefined(Pkg.REPLMode, :promptf)
+    const pkg_promptf = Pkg.REPLMode.promptf
+else # after https://github.com/JuliaLang/Pkg.jl/pull/3777
+    const pkg_promptf = Base.get_extension(Pkg, :REPLExt).promptf
+end
 function insert_into_keymap!(D::Dict)
     left_brackets = ['(', '{', '[']
     right_brackets = [')', '}', ']']
@@ -81,7 +86,7 @@ function insert_into_keymap!(D::Dict)
                 found_pkg = false
                 for mode in Base.active_repl.interface.modes
                     if mode isa LineEdit.Prompt
-                        if mode.prompt == Pkg.REPLMode.promptf
+                        if mode.prompt == pkg_promptf
                             found_pkg = true
                             pkgmode[] = mode
                         end
