@@ -17,7 +17,7 @@ import REPL.Terminals: raw!, width, height, cmove, getX, TerminalBuffer,
                   getY, clear_line, beep, disable_bracketed_paste, enable_bracketed_paste
 
 using OhMyREPL
-import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
+import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER, fix_world_age
 
 @nospecialize # use only declared type signatures
 
@@ -85,8 +85,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
     end
 end
 
-
-function create_keybindings()
+function create_keybindings(prefix_hist_prompt, world_age)
     D = Dict{Any, Any}()
     D['\b']   = (s, data, c) -> if LineEdit.edit_backspace(s, true)
         rewrite_with_ANSI(s)
@@ -278,26 +277,31 @@ function create_keybindings()
             LineEdit.enter_search(s, p, true)
         end
     end
-    return D
-end
-NEW_KEYBINDINGS = create_keybindings()
 
-function insert_keybindings(repl = Base.active_repl)
+    # Up Arrow
+    D["\e[A"] = (s,o...)-> begin
+        LineEdit.edit_move_up(buffer(s)) || LineEdit.enter_prefix_search(s, prefix_hist_prompt, true)
+        Prompt.rewrite_with_ANSI(s)
+    end
+    # Down Arrow
+    D["\e[B"] = (s,o...)-> begin
+        LineEdit.edit_move_down(buffer(s)) || LineEdit.enter_prefix_search(s, prefix_hist_prompt, false)
+        Prompt.rewrite_with_ANSI(s)
+    end
+
+    OhMyREPL.BracketInserter.insert_into_keymap!(D)
+
+    return Dict(k=>fix_world_age(f, world_age) for (k,f) in D)
+end
+
+function insert_keybindings(repl, world_age)
     mirepl = isdefined(repl,:mi) ? repl.mi : repl
     main_mode = mirepl.interface.modes[1]
     p = mirepl.interface.modes[5]
 
-    NEW_KEYBINDINGS["\e[A"] = (s,o...)-> begin
-        LineEdit.edit_move_up(buffer(s)) || LineEdit.enter_prefix_search(s, p, true)
-        Prompt.rewrite_with_ANSI(s)
-    end
-    # Down Arrow
-    NEW_KEYBINDINGS["\e[B"] = (s,o...)-> begin
-        LineEdit.edit_move_down(buffer(s)) || LineEdit.enter_prefix_search(s, p, false)
-        Prompt.rewrite_with_ANSI(s)
-    end
+    keybinds = create_keybindings(p, world_age)
 
-    main_mode.keymap_dict = LineEdit.keymap(Dict{Any, Any}[NEW_KEYBINDINGS, main_mode.keymap_dict])
+    main_mode.keymap_dict = LineEdit.keymap(Dict{Any, Any}[keybinds, main_mode.keymap_dict])
 end
 
 function _commit_line(s, data, c)
