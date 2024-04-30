@@ -2,13 +2,6 @@ module BracketInserter
 
 using OhMyREPL
 
-# If a user writes an opening bracket
-# automatically complete it with a closing bracket
-# unless the next character is that closing bracket
-mutable struct BracketInserterSettings
-    complete_brackets::Bool
-end
-
 import REPL
 import REPL.LineEdit
 import REPL.LineEdit: edit_insert, edit_move_left, edit_move_right, edit_backspace, edit_kill_region,
@@ -17,7 +10,6 @@ import REPL.LineEdit: edit_insert, edit_move_left, edit_move_right, edit_backspa
 import REPL.Terminals.beep
 import OhMyREPL.Prompt.rewrite_with_ANSI
 
-const BRACKET_INSERTER = BracketInserterSettings(true)
 
 function leftpeek(b::IOBuffer)
     p = position(b)
