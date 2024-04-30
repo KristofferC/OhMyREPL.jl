@@ -34,7 +34,9 @@ function no_closing_bracket(left_peek, v)
 end
 
 const AUTOMATIC_BRACKET_MATCH = Ref(!Sys.iswindows())
+const AUTOMATIC_STRING_LITERALS_MATCH = Ref(!Sys.iswindows()) # TODO: is the iswindows needed for this? And can we make the default be false for the Julia version(s) affected by #334?
 enable_autocomplete_brackets(v::Bool) = AUTOMATIC_BRACKET_MATCH[] = v
+enable_autocomplete_string_literals(v::Bool) = AUTOMATIC_STRING_LITERALS_MATCH[] = v
 
 const pkgmode = Ref{Any}()
 import Pkg
@@ -106,7 +108,7 @@ function insert_into_keymap!(D::Dict)
         D[v] = (s, o...) -> begin
             b = buffer(s)
 
-            if AUTOMATIC_BRACKET_MATCH[]
+            if (v == '\"' && AUTOMATIC_STRING_LITERALS_MATCH[]) || (v != '\"' && AUTOMATIC_BRACKET_MATCH[])
                 # Next char is the quote symbol so just move right
                 if !eof(b) && peek(b) == v
                     edit_move_right(b)
