@@ -34,7 +34,7 @@ function no_closing_bracket(left_peek, v)
 end
 
 const AUTOMATIC_BRACKET_MATCH = Ref(!Sys.iswindows())
-const AUTOMATIC_STRING_LITERALS_MATCH = Ref(!Sys.iswindows()) # TODO: is the iswindows needed for this? And can we make the default be false for the Julia version(s) affected by #334?
+const AUTOMATIC_STRING_LITERALS_MATCH = Ref(!Sys.iswindows() && !(VERSION >= v"1.10")) # TODO: is the iswindows needed for this? TODO: change default if a new Julia version makes this unnecessary
 enable_autocomplete_brackets(v::Bool) = AUTOMATIC_BRACKET_MATCH[] = v
 enable_autocomplete_string_literals(v::Bool) = AUTOMATIC_STRING_LITERALS_MATCH[] = v
 
