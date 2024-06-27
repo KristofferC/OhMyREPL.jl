@@ -283,10 +283,12 @@ end
 NEW_KEYBINDINGS = create_keybindings()
 
 function insert_keybindings(repl = Base.active_repl)
-    mirepl = isdefined(repl,:mi) ? repl.mi : repl
+    mirepl = isdefined(repl,:mistate) ? repl.mistate : repl
     main_mode = mirepl.interface.modes[1]
-    p = mirepl.interface.modes[5]
+    php_idx = VERSION >= v"1.11.0-rc1" ? 6 : 5
+    p = mirepl.interface.modes[php_idx]::LineEdit.PrefixHistoryPrompt
 
+    # Up Arrow
     NEW_KEYBINDINGS["\e[A"] = (s,o...)-> begin
         LineEdit.edit_move_up(buffer(s)) || LineEdit.enter_prefix_search(s, p, true)
         Prompt.rewrite_with_ANSI(s)
