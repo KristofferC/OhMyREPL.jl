@@ -286,7 +286,7 @@ function insert_keybindings(repl = Base.active_repl)
     mirepl = isdefined(repl,:mistate) ? repl.mistate : repl
     interface_modes = mirepl.interface.modes
     main_mode = interface_modes[1]
-    php_idx = findfirst(isa.(interface_modes, LineEdit.PrefixHistoryPrompt))
+    php_idx = findfirst(Base.Fix2(isa, LineEdit.PrefixHistoryPrompt), interface_modes)
     p = interface_modes[php_idx]
 
     # Up Arrow
