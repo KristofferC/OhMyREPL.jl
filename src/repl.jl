@@ -284,9 +284,10 @@ NEW_KEYBINDINGS = create_keybindings()
 
 function insert_keybindings(repl = Base.active_repl)
     mirepl = isdefined(repl,:mistate) ? repl.mistate : repl
-    main_mode = mirepl.interface.modes[1]
-    php_idx = VERSION >= v"1.11.0-rc1" ? 6 : 5
-    p = mirepl.interface.modes[php_idx]::LineEdit.PrefixHistoryPrompt
+    interface_modes = mirepl.interface.modes
+    main_mode = interface_modes[1]
+    php_idx = findfirst(isa.(interface_modes, LineEdit.PrefixHistoryPrompt))
+    p = interface_modes[php_idx]
 
     # Up Arrow
     NEW_KEYBINDINGS["\e[A"] = (s,o...)-> begin
