@@ -112,14 +112,12 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
     prev_t = Token()
     pprev_t = Token()
     for (i, t) in enumerate(tokens)
-        # a::x
-        #=
-        if kind(prev_t) == Tokens.DECLARATION
-            crayons[i-1] = cscheme.argdef
-            crayons[i] = cscheme.argdef
-        =#
         if JuliaSyntax.is_error(t)
             crayons[i] = cscheme.error
+        # a::x
+        elseif kind(t) == K"Identifier" && kind(prev_t) == K"::"
+            crayons[i-1] = cscheme.argdef
+            crayons[i] = cscheme.argdef
         # :foo
         elseif kind(t) == K"Identifier" && kind(prev_t) == K":" &&
                kind(pprev_t) ∉ (K"Integer", K"Float", K"Identifier", K")")
