@@ -286,7 +286,7 @@ end
 NEW_KEYBINDINGS = create_keybindings()
 
 function insert_keybindings(repl = Base.active_repl)
-    mirepl = isdefined(repl,:mistate) ? repl.mistate : repl
+    mirepl = (isdefined(repl,:mistate) && !isnothing(repl.mistate)) ? repl.mistate : repl
     interface_modes = mirepl.interface.modes
     main_mode = interface_modes[1]
     php_idx = findfirst(Base.Fix2(isa, LineEdit.PrefixHistoryPrompt), interface_modes)
