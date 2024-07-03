@@ -5,6 +5,8 @@ import Markdown
 import .OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
 import .OhMyREPL.HIGHLIGHT_MARKDOWN
 
+split_lines(s::AbstractString) = isdefined(Markdown, :lines) ? Markdown.lines(s) : split(s, '\n')
+
 function Markdown.term(io::IO, md::Markdown.Code, columns)
     code = md.code
     # Want to remove potential.
@@ -52,7 +54,7 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
             print(buff, output)
 
             str = String(take!(buff))
-            lines = Markdown.lines(str)
+            lines = split_lines(str)
             for li in eachindex(lines)
                 print(io, " "^Markdown.margin, lines[li])
                 li < lastindex(lines) && println(io)
@@ -62,7 +64,7 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
         end
     else
         Base.with_output_color(:cyan, io) do io
-            lines = Markdown.lines(md.code)
+            lines = split_lines(md.code)
             for i in eachindex(lines)
                 print(io, " "^Markdown.margin, lines[i])
                 i < lastindex(lines) && println(io)
