@@ -19,6 +19,10 @@ import REPL.Terminals: raw!, width, height, cmove, getX, TerminalBuffer,
 using OhMyREPL
 import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
+if VERSION > v"1.3"
+import JLFzf
+end
+
 @nospecialize # use only declared type signatures
 
 function rewrite_with_ANSI(s, cursormove::Bool = false)
