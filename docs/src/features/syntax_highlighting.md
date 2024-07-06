@@ -96,7 +96,7 @@ You can look in the source code to see how the default color schemes are made.
 
 For fun, the code below creates a truly random colorscheme:
 
-```jl
+```julia
 function rand_token()
     Crayon(background = rand(Bool) ? :nothing : rand(1:256),
               foreground = rand(Bool) ? :nothing : rand(1:256),
