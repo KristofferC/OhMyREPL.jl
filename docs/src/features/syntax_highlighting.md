@@ -41,7 +41,7 @@ This section will describe how to create your own colorscheme.
 !!! info
     Please refer to the [Crayons.jl](https://github.com/KristofferC/Crayons.jl) documentation while reading this section.
 
-We start by loading the `Crayons` package and importing the `SyntaxHighlighter` and the ..
+We start by loading the `Crayons` package and importing the `SyntaxHighlighter` module.
 
 ```julia
 using Crayons

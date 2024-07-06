@@ -22,7 +22,7 @@ If the first argument instead is a function, it will be run every time the promp
 to update which allows for more dynamic behavior.
 
 The different possible colors can be found by typing `Base.text_colors` in the Julia REPL's help mode.
-Colors in `Base.text_colors` can be called by names (e.g. `:red`, `:green`) or by an integer from 0 to 255 inclusive. 
+Colors in `Base.text_colors` can be called by names (e.g. `:red`, `:green`) or by an integer from 0 to 255 inclusive.
 
 As an example after, running:
 
