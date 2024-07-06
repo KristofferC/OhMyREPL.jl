@@ -43,14 +43,14 @@ This section will describe how to create your own colorscheme.
 
 We start by loading the `Crayons` package and importing the `SyntaxHighlighter` and the ..
 
-```
+```julia
 using Crayons
 import OhMyREPL: Passes.SyntaxHighlighter
 ```
 
 We now create a default colorscheme:
 
-```
+```julia
 scheme = SyntaxHighlighter.ColorScheme()
 ```
 
@@ -75,7 +75,7 @@ There are a number of setter function that updates the colorscheme. They are cal
 
 Let us set the strings to be printed in yellow, numbers to be printed in bold, and function calls to be printed in cyan:
 
-```
+```julia
 SyntaxHighlighter.string!(scheme, Crayon(foreground = :yellow))
 SyntaxHighlighter.number!(scheme, Crayon(bold = true))
 SyntaxHighlighter.call!(scheme, Crayon(foreground = :cyan))

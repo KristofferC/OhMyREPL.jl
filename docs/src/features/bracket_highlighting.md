@@ -11,6 +11,8 @@ Makes matching brackets highlighted when the cursor is between an opening and cl
 
 It is possbile to change the way the highlighted bracket is printed with the function
 
-```OhMyREPL.Passes.BracketHighlighter.setcrayon!(::Crayon)```
+```julia
+OhMyREPL.Passes.BracketHighlighter.setcrayon!(::Crayon)
+```
 
 ![](bracket_highlight_setting.png)

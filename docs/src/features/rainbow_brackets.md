@@ -7,7 +7,7 @@ Rainbow brackets is a feature that colors matching brackets in the same color (w
 There are two modes of this pass, one that uses 256 colors and one that uses only the 16 system colors.
 By default, we default to using the 16 color mode on Windows and 256 color mode otherwise. Changing between the modes is done by:
 
-```
+```julia
 OhMyREPL.Passes.RainbowBrackets.activate_16colors()
 OhMyREPL.Passes.RainbowBrackets.activate_256colors()
 ```
