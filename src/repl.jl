@@ -280,6 +280,8 @@ function create_keybindings()
             if isempty(line)
                 line = current_line 
             end
+            JLFzf.insert_history_to_repl(s, line)
+            rewrite_with_ANSI(s)
         else
             p = Base.active_repl.interface.modes[4]
             LineEdit.enter_search(s, p, true)
