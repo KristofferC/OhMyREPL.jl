@@ -271,16 +271,18 @@ function create_keybindings()
     #replace search with Fzf fuzzy search
     D["^R"] = function (s, data, c)
         if VERSION >= v"1.3" && OhMyREPL.ENABLE_FZF[]
-            current_line = LineEdit.input_string(s)
-            if !isempty(current_line)
-                line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "-m", "--read0", "--tiebreak=index", "--height=80%", "--query=$current_line");
-            else
-                line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "-m", "--read0", "--tiebreak=index", "--height=80%");
+            withenv("FZF_DEFAULT_OPTS" => nothing) do
+                current_line = LineEdit.input_string(s)
+                if !isempty(current_line)
+                    line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "-m", "--read0", "--tiebreak=index", "--height=80%", "--query=$current_line")
+                else
+                    line = JLFzf.inter_fzf(JLFzf.read_repl_hist(), "-m", "--read0", "--tiebreak=index", "--height=80%")
+                end
+                if isempty(line)
+                    line = current_line
+                end
+                JLFzf.insert_history_to_repl(s, line)
             end
-            if isempty(line)
-                line = current_line 
-            end
-            JLFzf.insert_history_to_repl(s, line)
             rewrite_with_ANSI(s)
         else
             p = Base.active_repl.interface.modes[4]
