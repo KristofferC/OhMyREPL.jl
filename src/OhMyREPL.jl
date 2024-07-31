@@ -138,10 +138,10 @@ function __init__()
     end
 end
 
-if VERSION <= v"1.12-" && !Sys.iswindows()
-if ccall(:jl_generating_output, Cint, ()) == 1
-    include("precompile.jl")
-end
+if VERSION <= v"1.11-" && !Sys.iswindows()
+    if ccall(:jl_generating_output, Cint, ()) == 1
+        include("precompile.jl")
+    end
 end
 
 end # module
