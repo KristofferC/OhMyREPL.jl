@@ -1,4 +1,3 @@
-precompile(Tuple{OhMyREPL.Prompt.var"#2#28", Any, Any, Any})
 precompile(Tuple{typeof(Base.Unicode.textwidth), String})
 precompile(Tuple{Type{JuliaSyntax.Token}, JuliaSyntax.SyntaxHead, Base.UnitRange{Int64}})
 precompile(Tuple{typeof(JuliaSyntax.kind), JuliaSyntax.Token})
