@@ -4,7 +4,7 @@ In `OhMyREPL` each plugin that changes the way text is printed to the REPL is im
 
 All the passes are registered in a global pass handler. To show all the passes use `OhMyREPL.showpasses()`:
 
-```jl
+```julia-repl
 julia> OhMyREPL.showpasses()
 ----------------------------------
  #   Pass name             Enabled
@@ -22,13 +22,13 @@ A pass can be enabled or disabled at will with `OhMyREPL.enable_pass!(pass_name:
 
 This section shows how text from the REPL get transformed into syntax highlighted text. The sample text used is:
 
-```jl
+```julia
 str = "function f(x::Float64) return :x + 'a' end"
 ```
 
 First the text is tokenized with [`JuliaSyntax.jl`](https://github.com/JuliaLang/JuliaSyntax.jl):
 
-```jl
+```julia-repl
 julia> using JuliaSyntax
 
 julia> tokens = JuliaSyntax.tokenize(str)
@@ -58,14 +58,14 @@ julia> tokens = JuliaSyntax.tokenize(str)
 
 A vector of `Crayon`s of the same length as the Julia tokens is then created and filled  with empty tokens.
 
-```
+```julia
 crayons = Vector{Crayon}(length(tokens));
 fill!(crayons, Crayon()) # Crayon is a bits type so this is OK
 ```
 
 These two vectors and the source code are then sent to the syntax highlighter pass together with an integer that represent what character offset the cursor currently is located. The syntax highlighter does not use this information but the bracket highlighter does.
 
-```
+```julia
 OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0, str)
 ```
 
@@ -88,7 +88,7 @@ This section shows how to create a pass that let the user define a `Crayon` for 
 
 We start off with a few imports and creating a new struct which will hold the setting for the pass:
 
-```jl
+```julia
 using Crayons
 import JuliaSyntax
 import JuliaSyntax: Token, untokenize, kind
@@ -104,7 +104,7 @@ const FLOAT64_MODIFIER = Float64Modifier(Crayon(foreground = :red, underline= tr
 
 We then use call overloading to define a function for the type. The function will update the `Crayon` if the previous token was a `::` operator and that the current token is a `Float64` identifier, as in `::Float64`.
 
-```jl
+```julia
 # The pass function, the cursor position is not used but it needs to be given an argument
 function (float64modifier::Float64Modifier)(crayons::Vector{Crayon}, tokens::Vector{Token}, cursorpos::Int, str::AbstractString)
     # Loop over all tokens and crayons
@@ -129,7 +129,7 @@ A pass can be tested with the `OhMyREPL.test_pass([io::IO], pass, str::String)` 
 
 To register and start using the pass simply use `OhMyREPL.add_pass!(passname::String, pass)`:
 
-```jl
+```julia-repl
 julia> OhMyREPL.add_pass!("Redify Float64", FLOAT64_MODIFIER)
 ----------------------------------
  #   Pass name             Enabled
@@ -150,7 +150,7 @@ We actually have a conflict now because both the syntax highlighter and the newl
 
 The prescedence of a pass can be modified with the `OhMyREPL.prescedence!(pass::Union{String, Int}, prescedence::Int)`. The variable `pass` here is either the name of the pass or its number as given by `OhMyREPL.show_passes()`. We now set the prescedence of the new pass to 3:
 
-```jl
+```julia-repl
 julia> OhMyREPL.prescedence!("Redify Float64", 3)
 ----------------------------------
  #   Pass name             Enabled

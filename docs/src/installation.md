@@ -2,7 +2,7 @@
 
 The package is registered in the General registry so it is easily installed by
 
-```jl
+```julia
 import Pkg; Pkg.add("OhMyREPL")
 ```
 
@@ -10,7 +10,7 @@ import Pkg; Pkg.add("OhMyREPL")
 
 One way of automatically starting the package with Julia is by putting
 
-```jl
+```julia
 atreplinit() do repl
     try
         @eval using OhMyREPL
