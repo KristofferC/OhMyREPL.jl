@@ -152,7 +152,7 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
                 crayons[i-1] = cscheme.function_def
             end
         # @fdsafds
-        elseif kind(t) == K"Identifier" && kind(prev_t) == K"@"
+        elseif kind(t) == K"MacroName"
             crayons[i-1] = cscheme._macro
             crayons[i] = cscheme._macro
         # 2] = 32.32
