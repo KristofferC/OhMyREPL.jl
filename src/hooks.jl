@@ -1,13 +1,41 @@
-
+import REPL
+import REPL.LineEdit
 using Crayons
 import Markdown
 
-import .OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
-import .OhMyREPL.HIGHLIGHT_MARKDOWN
+function _refresh_line(s::REPL.LineEdit.BufferLike)
+    LineEdit.refresh_multi_line(s)
+    OhMyREPL.Prompt.rewrite_with_ANSI(s)
+end
+
+function _REPL_display(d::REPL.REPLDisplay, mime::MIME"text/plain", @nospecialize(x))
+    x = Ref{Any}(x)
+    REPL.with_repl_linfo(d.repl) do io
+        if isdefined(REPL, :active_module)
+            mod = REPL.active_module(d)::Module
+        else
+            mod = Main
+        end
+        io = IOContext(io, :limit => true, :module => mod)
+        if OUTPUT_PROMPT !== nothing
+            output_prompt = OUTPUT_PROMPT isa String ? OUTPUT_PROMPT : OUTPUT_PROMPT()
+            write(io, OUTPUT_PROMPT_PREFIX)
+            write(io, output_prompt, "\e[0m")
+        end
+        get(io, :color, false) && write(io, REPL.answer_color(d.repl))
+        if isdefined(d.repl, :options) && isdefined(d.repl.options, :iocontext)
+            # this can override the :limit property set initially
+            io = foldl(IOContext, d.repl.options.iocontext, init=io)
+        end
+        show(io, mime, x[])
+        println(io)
+    end
+    return nothing
+end
 
 split_lines(s::AbstractString) = isdefined(Markdown, :lines) ? Markdown.lines(s) : split(s, '\n')
 
-function Markdown.term(io::IO, md::Markdown.Code, columns)
+function _Markdown_term(io::IO, md::Markdown.Code, columns)
     code = md.code
     # Want to remove potential.
     lang = md.language == "" ? "" : first(split(md.language))
@@ -37,11 +65,11 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
         push!(outputs, "")
     end
 
-    if do_syntax && HIGHLIGHT_MARKDOWN[]
+    if do_syntax && OhMyREPL.HIGHLIGHT_MARKDOWN[]
         for (i, (sourcecode, output)) in enumerate(zip(sourcecodes, outputs))
             tokens = collect(tokenize(sourcecode))
             crayons = fill(Crayon(), length(tokens))
-            SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0, sourcecode)
+            OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0, sourcecode)
             buff = IOBuffer()
             if lang == "jldoctest" || lang == "julia-repl"
                 print(buff, Crayon(foreground = :red, bold = true), "julia> ", Crayon(reset = true))
@@ -70,5 +98,20 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
                 i < lastindex(lines) && println(io)
             end
         end
+    end
+end
+
+_refresh_line_hook = _refresh_line
+
+function activate_hooks()
+    @eval begin
+        LineEdit.refresh_line(s::REPL.LineEdit.BufferLike) =
+            _refresh_line_hook(s)
+        Markdown.term(io::IO, md::Markdown.Code, columns) =
+            _Markdown_term(io, md, columns)
+    end
+    if !isdefined(REPL, :IPython)
+        @eval REPL.display(d::REPL.REPLDisplay, mime::MIME"text/plain", x) =
+            _REPL_display(d, mime, x)
     end
 end
