@@ -42,7 +42,7 @@ function _Markdown_term(io::IO, md::Markdown.Code, columns)
     outputs = String[]
     sourcecodes = String[]
     do_syntax = false
-    if occursin(r"jldoctest;?", lang) || lang == "julia-repl"
+    if (occursin(r"jldoctest;?", lang) && contains(code, "julia> ")) || lang == "julia-repl"
         do_syntax = true
         code_blocks = split("\n" * code, "\njulia> ")
         for codeblock in code_blocks[2:end] #
@@ -59,7 +59,7 @@ function _Markdown_term(io::IO, md::Markdown.Code, columns)
             push!(sourcecodes, string(sourcecode))
             push!(outputs, string(output))
         end
-    elseif lang == "julia" || lang == ""
+    elseif lang == "julia" || lang == "" || occursin(r"jldoctest;?", lang) 
         do_syntax = true
         push!(sourcecodes, code)
         push!(outputs, "")
