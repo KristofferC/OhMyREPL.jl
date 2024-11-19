@@ -166,4 +166,5 @@ function insert_into_keymap!(D::Dict)
     end
 end
 
+insert_into_keymap!(OhMyREPL.Prompt.NEW_KEYBINDINGS)
 end # module

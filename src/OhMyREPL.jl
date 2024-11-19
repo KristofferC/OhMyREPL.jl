@@ -17,26 +17,12 @@ export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highligh
 
 const SUPPORTS_256_COLORS = !(Sys.iswindows() && VERSION < v"1.5.3")
 
-# Wrap the function `f` so that it's always invoked in the given `world_age`
-function fix_world_age(f, world_age)
-    if world_age == typemax(UInt)
-        function (args...; kws...)
-            Base.invokelatest(f, args...; kws...)
-        end
-    else
-        function (args...; kws...)
-            Base.invoke_in_world(world_age, f, args...; kws...)
-        end
-    end
-end
-
 include("repl_pass.jl")
 include("repl.jl")
 include("passes/Passes.jl")
 
 include("BracketInserter.jl")
 include("prompt.jl")
-include("hooks.jl")
 
 import .BracketInserter.enable_autocomplete_brackets
 
@@ -105,47 +91,50 @@ const ENABLE_FZF = Ref(true)
 enable_fzf(v::Bool) = ENABLE_FZF[] = v
 
 using Pkg
-function reinsert_after_pkg(repl, world_age)
+function reinsert_after_pkg()
+    repl = Base.active_repl
     mirepl = isdefined(repl,:mi) ? repl.mi : repl
     main_mode = mirepl.interface.modes[1]
     m = first(methods(main_mode.keymap_dict[']']))
     if m.module == Pkg.REPLMode
-        Prompt.insert_keybindings(repl, world_age)
+        Prompt.insert_keybindings()
     end
-end
-
-function setup_repl(repl, world_age)
-    if !isdefined(repl, :interface)
-        repl.interface = REPL.setup_interface(repl)
-    end
-    Prompt.insert_keybindings(repl, world_age)
-    @async begin
-        sleep(0.25)
-        reinsert_after_pkg(repl, world_age)
-    end
-    update_interface(repl.interface)
-
-    global _refresh_line_hook = fix_world_age(_refresh_line, world_age)
 end
 
 function __init__()
     options = Base.JLOptions()
-    world_age = Base.get_world_counter()
     # command-line
     if (options.isinteractive != 1) && options.commands != C_NULL
         return
     end
 
     if isdefined(Base, :active_repl)
-        setup_repl(Base.active_repl, world_age)
+        if !isdefined(Base.active_repl, :interface)
+            Base.active_repl.interface = REPL.setup_interface(Base.active_repl)
+        end
+        Prompt.insert_keybindings()
+        @async begin
+            sleep(0.25)
+            reinsert_after_pkg()
+        end
     else
         atreplinit() do repl
-            setup_repl(Base.active_repl, world_age)
+            if !isdefined(repl, :interface)
+                repl.interface = REPL.setup_interface(repl)
+            end
+            Prompt.insert_keybindings()
+            @async begin
+                sleep(0.25)
+                reinsert_after_pkg()
+            end
+            update_interface(repl.interface)
         end
     end
 
     if ccall(:jl_generating_output, Cint, ()) == 0
-        activate_hooks()
+        include(joinpath(@__DIR__, "refresh_lines.jl"))
+        include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
+        include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
     end
 end
 
