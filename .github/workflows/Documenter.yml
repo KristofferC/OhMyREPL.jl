@@ -5,17 +5,17 @@ on:
       - master
     tags: '*'
   pull_request:
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@latest
         with:
-          version: '1'
-      - name: Build and deploy
+          version: '1'                         # replace this with whatever version you need
+          show-versioninfo: true               # this causes versioninfo to be printed to the action log
+      - uses: julia-actions/cache@v2           # cache using https://github.com/julia-actions/cache
+      - uses: julia-actions/julia-docdeploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # If authenticating with GitHub Actions token
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # If authenticating with SSH deploy key
-        run: julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); include("docs/make.jl")'
