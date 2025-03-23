@@ -2,13 +2,6 @@ module BracketInserter
 
 using OhMyREPL
 
-# If a user writes an opening bracket
-# automatically complete it with a closing bracket
-# unless the next character is that closing bracket
-mutable struct BracketInserterSettings
-    complete_brackets::Bool
-end
-
 import REPL
 import REPL.LineEdit
 import REPL.LineEdit: edit_insert, edit_move_left, edit_move_right, edit_backspace, edit_kill_region,
@@ -17,7 +10,6 @@ import REPL.LineEdit: edit_insert, edit_move_left, edit_move_right, edit_backspa
 import REPL.Terminals.beep
 import OhMyREPL.Prompt.rewrite_with_ANSI
 
-const BRACKET_INSERTER = BracketInserterSettings(true)
 
 function leftpeek(b::IOBuffer)
     p = position(b)
@@ -42,7 +34,9 @@ function no_closing_bracket(left_peek, v)
 end
 
 const AUTOMATIC_BRACKET_MATCH = Ref(!Sys.iswindows())
+const AUTOMATIC_STRING_LITERALS_MATCH = Ref(!Sys.iswindows() && !(VERSION >= v"1.10")) # TODO: is the iswindows needed for this? TODO: change default if a new Julia version makes this unnecessary
 enable_autocomplete_brackets(v::Bool) = AUTOMATIC_BRACKET_MATCH[] = v
+enable_autocomplete_string_literals(v::Bool) = AUTOMATIC_STRING_LITERALS_MATCH[] = v
 
 const pkgmode = Ref{Any}()
 import Pkg
@@ -114,7 +108,7 @@ function insert_into_keymap!(D::Dict)
         D[v] = (s, o...) -> begin
             b = buffer(s)
 
-            if AUTOMATIC_BRACKET_MATCH[]
+            if (v == '\"' && AUTOMATIC_STRING_LITERALS_MATCH[]) || (v != '\"' && AUTOMATIC_BRACKET_MATCH[])
                 # Next char is the quote symbol so just move right
                 if !eof(b) && peek(b) == v
                     edit_move_right(b)
