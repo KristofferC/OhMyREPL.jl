@@ -5,7 +5,7 @@ using JuliaSyntax: @K_str, kind, Token, untokenize
 
 using Crayons
 
-import OhMyREPL: add_pass!, PASS_HANDLER, SUPPORTS_256_COLORS 
+import OhMyREPL: add_pass!, PASS_HANDLER, SUPPORTS_256_COLORS
 
 mutable struct ColorScheme
     symbol::Crayon
@@ -125,7 +125,7 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
             crayons[i] = cscheme.symbol
         # function
         elseif JuliaSyntax.is_keyword(kind(t))
-            if kind(t) == K"true" || kind(t) == K"false"
+            if kind(t) == K"Bool"
                 crayons[i] = cscheme.symbol
             else
                 crayons[i] = cscheme.keyword
@@ -134,7 +134,7 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
         elseif kind(t) == K"String" || kind(t) == K"Char" || kind(t) == K"CmdString"
             crayons[i] = cscheme.string
         # * -
-        elseif JuliaSyntax.is_operator(kind(t)) || kind(t) == K"true" || kind(t) == K"false"
+        elseif JuliaSyntax.is_operator(kind(t)) || kind(t) == K"Bool"
             crayons[i] = cscheme.op
         # #= foo =#
         elseif kind(t) == K"Comment"
