@@ -1,6 +1,6 @@
 name = "OhMyREPL"
 uuid = "5fb14364-9ced-5910-84b2-373655c76a03"
-version = "0.5.30"
+version = "0.5.31"
 
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
@@ -13,7 +13,7 @@ REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 
 [compat]
 Crayons = "1, 2, 3, 4"
-JuliaSyntax = "0.3.3, 0.4, 1"
+JuliaSyntax = "1"
 JLFzf = "^0.1.1"
 julia = "1.6"
 
