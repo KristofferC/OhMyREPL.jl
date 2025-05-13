@@ -156,7 +156,8 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
             crayons[i-1] = cscheme._macro
             crayons[i] = cscheme._macro
         # 2] = 32.32
-        elseif kind(t) ∈ (K"Integer", K"BinInt", K"OctInt", K"HexInt", K"Float") || (kind(t) == K"Identifier" && untokenize(t, str) == "NaN")
+        elseif kind(t) ∈ (K"Integer", K"BinInt", K"OctInt", K"HexInt", K"Float", K"Float32") || 
+                (kind(t) == K"Identifier" && untokenize(t, str) ∈ ("Inf", "Inf16", "Inf32", "Inf64", "NaN", "NaN16", "NaN32", "NaN64")
             crayons[i] = cscheme.number
         elseif JuliaSyntax.is_whitespace(kind(t))
             crayons[i] = Crayon()
