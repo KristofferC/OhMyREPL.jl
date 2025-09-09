@@ -7,7 +7,7 @@ import REPL
 import REPL.LineEdit
 import REPL.Terminals
 
-import REPL: respond, return_callback
+import REPL: respond, return_callback, LineEdit
 import REPL.LineEdit: buffer, cmove_col, cmove_up, InputAreaState, transition,
                       terminal, buffer, on_enter, move_input_end, add_history, state, mode, edit_insert
 

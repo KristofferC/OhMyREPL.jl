@@ -10,10 +10,17 @@ function REPL.display(d::REPL.REPLDisplay, mime::MIME"text/plain", x)
             mod = Main
         end
         io = IOContext(io, :limit => true, :module => mod)
-        if OUTPUT_PROMPT !== nothing
-            output_prompt = OUTPUT_PROMPT isa String ? OUTPUT_PROMPT : OUTPUT_PROMPT()
-            write(io, OUTPUT_PROMPT_PREFIX)
-            write(io, output_prompt, "\e[0m")
+        if ENABLE_SEMANTIC_PROMPTS[]
+            write(io, OSC_133_COMMAND_START)
+        end
+        custom_prompts = CUSTOM_PROMPTS[]
+        if custom_prompts !== nothing
+            if custom_prompts.output_prompt_prefix !== nothing
+                write(io, maybe_call(custom_prompts.output_prompt_prefix))
+            end
+            if custom_prompts.output_prompt !== nothing
+                write(io, maybe_call(custom_prompts.output_prompt), "\e[0m")
+            end
         end
         get(io, :color, false) && write(io, REPL.answer_color(d.repl))
         if isdefined(d.repl, :options) && isdefined(d.repl.options, :iocontext)

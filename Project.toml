@@ -3,6 +3,7 @@ uuid = "5fb14364-9ced-5910-84b2-373655c76a03"
 version = "0.5.31"
 
 [deps]
+ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
 JLFzf = "1019f520-868f-41f5-a6de-eb00f4b6a39c"
 JuliaSyntax = "70703baa-626e-46a2-a12c-08ffd08c73b4"
@@ -12,9 +13,10 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 
 [compat]
+ConstructionBase = "1.6.0"
 Crayons = "1, 2, 3, 4"
-JuliaSyntax = "1"
 JLFzf = "^0.1.1"
+JuliaSyntax = "1"
 julia = "1.6"
 
 [extras]
