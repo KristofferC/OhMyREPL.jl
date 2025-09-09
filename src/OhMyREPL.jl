@@ -5,6 +5,7 @@ bracket matching and other nifty features.
 """
 module OhMyREPL
 
+using ConstructionBase: setproperties
 import JuliaSyntax
 using Crayons
 if VERSION > v"1.3"
@@ -13,7 +14,7 @@ end
 
 import REPL
 
-export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, enable_fzf, test_colorscheme
+export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, enable_fzf, enable_semantic_prompts, test_colorscheme
 
 const SUPPORTS_256_COLORS = !(Sys.iswindows() && VERSION < v"1.5.3")
 
@@ -116,7 +117,10 @@ function __init__()
         @async begin
             sleep(0.25)
             reinsert_after_pkg()
+            # Get any new modes
+            update_interface()
         end
+        update_interface()
     else
         atreplinit() do repl
             if !isdefined(repl, :interface)
@@ -126,6 +130,8 @@ function __init__()
             @async begin
                 sleep(0.25)
                 reinsert_after_pkg()
+                # Get any new modes
+                update_interface(repl.interface)
             end
             update_interface(repl.interface)
         end

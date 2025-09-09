@@ -10,6 +10,7 @@ makedocs(
             "features/bracket_highlighting.md",
             "features/bracket_complete.md",
             "features/prompt.md",
+            "features/terminal_integration.md",
             "features/rainbow_brackets.md",
             "features/markdown_highlight.md",
             "features/fzf.md",
