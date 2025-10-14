@@ -7,15 +7,13 @@ module OhMyREPL
 
 import JuliaSyntax
 using Crayons
-if VERSION > v"1.3"
 import JLFzf
-end
 
 import REPL
 
 export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, enable_fzf, test_colorscheme
 
-const SUPPORTS_256_COLORS = !(Sys.iswindows() && VERSION < v"1.5.3")
+const SUPPORTS_256_COLORS = !Sys.iswindows()
 
 include("repl_pass.jl")
 include("repl.jl")
@@ -133,7 +131,6 @@ function __init__()
 
     if ccall(:jl_generating_output, Cint, ()) == 0
         include(joinpath(@__DIR__, "refresh_lines.jl"))
-        include(joinpath(@__DIR__, "output_prompt_overwrite.jl"))
         include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
     end
 end
