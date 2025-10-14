@@ -15,7 +15,7 @@ REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 Crayons = "1, 2, 3, 4"
 JuliaSyntax = "1"
 JLFzf = "^0.1.1"
-julia = "1.6"
+julia = "1.10"
 
 [extras]
 TerminalRegressionTests = "98bfdc55-cc95-5876-a49a-74609291cbe0"

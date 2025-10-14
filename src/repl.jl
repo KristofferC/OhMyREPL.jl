@@ -19,9 +19,7 @@ import REPL.Terminals: raw!, width, height, cmove, getX, TerminalBuffer,
 using OhMyREPL
 import OhMyREPL: untokenize_with_ANSI, apply_passes!, PASS_HANDLER
 
-if VERSION > v"1.3"
 import JLFzf
-end
 
 @nospecialize # use only declared type signatures
 
@@ -57,11 +55,7 @@ function rewrite_with_ANSI(s, cursormove::Bool = false)
     l = textwidth(get_prompt(s))
     if !isa(s, LineEdit.SearchState)
         # xref: https://github.com/JuliaLang/julia/pull/36689
-        @static if VERSION ≥ v"1.6.0-DEV.517"
-            LineEdit.write_prompt(termbuf, mode, LineEdit.hascolor(terminal(s)))
-        else
-            LineEdit.write_prompt(termbuf, mode)
-        end
+        LineEdit.write_prompt(termbuf, mode, LineEdit.hascolor(terminal(s)))
         LineEdit.write(termbuf, "\e[0m") # Reset any formatting from Julia so that we start with a clean slate
     end
 
@@ -270,7 +264,7 @@ function create_keybindings()
 
     #replace search with Fzf fuzzy search
     D["^R"] = function (s, data, c)
-        if VERSION >= v"1.3" && OhMyREPL.ENABLE_FZF[]
+        if OhMyREPL.ENABLE_FZF[]
             withenv("FZF_DEFAULT_OPTS" => nothing) do
                 current_line = LineEdit.input_string(s)
                 if !isempty(current_line)
