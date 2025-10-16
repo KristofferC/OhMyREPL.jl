@@ -7,3 +7,9 @@ OhMyREPL will by default make code blocks written in markdown syntax (for exampl
 ## Settings
 
 Can be disabled or enabled with `enable_highlight_markdown(::Bool)`.
+
+To distinguish the `julia> ` in a markdown output from the real REPL prompt, its appearance is configurable.
+
+```@docs
+OhMyREPL.markdown_prompt!
+```

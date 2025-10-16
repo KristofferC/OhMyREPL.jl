@@ -1,4 +1,3 @@
-
 using Crayons
 import Markdown
 
@@ -44,7 +43,7 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
             SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0, sourcecode)
             buff = IOBuffer()
             if lang == "jldoctest" || lang == "julia-repl"
-                print(buff, Crayon(foreground = :red, bold = true), "julia> ", Crayon(reset = true))
+                print(buff, MARKDOWN_PROMPT, Crayon(reset = true))
             end
             for (token, crayon) in zip(tokens, crayons)
                 print(buff, crayon)
@@ -72,3 +71,15 @@ function Markdown.term(io::IO, md::Markdown.Code, columns)
         end
     end
 end
+
+"""
+    markdown_prompt!(prompt = "julia> "; crayon = Crayon(foreground=:red, bold=true))
+
+Set the prompt shown in `jldoctest` and `julia-repl` code blocks.
+"""
+function markdown_prompt!(prompt = "julia> "; crayon = Crayon(foreground = :red, bold = true))
+    global MARKDOWN_PROMPT = sprint(print, crayon, prompt)
+    return
+end
+
+markdown_prompt!()
