@@ -152,7 +152,7 @@ function (highlighter::SyntaxHighlighterSettings)(crayons::Vector{Crayon}, token
                 crayons[i-1] = cscheme.function_def
             end
         # @fdsafds
-        elseif kind(t) == K"MacroName"
+        elseif kind(t) == @static pkgversion(JuliaSyntax) ≥ v"2.0.0-DEV" ? K"macro_name" : K"MacroName"
             crayons[i-1] = cscheme._macro
             crayons[i] = cscheme._macro
         # 2] = 32.32
