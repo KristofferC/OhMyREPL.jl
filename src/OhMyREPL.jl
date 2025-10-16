@@ -11,7 +11,7 @@ import JLFzf
 
 import REPL
 
-export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, enable_fzf, test_colorscheme
+export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_autocomplete_string_literals, enable_highlight_markdown, enable_fzf, test_colorscheme
 
 const SUPPORTS_256_COLORS = !Sys.iswindows()
 
@@ -23,6 +23,7 @@ include("BracketInserter.jl")
 include("prompt.jl")
 
 import .BracketInserter.enable_autocomplete_brackets
+import .BracketInserter.enable_autocomplete_string_literals
 
 function colorscheme!(name::String)
     Passes.SyntaxHighlighter.activate!(
