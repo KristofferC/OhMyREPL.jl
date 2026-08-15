@@ -1,7 +1,0 @@
-precompile(Tuple{typeof(Base.Unicode.textwidth), String})
-precompile(Tuple{Type{JuliaSyntax.Token}, JuliaSyntax.SyntaxHead, Base.UnitRange{Int64}})
-precompile(Tuple{typeof(JuliaSyntax.kind), JuliaSyntax.Token})
-precompile(Tuple{OhMyREPL.Passes.SyntaxHighlighter.SyntaxHighlighterSettings, Array{Crayons.Crayon, 1}, Array{JuliaSyntax.Token, 1}, Int64, String})
-precompile(Tuple{OhMyREPL.Passes.BracketHighlighter.BracketHighlighterSettings, Array{Crayons.Crayon, 1}, Array{JuliaSyntax.Token, 1}, Int64, String})
-precompile(Tuple{OhMyREPL.Passes.RainbowBrackets.RainbowBracketsSettings, Array{Crayons.Crayon, 1}, Array{JuliaSyntax.Token, 1}, Int64, String})
-precompile(Tuple{typeof(OhMyREPL.untokenize_with_ANSI), Base.IOContext{Base.GenericIOBuffer{Array{UInt8, 1}}}, OhMyREPL.PassHandler, Array{JuliaSyntax.Token, 1}, String, Int64})
