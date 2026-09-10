@@ -7,16 +7,9 @@ makedocs(
         "Installation" => "installation.md",
         "Features" => Any[
             "features/syntax_highlighting.md",
-            "features/bracket_highlighting.md",
-            "features/bracket_complete.md",
+            "features/native.md",
             "features/prompt.md",
-            "features/rainbow_brackets.md",
-            "features/markdown_highlight.md",
-            "features/fzf.md",
             ],
-        "Internals" => Any[
-            "internals/passes.md"
-            ]
     ]
 )
 

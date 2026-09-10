@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@latest
         with:
-          version: '1'                         # replace this with whatever version you need
+          version: '~1.13.0-0'
           show-versioninfo: true               # this causes versioninfo to be printed to the action log
       - uses: julia-actions/cache@v2           # cache using https://github.com/julia-actions/cache
       - uses: julia-actions/julia-docdeploy@v1

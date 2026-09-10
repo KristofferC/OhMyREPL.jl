@@ -1,126 +1,101 @@
-# Syntax highlighting
+# Colorschemes
 
 ![repl](https://i.imgur.com/wtR0ASD.png)
 
-The Syntax highlighting pass transforms input text in the REPL to highlighted text, highlighting keyword, operators, symbols, strings etc. in different colors. There are a few color schemes that comes with `OhMyREPL` but it is fairly easy to create your own to your liking.
+Julia 1.13+ highlights REPL input (and code blocks in docstrings) natively using the
+`JuliaSyntaxHighlighting` standard library, which reads its colors from
+[StyledStrings](https://docs.julialang.org/en/v1/stdlib/StyledStrings/) *faces* named
+`julia_keyword`, `julia_string` and so on. An OhMyREPL colorscheme is simply a named
+collection of these faces, and activating one sets the faces globally, so the scheme
+applies everywhere the native highlighting is used.
 
 ## Default schemes
 
-The current default colorschemes that comes with `OhMyREPL` are
+The colorschemes that come with `OhMyREPL` are
 
-* "JuliaDefault" - the default Julia scheme, white and bold.
-* "Monokai16" - 16 color Monokai
-* "Monokai256" - 256 colors Monokai
-* "Monokai24bit" - 24 bit colored Monokai
-* "BoxyMonokai256" - 256 colors Monokai from [here](https://github.com/oivva/st-boxy)
-* "TomorrowNightBright" - 256 colors Tomorrow Night Bright
-* "TomorrowNightBright24bit" - 24 bit colored Tomorrow Night Bright
-* "OneDark" - 24 bit colored OneDark
-* "Base16MaterialDarker" - 24-bit [Base16](https://github.com/chriskempson/base16) Material Darker color scheme by [Nate Peters](https://github.com/ntpeters/base16-materialtheme-scheme)
+* "JuliaDefault" - the stock Julia colors
+* "Monokai" - the default when loading OhMyREPL
+* "BoxyMonokai" - Monokai variant from [here](https://github.com/oivva/st-boxy)
+* "Tomorrow", "TomorrowDay" and "TomorrowNightBright" - the [Tomorrow](https://github.com/chriskempson/tomorrow-theme) themes
+* "Distinguished"
+* "OneDark" and "OneLight" - the Atom themes
+* "Base16MaterialDarker" - [Base16](https://github.com/chriskempson/base16) Material Darker color scheme by [Nate Peters](https://github.com/ntpeters/base16-materialtheme-scheme)
 * "GruvboxDark" - Dark-mode variation of the [Gruvbox](https://github.com/morhetz/gruvbox#dark-mode) color scheme by Pavel Pertsev.
 * "GitHubLight", "GitHubDark" and "GitHubDarkDimmed" - GitHub's [colorschemes](https://primer.style/primitives/colors#themes), matching the [VS Code themes](https://github.com/primer/github-vscode-theme/)
 
- By default, "Monokai16" will be used on Windows and "Monokai256" otherwise. To test the supported colors in your terminal you can use `Crayons.test_system_colors()`, `Crayons.test_256_colors()`, `Crayons.test_24bit_colors()` to test 16, 256 and 24 bit colors respectively.
+All schemes are defined in 24-bit color; StyledStrings automatically downsamples them
+to 256 or 16 colors depending on what the terminal supports. The old
+capability-specific scheme names ("Monokai256", "Monokai24bit", ...) still work as
+aliases.
+
+Use `colorschemes()` to list the schemes together with a sample of their colors.
 
 ## Preview
 
-To see an example output of a colorscheme use `test_colorscheme(name::String, [test_string::String])`. If a `test_string` is not given, a default string will be used.
-
-![](test_colorscheme.png)
+To see an example output of a colorscheme use `test_colorscheme(name::String,
+[test_string::String])`. If a `test_string` is not given, a default string will be
+used.
 
 ## Activate
 
-To activate a colorscheme use `colorscheme!(name::String)`
+To activate a colorscheme use `colorscheme!(name::String)`.
 
-![](activate_colorscheme.png)
+## Creating your own colorschemes
 
-## Creating your own colorschemes.
-
-This section will describe how to create your own colorscheme.
-
-!!! info
-    Please refer to the [Crayons.jl](https://github.com/KristofferC/Crayons.jl) documentation while reading this section.
-
-We start by loading the `Crayons` package and importing the `SyntaxHighlighter` module.
+A colorscheme is created with the `OhMyREPL.ColorScheme` constructor, where every
+keyword argument is a `StyledStrings.Face`:
 
 ```julia
-using Crayons
-import OhMyREPL: Passes.SyntaxHighlighter
+using StyledStrings: Face
+
+scheme = OhMyREPL.ColorScheme(
+    symbol       = Face(foreground = 0xae81ff),         # :foo, true/false
+    comment      = Face(foreground = 0x595959),         # # comment
+    string       = Face(foreground = 0xe6db74),         # "str", 'c', `cmd`, r"re"
+    call         = Face(foreground = 0x66d9ef),         # foo(...)
+    op           = Face(foreground = 0xf92672),         # *, =, √
+    keyword      = Face(foreground = 0xf92672, weight = :bold), # function, begin
+    function_def = Face(foreground = 0xa6e22a),         # the name in function foo(x)
+    error        = Face(background = :bright_red),      # syntax errors
+    argdef       = Face(foreground = 0x66d9ef),         # ::Float64
+    macro_       = Face(foreground = 0x66d9ef),         # @time
+    number       = Face(foreground = 0xae81ff),         # 100, 1.0, 0xf00
+)
 ```
 
-We now create a default colorscheme:
+Colors can be given as 24-bit hex values (`0xae81ff`), or as named terminal colors
+(`:red`, `:bright_blue`, ...). Besides `foreground` and `background`, a `Face` supports
+attributes like `weight`, `slant`, `underline` and more; see the
+[StyledStrings documentation](https://docs.julialang.org/en/v1/stdlib/StyledStrings/).
+Fields that are left out use the terminal's default color.
+
+Register and activate the scheme with:
 
 ```julia
-scheme = SyntaxHighlighter.ColorScheme()
+colorscheme!("MyScheme", scheme)
 ```
 
-By using the function `test_colorscheme` we can see that the default colorscheme simply prints everything in the default color:
+## Fine-grained control
 
-![](default_colorscheme.png)
-
-There are a number of setter function that updates the colorscheme. They are called like `setter!(cs::ColorScheme, crayon::Crayon)`. The different setters are:
-
-* `symbol!` - A symbol, ex `:symbol`
-* `comment!` - A comment, ex `# comment`, `#= block comment =#`
-* `string!` - A string or char, ex `"""string"""`, `'a'`
-* `call!` - A functionc all, ex `foo()`
-* `op!` - An operator, ex `*`, `√`
-* `keyword!` - A keyword, ex `function`, `begin`, `try`
-* `function_def!` - A function definition, ex `function foo(x) x end`
-* `error!` - An error in the Tokenizer, ex `#= unending multi comment`
-* `argdef!` - Definition of a type, ex `::Float64`
-* `macro!` - A macro, ex `@time`
-* `number!` - A number, ex `100`, `100_00.0`, `0xf00`
-* `text!` - Nothing of the above
-
-Let us set the strings to be printed in yellow, numbers to be printed in bold, and function calls to be printed in cyan:
+A colorscheme covers the most important faces, but the native highlighting
+distinguishes more token types than a colorscheme does (booleans, string delimiters,
+broadcasting operators, ...). Individual faces can be adjusted directly with
+`StyledStrings.loadface!`:
 
 ```julia
-SyntaxHighlighter.string!(scheme, Crayon(foreground = :yellow))
-SyntaxHighlighter.number!(scheme, Crayon(bold = true))
-SyntaxHighlighter.call!(scheme, Crayon(foreground = :cyan))
+using StyledStrings: loadface!, Face
+loadface!(:julia_comparator => Face(foreground = :cyan))
 ```
 
-!!! info
-    Remember that you can also use integers for the `foreground` and `background` arguments to `Crayon` and they will then refer to the colors showed by `Crayons.test_256_colors()`. Also, you can of course specify many properties for the same `Crayon`.
+Faces customized this way are reset the next time a colorscheme is activated. See the
+`JuliaSyntaxHighlighting` documentation for the full list of `julia_*` faces. Faces can
+also be customized persistently, independently of OhMyREPL, in
+`~/.julia/config/faces.toml`.
 
-By recalling `test_colorscheme` on the scheme we can see it has been updated:
+## Toggling highlighting
 
-![](updated_scheme.png)
-
-By continuing in this fashion you can build up a full colorscheme. When you are satisfied with your colorscheme you can add it to the group of color schemes and activate it as:
-
-![](activate_custom_scheme.png)
-
-You can look in the source code to see how the default color schemes are made.
-
-For fun, the code below creates a truly random colorscheme:
+The native input highlighting itself can be turned off with the REPL option
 
 ```julia
-function rand_token()
-    Crayon(background = rand(Bool) ? :nothing : rand(1:256),
-              foreground = rand(Bool) ? :nothing : rand(1:256),
-              bold = rand(Bool), italics = rand(Bool), underline = rand(Bool))
-end
-
-function create_random_colorscheme()
-    random = SyntaxHighlighter.ColorScheme()
-    SyntaxHighlighter.symbol!(random,rand_token())
-    SyntaxHighlighter.comment!(random, rand_token())
-    SyntaxHighlighter.string!(random, rand_token())
-    SyntaxHighlighter.call!(random, rand_token())
-    SyntaxHighlighter.op!(random, rand_token())
-    SyntaxHighlighter.keyword!(random, rand_token())
-    SyntaxHighlighter.macro!(random, rand_token())
-    SyntaxHighlighter.function_def!(random, rand_token())
-    SyntaxHighlighter.text!(random, rand_token())
-    SyntaxHighlighter.error!(random, rand_token())
-    SyntaxHighlighter.argdef!(random, rand_token())
-    SyntaxHighlighter.number!(random, rand_token())
-    return random
-end
-
-test_colorscheme(create_random_colorscheme())
+Base.active_repl.options.style_input = false
 ```
-
-![](random_scheme.png)

@@ -1,7 +1,7 @@
 # OhMyREPL
 
 
-[![][docs-stable-img]][docs-stable-url] [![build](https://github.com/KristofferC/OhMyREPL.jl/workflows/CI/badge.svg)](https://github.com/KristofferC/OhMyREPL.jl/actions?query=workflow%3ACI) 
+[![][docs-stable-img]][docs-stable-url] [![build](https://github.com/KristofferC/OhMyREPL.jl/workflows/CI/badge.svg)](https://github.com/KristofferC/OhMyREPL.jl/actions?query=workflow%3ACI)
 
 [docs-stable-img]: https://img.shields.io/badge/docs-blue.svg
 [docs-stable-url]: https://kristofferc.github.io/OhMyREPL.jl/latest
@@ -10,9 +10,19 @@
 
 ![repl](https://i.imgur.com/wtR0ASD.png)
 
+As of Julia 1.13, most of the features OhMyREPL used to implement (syntax highlighting,
+bracket highlighting, rainbow brackets, automatic bracket insertion and markdown
+highlighting in docstrings) are built into the Julia REPL itself. OhMyREPL is now a thin
+layer on top of the native functionality that provides:
 
-A package that hooks into the Julia REPL and gives it syntax highlighting, bracket highlighting, rainbow brackets and other goodies.
-A (slightly outdated) video showing installation and features of the package is available [here](https://www.youtube.com/watch?v=lTLPAOLLbTU).
+* Colorschemes - Named colorschemes for the built-in syntax highlighting (applied as
+  [StyledStrings](https://docs.julialang.org/en/v1/stdlib/StyledStrings/) faces), plus
+  an easy way to define your own.
+* Prompt changing - Can change the text and color of the `julia>` prompt as well as add
+  a prompt for output.
+
+OhMyREPL 0.6+ requires Julia 1.13. On older Julia versions the 0.5.x releases are
+installed instead, which implement the REPL features within the package itself.
 
 If you like this package please give it a star. I like stars.
 
@@ -24,22 +34,21 @@ Pkg.add("OhMyREPL")
 
 and then just load with `using OhMyREPL` (preferably by putting it in the `.julia/config/startup.jl` file)
 
-### Features
+### Quick start
 
-* Syntax highlighting - Highlighting of keyword, operators, symbols, strings etc. in different colors.
-* Bracket highlighting - Will make matching brackets highlighted when the cursor is between an opening and closing bracket.
-* Automatic bracket insertion - Will insert matching closing bracket and quotation symbols when suitable.
-* Prompt changing - Can change the text and color of the `julia>` prompt as well as add a prompt for output.
-* Rainbow brackets - Colorizes matching brackets in the same color.
-* Fuzzy (fzf) history search - Search REPL history in any mode fuzzily with beloved [fzf](https://github.com/junegunn/fzf).
+```julia
+julia> colorschemes()       # list available colorschemes
+
+julia> colorscheme!("OneDark")  # activate one
+
+julia> test_colorscheme("GruvboxDark")  # preview one without activating it
+```
 
 ### Documentation
 
-Please see [the documentation](https://KristofferC.github.io/OhMyREPL.jl/latest) for more extensive description of the features and their settings like how to change colorschemes, how to create your own colorschemes etc.
+Please see [the documentation](https://KristofferC.github.io/OhMyREPL.jl/latest) for a
+more extensive description of the features and their settings, like how to change
+colorschemes and how to create your own.
 
 [docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
 [docs-latest-url]: https://kristofferc.github.io/OhMyREPL.jl/latest/
-
-### Warning
-
-Note that this package overwrites some methods from Julia Base. If you get a weird error when using OhMyREPL you should reproduce it without having OhMyREPL loaded before reporting it as a Julia bug.

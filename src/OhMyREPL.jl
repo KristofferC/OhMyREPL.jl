@@ -1,140 +1,149 @@
-__precompile__()
 """
-A package that provides a new REPL that has syntax highlighting,
-bracket matching and other nifty features.
+A package that makes the Julia REPL nicer.
+
+As of Julia 1.13, syntax highlighting, matching bracket highlighting, rainbow
+brackets and automatic insertion of closing brackets are built into the REPL
+itself. OhMyREPL is a thin layer on top of this that provides:
+
+- Named colorschemes for the built-in syntax highlighting, applied as
+  StyledStrings faces (see [`colorscheme!`](@ref) and [`colorschemes`](@ref)).
+- Customizable input and output prompts.
 """
 module OhMyREPL
 
-import JuliaSyntax
-using Crayons
-import JLFzf
-
 import REPL
+import REPL.LineEdit
+using StyledStrings: StyledStrings, Face
+import JuliaSyntaxHighlighting
 
-export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, enable_fzf, test_colorscheme
+export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown,
+       enable_fzf, test_colorscheme
 
-const SUPPORTS_256_COLORS = !Sys.iswindows()
-
-include("repl_pass.jl")
-include("repl.jl")
-include("passes/Passes.jl")
-
-include("BracketInserter.jl")
+include("colorschemes.jl")
 include("prompt.jl")
 
-import .BracketInserter.enable_autocomplete_brackets
+_active_repl() = isdefined(Base, :active_repl) ? Base.active_repl : nothing
 
-function colorscheme!(name::String)
-    Passes.SyntaxHighlighter.activate!(
-        Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS, name)
-    Passes.RainbowBrackets.updatebracketcolors!(
-        Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS.active)
-    return Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS.active
-end
-
-function colorschemes()
-    show(Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS)
-end
-
-const TEST_STR = """
-
-function funcdef(x::Float64, y::Int64)
-    y = 100_000
-    x = :foo
-    s = "I am a happy string"
-    c = `mycmd`
-    @time 1+1
-    #= Comments look like this =#
-    z = funccall(x, y)
-    5 * 3 + 2 - 1
-end
 """
+    enable_fzf(enable::Bool)
 
-function test_colorscheme(name::String, str::String = TEST_STR)
-    syntaxpass = get_pass(PASS_HANDLER, "SyntaxHighlighter")
-    active = syntaxpass.active
-    try
-        colorscheme!(name)
-        test_pass(syntaxpass, str)
-    finally
-        syntaxpass.active = active
+Compatibility no-op. The fzf based history search was removed from OhMyREPL;
+use the REPL's built-in `^R` history search.
+"""
+function enable_fzf(v::Bool)
+    @warn "The fzf based history search was removed from OhMyREPL in favor of the built-in `^R` history search; `enable_fzf` is a no-op." maxlog = 1
+    return
+end
+
+# REPL options cannot always be applied immediately since the REPL may not
+# have been created yet (e.g. when OhMyREPL is loaded from startup.jl).
+# They are stashed here and applied from `_setup_repl`.
+const AUTO_BRACKETS = Ref{Union{Nothing, Bool}}(nothing)
+const STYLE_INPUT = Ref{Union{Nothing, Bool}}(nothing)
+const BRACKET_HIGHLIGHT = Ref{Union{Nothing, Bool}}(nothing)
+
+"""
+    enable_autocomplete_brackets(enable::Bool)
+
+Toggle automatic insertion of closing brackets and quotes. This simply sets
+the REPL's native `auto_insert_closing_bracket` option.
+"""
+function enable_autocomplete_brackets(v::Bool)
+    AUTO_BRACKETS[] = v
+    _apply_options()
+    return
+end
+
+"""
+    enable_highlight_markdown(enable::Bool)
+
+Compatibility no-op. Markdown code blocks in docstrings are highlighted
+natively on Julia 1.13+.
+"""
+function enable_highlight_markdown(v::Bool = true)
+    @warn "Markdown code blocks are highlighted natively on Julia 1.13+; `enable_highlight_markdown` is a no-op." maxlog = 1
+    return
+end
+
+"""
+    enable_pass!(name::String, enabled::Bool)
+
+Compatibility shim for the old customizable pass pipeline, which was removed
+in favor of the native REPL highlighting in Julia 1.13. The passes that map
+onto native functionality still work:
+
+- `"SyntaxHighlighter"` toggles the REPL's `style_input` option.
+- `"RainbowBrackets"` toggles `JuliaSyntaxHighlighting.RAINBOW_DELIMITERS_ENABLED`.
+- `"BracketHighlighter"` toggles the REPL's `EnclosingParenHighlightPass`.
+
+Any other pass name is ignored with a warning.
+"""
+function enable_pass!(name::String, enabled::Bool)
+    if name == "SyntaxHighlighter"
+        STYLE_INPUT[] = enabled
+        _apply_options()
+    elseif name == "RainbowBrackets"
+        JuliaSyntaxHighlighting.RAINBOW_DELIMITERS_ENABLED[] = enabled
+    elseif name == "BracketHighlighter"
+        BRACKET_HIGHLIGHT[] = enabled
+        _apply_options()
+    else
+        @warn "The custom pass pipeline was removed from OhMyREPL in favor of the native REPL highlighting in Julia 1.13; `enable_pass!(\"$name\", ...)` is ignored." maxlog = 1
     end
     return
 end
 
-
-function test_colorscheme(cs::Passes.SyntaxHighlighter.ColorScheme, str::String = TEST_STR)
-    syntaxpass = get_pass(PASS_HANDLER, "SyntaxHighlighter")
-    active = syntaxpass.active
-    name = "plzdontnameyourcolorschemethis"
-    try
-        Passes.SyntaxHighlighter.add!(syntaxpass, name, cs)
-        colorscheme!(name)
-        test_pass(syntaxpass, str)
-    finally
-        syntaxpass.active = active
-        if haskey(syntaxpass.schemes, name)
-            delete!(syntaxpass.schemes, name)
+function _apply_options(repl = _active_repl())
+    repl isa REPL.LineEditREPL || return
+    if AUTO_BRACKETS[] !== nothing
+        repl.options.auto_insert_closing_bracket = AUTO_BRACKETS[]::Bool
+    end
+    if STYLE_INPUT[] !== nothing
+        repl.options.style_input = STYLE_INPUT[]::Bool
+    end
+    if BRACKET_HIGHLIGHT[] !== nothing && isdefined(repl, :interface)
+        for mode in repl.interface.modes
+            mode isa LineEdit.Prompt || continue
+            passes = mode.styling_passes
+            filter!(p -> !(p isa REPL.StylingPasses.EnclosingParenHighlightPass), passes)
+            if BRACKET_HIGHLIGHT[]::Bool
+                push!(passes, REPL.StylingPasses.EnclosingParenHighlightPass())
+            end
         end
     end
     return
 end
 
-showpasses(io::IO = stdout) = Base.show(io, PASS_HANDLER)
-
-const HIGHLIGHT_MARKDOWN = Ref(true)
-enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
-
-const ENABLE_FZF = Ref(true)
-enable_fzf(v::Bool) = ENABLE_FZF[] = v
-
-using Pkg
-function reinsert_after_pkg()
-    repl = Base.active_repl
-    mirepl = isdefined(repl,:mi) ? repl.mi : repl
-    main_mode = mirepl.interface.modes[1]
-    m = first(methods(main_mode.keymap_dict[']']))
-    if m.module == Pkg.REPLMode
-        Prompt.insert_keybindings()
+function _setup_repl(repl)
+    repl isa REPL.LineEditREPL || return
+    try
+        if !isdefined(repl, :interface)
+            repl.interface = REPL.setup_interface(repl)
+        end
+        _apply_options(repl)
+        update_interface(repl.interface)
+    catch e
+        @warn "OhMyREPL failed to hook into the REPL" exception = (e, catch_backtrace())
     end
+    return
 end
 
 function __init__()
+    ccall(:jl_generating_output, Cint, ()) == 1 && return
     options = Base.JLOptions()
     # command-line
     if (options.isinteractive != 1) && options.commands != C_NULL
         return
     end
 
-    if isdefined(Base, :active_repl)
-        if !isdefined(Base.active_repl, :interface)
-            Base.active_repl.interface = REPL.setup_interface(Base.active_repl)
-        end
-        Prompt.insert_keybindings()
-        @async begin
-            sleep(0.25)
-            reinsert_after_pkg()
-        end
-    else
-        atreplinit() do repl
-            if !isdefined(repl, :interface)
-                repl.interface = REPL.setup_interface(repl)
-            end
-            Prompt.insert_keybindings()
-            @async begin
-                sleep(0.25)
-                reinsert_after_pkg()
-            end
-            update_interface(repl.interface)
-        end
-    end
+    colorscheme!(DEFAULT_COLORSCHEME)
 
-    if ccall(:jl_generating_output, Cint, ()) == 0
-        include(joinpath(@__DIR__, "refresh_lines.jl"))
-        include(joinpath(@__DIR__, "MarkdownHighlighter.jl"))
+    repl = _active_repl()
+    if repl !== nothing
+        _setup_repl(repl)
+    else
+        atreplinit(_setup_repl)
     end
 end
-
-include("precompile.jl")
 
 end # module
